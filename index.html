@@ -608,6 +608,13 @@ footer{position:relative;z-index:1;margin-top:48px;padding:24px 32px;
       <div class="chart-wrap"><canvas id="cAcumMinGol" height="260"></canvas></div>
     </div>
 
+    <!-- Distribuição por MIN. GOL -->
+    <div class="section-label">Distribuição de gols por minuto (% de cada faixa, sem acumular)</div>
+    <div class="card">
+      <div class="card-title">% de gols saídos em cada faixa de minuto (incl. sem gol → &gt; 101)</div>
+      <div class="chart-wrap"><canvas id="cDistMinGol" height="260"></canvas></div>
+    </div>
+
   </div>
 
 
@@ -1438,6 +1445,32 @@ function renderInterval() {
       },
       plugins: { ...cd().plugins, tooltip: { ...cd().plugins.tooltip, callbacks: {
         label: ctx => ` ${ctx.raw}% acumulado`
+      }}}
+    }
+  });
+
+  // ── 6. DISTRIBUIÇÃO POR MIN. GOL (sem acumular) ──
+  // Calcula o % de cada faixa subtraindo o acumulado anterior
+  const distPcts = acumPcts.map((v, i) => {
+    const prev = i === 0 ? 0 : acumPcts[i - 1];
+    return round1(v - prev);
+  });
+
+  destroyChart('cDistMinGol');
+  charts['cDistMinGol'] = new Chart(document.getElementById('cDistMinGol'), {
+    type: 'bar',
+    data: { labels: acumLabels, datasets: [{
+      data: distPcts,
+      backgroundColor: distPcts.map(v => v >= 10 ? 'rgba(46,204,138,.75)' : 'rgba(240,160,48,.75)'),
+      borderRadius: 3, barPercentage: .85
+    }]},
+    options: { ...cd(),
+      scales: {
+        y: { min:0, ticks:{ callback:v=>v+'%', color:'#556070', font:{size:10} }, grid:{ color:'rgba(255,255,255,.04)' } },
+        x: { ticks:{ color:'#8A96A3', font:{size:9}, maxRotation:45 }, grid:{ display:false } }
+      },
+      plugins: { ...cd().plugins, tooltip: { ...cd().plugins.tooltip, callbacks: {
+        label: ctx => ` ${ctx.raw}% dos jogos`
       }}}
     }
   });
