@@ -492,17 +492,6 @@ footer{position:relative;z-index:1;margin-top:48px;padding:24px 32px;
         <div id="top10Worst"></div>
       </div>
     </div>
-    <div class="section-label">Top 10 melhores × piores — por Lucro (mín. 10 entradas)</div>
-    <div class="grid2">
-      <div class="card">
-        <div class="card-title g">💰 Top 10 melhores — Lucro</div>
-        <div id="top10BestLucro"></div>
-      </div>
-      <div class="card">
-        <div class="card-title r">📉 Top 10 piores — Lucro</div>
-        <div id="top10WorstLucro"></div>
-      </div>
-    </div>
     <div class="section-label">Ranking geral</div>
     <div class="card">
       <div class="card-title">Todos os campeonatos (mín. 10 entradas)</div>
@@ -1342,27 +1331,6 @@ function renderCampeonatos() {
       <span class="top10-name">${r.campeonato}</span>
       <span class="top10-meta">${r.total}e · ${r.win_rate}%</span>
       <span class="top10-roi" style="color:var(--red)">${r.roi}%</span>
-    </div>`).join('');
-
-  // Top 10 por Lucro
-  const bestLucro  = [...campData].sort((a,b) => b.lucro - a.lucro).slice(0, 10);
-  const worstLucro = [...campData].sort((a,b) => a.lucro - b.lucro).slice(0, 10);
-  const fmtLucro = v => (v >= 0 ? '+' : '') + 'R$' + Math.abs(v).toLocaleString('pt-BR', {minimumFractionDigits:2});
-
-  document.getElementById('top10BestLucro').innerHTML = bestLucro.map((r,i) => `
-    <div class="top10-item" style="background:rgba(46,204,138,.03);">
-      <span class="top10-rank">${i+1}</span>
-      <span class="top10-name">${r.campeonato}</span>
-      <span class="top10-meta">${r.total}e · ${r.win_rate}%</span>
-      <span class="top10-roi" style="color:var(--green)">${fmtLucro(r.lucro)}</span>
-    </div>`).join('');
-
-  document.getElementById('top10WorstLucro').innerHTML = worstLucro.map((r,i) => `
-    <div class="top10-item" style="background:rgba(240,90,90,.03);">
-      <span class="top10-rank">${i+1}</span>
-      <span class="top10-name">${r.campeonato}</span>
-      <span class="top10-meta">${r.total}e · ${r.win_rate}%</span>
-      <span class="top10-roi" style="color:var(--red)">${fmtLucro(r.lucro)}</span>
     </div>`).join('');
 
   filterTabela();
