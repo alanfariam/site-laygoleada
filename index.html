@@ -1151,7 +1151,8 @@ function renderLucroDiarioKpi() {
       const [mm, yyyy] = sel.split('/');
       dados = rawLucroDiario.filter(d => {
         const parts = d.data.split('/');
-        return parts[1] === mm && parts[2] === yyyy.slice(-2);
+        const dataAno = parts[2].length === 2 ? '20' + parts[2] : parts[2];
+        return parts[1] === mm && dataAno === yyyy;
       });
     }
   } else if (kpiMode === 'ano') {
@@ -1159,7 +1160,8 @@ function renderLucroDiarioKpi() {
     if (sel) {
       dados = rawLucroDiario.filter(d => {
         const parts = d.data.split('/');
-        return ('20' + parts[2]) === sel || parts[2] === sel;
+        const dataAno = parts[2].length === 2 ? '20' + parts[2] : parts[2];
+        return dataAno === sel;
       });
     }
   }
@@ -1168,7 +1170,7 @@ function renderLucroDiarioKpi() {
 
   // Ordenar por data
   dados = [...dados].sort((a, b) => {
-    const toDate = s => { const p = s.split('/'); return new Date(2000+parseInt(p[2]), parseInt(p[1])-1, parseInt(p[0])); };
+    const toDate = s => { const p = s.split('/'); const ano = p[2].length === 2 ? 2000 + parseInt(p[2]) : parseInt(p[2]); return new Date(ano, parseInt(p[1])-1, parseInt(p[0])); };
     return toDate(a.data) - toDate(b.data);
   });
 
