@@ -324,6 +324,23 @@ h1 {
   letter-spacing: 1px;
   text-transform: uppercase;
 }
+.btn-copy {
+  display: block;
+  width: 100%;
+  margin-top: 12px;
+  padding: 10px;
+  background: #1a1d25;
+  border: 1px solid #FFD700;
+  border-radius: 8px;
+  color: #FFD700;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: background .15s;
+}
+.btn-copy:hover, .btn-copy:active { background: #FFD700; color: #0a0c10; }
 </style>
 </head>
 <body>
@@ -498,9 +515,21 @@ function buildCard(dia, acumuladoMes) {
   btnSave.onclick = () => salvarCard(cardEl, dataStr);
 
   // Legenda
+  const captionText = buildCaption(dia, lucro, wr, greens, reds, entradas, dataStr);
   const caption = document.createElement('div');
   caption.className = 'caption-box';
-  caption.innerHTML = `<strong>📋 Legenda para o Reels</strong>${buildCaption(dia, lucro, wr, greens, reds, entradas, dataStr).replace(/\n/g,'<br>')}`;
+  caption.innerHTML = `<strong>📋 Legenda para o Reels</strong>${captionText.replace(/\n/g,'<br>')}`;
+
+  const btnCopy = document.createElement('button');
+  btnCopy.className = 'btn-copy';
+  btnCopy.textContent = '📋 COPIAR LEGENDA';
+  btnCopy.onclick = () => {
+    navigator.clipboard.writeText(captionText).then(() => {
+      btnCopy.textContent = '✅ COPIADO!';
+      setTimeout(() => { btnCopy.textContent = '📋 COPIAR LEGENDA'; }, 2000);
+    });
+  };
+  caption.appendChild(btnCopy);
 
   wrapper.appendChild(cardEl);
   wrapper.appendChild(btnSave);
