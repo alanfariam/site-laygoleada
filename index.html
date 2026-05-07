@@ -233,6 +233,36 @@ footer{position:relative;z-index:1;margin-top:48px;padding:24px 32px;
   .aprenda-hero{grid-template-columns:1fr;}
   .steps-grid{grid-template-columns:1fr;}
 }
+/* ABA INÍCIO */
+.ini-hero{text-align:center;padding:52px 24px 40px;border-bottom:1px solid var(--border);margin-bottom:32px;}
+.ini-hero-tag{font-family:var(--mono);font-size:10px;color:var(--green);letter-spacing:.15em;text-transform:uppercase;margin-bottom:18px;}
+.ini-hero-title{font-family:var(--mono);font-size:clamp(26px,4vw,42px);font-weight:700;color:var(--text);line-height:1.15;margin-bottom:14px;}
+.ini-hero-sub{font-size:15px;color:var(--text2);margin-bottom:16px;max-width:500px;margin-left:auto;margin-right:auto;line-height:1.7;}
+.ini-creds{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:6px 10px;margin-bottom:28px;font-family:var(--mono);font-size:11px;color:var(--text3);letter-spacing:.04em;}
+.ini-creds-sep{color:var(--green);opacity:.5;}
+.ini-pills{display:flex;flex-wrap:wrap;justify-content:center;gap:12px;}
+.ini-pill{display:flex;flex-direction:column;align-items:center;background:rgba(46,204,138,.07);border:1px solid rgba(46,204,138,.2);border-radius:12px;padding:14px 24px;min-width:130px;}
+.ini-pill-val{font-family:var(--mono);font-size:22px;font-weight:700;color:var(--green);}
+.ini-pill-lbl{font-family:var(--mono);font-size:8px;color:var(--text3);letter-spacing:.12em;margin-top:5px;}
+.ini-kpi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:14px;}
+.ini-kpi{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r2);padding:18px 20px;}
+.ini-kpi-val{font-family:var(--mono);font-size:22px;font-weight:700;color:var(--text);margin-bottom:5px;}
+.ini-kpi-lbl{font-family:var(--mono);font-size:9px;color:var(--text3);letter-spacing:.1em;text-transform:uppercase;}
+.ini-bar-wrap{margin-bottom:6px;display:flex;justify-content:space-between;}
+.ini-bar-wrap span{font-family:var(--mono);font-size:10px;}
+.ini-bar{height:7px;border-radius:4px;background:var(--bg4);overflow:hidden;margin-bottom:28px;}
+.ini-bar-inner{height:100%;background:var(--green);border-radius:4px;width:0%;transition:width 1.2s ease;}
+.ini-plans{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:8px;margin-bottom:32px;}
+.ini-plan{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r2);padding:28px 24px;text-align:center;position:relative;transition:border-color .2s;}
+.ini-plan:hover{border-color:var(--border2);}
+.ini-plan.popular{border-color:rgba(46,204,138,.35);background:rgba(46,204,138,.04);}
+.ini-plan-badge{position:absolute;top:-12px;left:50%;transform:translateX(-50%);font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.1em;background:var(--green);color:#0A0C10;padding:3px 14px;border-radius:999px;white-space:nowrap;}
+.ini-plan-name{font-family:var(--mono);font-size:10px;color:var(--text3);letter-spacing:.12em;text-transform:uppercase;margin-bottom:14px;}
+.ini-plan-price{font-family:var(--mono);font-size:30px;font-weight:700;color:var(--text);margin-bottom:4px;line-height:1;}
+.ini-plan-period{font-size:11px;color:var(--text3);margin-bottom:8px;}
+.ini-plan-econ{font-size:11px;color:var(--green);min-height:18px;margin-bottom:20px;}
+@media(max-width:900px){.ini-kpi-grid{grid-template-columns:repeat(2,1fr);}.ini-plans{grid-template-columns:1fr;}}
+@media(max-width:500px){.ini-kpi-grid{grid-template-columns:1fr 1fr;}.ini-hero-title{font-size:24px;}}
 </style>
 </head>
 <body>
@@ -283,7 +313,8 @@ footer{position:relative;z-index:1;margin-top:48px;padding:24px 32px;
 </div>
 
 <div class="tabs">
-  <button class="tab active" onclick="showTab('kpis')">KPIs Gerais</button>
+  <button class="tab active" onclick="showTab('inicio')">Início</button>
+  <button class="tab" onclick="showTab('kpis')">KPIs Gerais</button>
   <button class="tab" onclick="showTab('lucro')">Lucro Mensal</button>
   <button class="tab" onclick="showTab('dias')">Lucro Semanal</button>
   <button class="tab" onclick="showTab('times')">Times</button>
@@ -299,9 +330,121 @@ footer{position:relative;z-index:1;margin-top:48px;padding:24px 32px;
   <div class="err-banner" id="errBanner"></div>
 
   <!-- ══════════════════════════════════════
+       ABA: INÍCIO
+  ══════════════════════════════════════ -->
+  <div id="page-inicio" class="page active">
+
+    <!-- HERO -->
+    <div class="ini-hero">
+      <div class="ini-hero-tag">🎯 Lay Goleada · Método Over FreeFire</div>
+      <h1 class="ini-hero-title" style="text-transform:uppercase;">Over Limite com Entradas Reais —<br>Foco Gol Rápido.</h1>
+      <p class="ini-hero-sub">Estratégia validada com mais de 3 mil entradas reais e registradas.</p>
+      <div class="ini-creds">
+        <span>Analista de dados com 20 anos de mercado</span>
+        <span class="ini-creds-sep">·</span>
+        <span>Histórico 100% público e auditável</span>
+        <span class="ini-creds-sep">·</span>
+        <span>Zero achismo</span>
+      </div>
+      <div class="ini-pills">
+        <div class="ini-pill"><span class="ini-pill-val" id="iniWR">—</span><span class="ini-pill-lbl">WIN RATE GERAL</span></div>
+        <div class="ini-pill"><span class="ini-pill-val" id="iniEntradas">—</span><span class="ini-pill-lbl">ENTRADAS ANALISADAS</span></div>
+        <div class="ini-pill"><span class="ini-pill-val" id="iniLucro">—</span><span class="ini-pill-lbl">LUCRO TOTAL</span></div>
+      </div>
+    </div>
+
+    <!-- KPIs reais -->
+    <div class="section-label">Os números reais. Sem esconder o red.</div>
+    <div class="ini-kpi-grid">
+      <div class="ini-kpi">
+        <div class="ini-kpi-val" id="iniKpiWR" style="color:var(--green)">—</div>
+        <div class="ini-kpi-lbl">Win Rate</div>
+      </div>
+      <div class="ini-kpi">
+        <div class="ini-kpi-val" id="iniKpiLucro">—</div>
+        <div class="ini-kpi-lbl">Lucro Total</div>
+      </div>
+      <div class="ini-kpi">
+        <div class="ini-kpi-val" id="iniKpiROI">—</div>
+        <div class="ini-kpi-lbl">ROI</div>
+      </div>
+      <div class="ini-kpi">
+        <div class="ini-kpi-val" id="iniKpiEntradas">—</div>
+        <div class="ini-kpi-lbl">Total Entradas</div>
+      </div>
+      <div class="ini-kpi">
+        <div class="ini-kpi-val" id="iniKpiGreens" style="color:var(--green)">—</div>
+        <div class="ini-kpi-lbl">Greens</div>
+      </div>
+      <div class="ini-kpi">
+        <div class="ini-kpi-val" id="iniKpiReds" style="color:var(--red)">—</div>
+        <div class="ini-kpi-lbl">Reds</div>
+      </div>
+    </div>
+    <div class="ini-bar-wrap">
+      <span style="color:var(--green);" id="iniBarGreenPct">—</span>
+      <span style="color:var(--red);" id="iniBarRedPct">—</span>
+    </div>
+    <div class="ini-bar"><div class="ini-bar-inner" id="iniBar"></div></div>
+
+    <!-- Como funciona -->
+    <div class="section-label">Como funciona</div>
+    <div class="steps-grid">
+      <div class="step-card">
+        <div class="step-num">Passo 01</div>
+        <div class="step-title">Robô monitora os jogos ao vivo</div>
+        <div class="step-desc">O sistema analisa partidas em tempo real buscando o padrão ideal de placar, minuto e odd para acionar o alerta.</div>
+      </div>
+      <div class="step-card">
+        <div class="step-num">Passo 02</div>
+        <div class="step-title">Alerta chega no seu Telegram</div>
+        <div class="step-desc">Você recebe a notificação instantânea com o jogo, as odds e o contexto. Tudo que precisa para decidir em segundos.</div>
+      </div>
+      <div class="step-card">
+        <div class="step-num">Passo 03</div>
+        <div class="step-title">Você decide entrar ou não</div>
+        <div class="step-desc">Sem obrigação. Você tem autonomia total. Os dados deste dashboard estão aqui justamente para ajudar na sua decisão.</div>
+      </div>
+      <div class="step-card">
+        <div class="step-num">Passo 04</div>
+        <div class="step-title">Resultado registrado aqui</div>
+        <div class="step-desc">Cada operação — green ou red — é registrada na planilha e refletida neste dashboard. Nada fica de fora.</div>
+      </div>
+    </div>
+
+    <!-- Planos -->
+    <div class="section-label">Planos e preços</div>
+    <div class="ini-plans">
+      <div class="ini-plan">
+        <div class="ini-plan-name">Teste</div>
+        <div class="ini-plan-price">R$ 14,90</div>
+        <div class="ini-plan-period">3 dias de acesso</div>
+        <div class="ini-plan-econ"></div>
+        <a href="https://t.me/AlertasFreeFireAstrofy_bot" target="_blank" class="btn-cta-lg" style="display:block;box-sizing:border-box;">Começar →</a>
+      </div>
+      <div class="ini-plan popular">
+        <div class="ini-plan-badge">MAIS POPULAR</div>
+        <div class="ini-plan-name">Mensal</div>
+        <div class="ini-plan-price">R$ 89,90</div>
+        <div class="ini-plan-period">por mês</div>
+        <div class="ini-plan-econ"></div>
+        <a href="https://t.me/AlertasFreeFireAstrofy_bot" target="_blank" class="btn-cta-lg" style="display:block;box-sizing:border-box;">Assinar →</a>
+      </div>
+      <div class="ini-plan">
+        <div class="ini-plan-name">Trimestral</div>
+        <div class="ini-plan-price">R$ 180,00</div>
+        <div class="ini-plan-period">a cada 3 meses</div>
+        <div class="ini-plan-econ">Economia de R$ 89,70</div>
+        <a href="https://t.me/AlertasFreeFireAstrofy_bot" target="_blank" class="btn-cta-lg" style="display:block;box-sizing:border-box;">Assinar →</a>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ══════════════════════════════════════
        ABA: KPIs GERAIS
   ══════════════════════════════════════ -->
-  <div id="page-kpis" class="page active">
+  <div id="page-kpis" class="page">
 
     <!-- Filtro -->
     <div class="section-label">Filtro</div>
@@ -922,7 +1065,7 @@ function showTab(id) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   document.getElementById('page-' + id).classList.add('active');
-  const idx = ['kpis','lucro','dias','times','camp','odds','gols','interval','qtdgols','aprenda'].indexOf(id);
+  const idx = ['inicio','kpis','lucro','dias','times','camp','odds','gols','interval','qtdgols','aprenda'].indexOf(id);
   document.querySelectorAll('.tab')[idx].classList.add('active');
   if (id === 'interval') renderSeq();
 }
@@ -934,6 +1077,37 @@ async function api(path) {
   const r = await fetch(API + path);
   if (!r.ok) throw new Error(`HTTP ${r.status} em ${path}`);
   return r.json();
+}
+
+// ══════════════════════════════════════════════
+// INÍCIO
+// ══════════════════════════════════════════════
+function renderInicio() {
+  if (!rawKpisGeral) return;
+  const d = rawKpisGeral;
+
+  // Pills hero
+  document.getElementById('iniWR').textContent       = d.win_rate.toFixed(1) + '%';
+  document.getElementById('iniEntradas').textContent = d.total_entradas.toLocaleString('pt-BR');
+  document.getElementById('iniLucro').textContent    = (d.lucro_total >= 0 ? '+R$ ' : '-R$ ') +
+    Math.abs(d.lucro_total).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+  // KPI grid
+  document.getElementById('iniKpiWR').textContent      = d.win_rate.toFixed(1) + '%';
+  document.getElementById('iniKpiLucro').textContent   = (d.lucro_total >= 0 ? '+R$ ' : '-R$ ') +
+    Math.abs(d.lucro_total).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  document.getElementById('iniKpiROI').textContent     = (d.roi >= 0 ? '+' : '') + d.roi.toFixed(2) + '%';
+  document.getElementById('iniKpiEntradas').textContent = d.total_entradas.toLocaleString('pt-BR');
+  document.getElementById('iniKpiGreens').textContent  = d.greens.toLocaleString('pt-BR');
+  document.getElementById('iniKpiReds').textContent    = d.reds.toLocaleString('pt-BR');
+
+  // Green/Red bar
+  const total = d.greens + d.reds;
+  const greenPct = total > 0 ? Math.round((d.greens / total) * 100) : 0;
+  const redPct   = 100 - greenPct;
+  document.getElementById('iniBar').style.width        = greenPct + '%';
+  document.getElementById('iniBarGreenPct').textContent = greenPct + '% Greens';
+  document.getElementById('iniBarRedPct').textContent   = redPct  + '% Reds';
 }
 
 // ══════════════════════════════════════════════
@@ -962,6 +1136,7 @@ async function init() {
     ]);
 
     populateKpiSelects();
+    renderInicio();
     renderKpis();
     renderAcumulado(rawKpisGeral);
     renderUltimas(rawKpisGeral);
