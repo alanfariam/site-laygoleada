@@ -539,6 +539,32 @@ footer{position:relative;z-index:1;margin-top:48px;padding:24px 32px;
         <div class="chart-wrap"><canvas id="cEmpate" height="260"></canvas></div>
       </div>
     </div>
+    <div class="section-label">Classificação por tipo de confronto</div>
+    <div class="card">
+      <div class="card-title">Win Rate % — Tipo de confronto (Casa vs Fora)</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;">
+        <span style="font-size:10px;font-family:var(--mono);background:rgba(255,255,255,.06);border-radius:4px;padding:3px 8px;color:var(--text2);">🏠 <b>Super Fav. Casa</b> — Odd Casa &lt; 1.50</span>
+        <span style="font-size:10px;font-family:var(--mono);background:rgba(255,255,255,.06);border-radius:4px;padding:3px 8px;color:var(--text2);">🏠 <b>Fav. Casa</b> — 1.50 ≤ Odd Casa &lt; 2.00</span>
+        <span style="font-size:10px;font-family:var(--mono);background:rgba(255,255,255,.06);border-radius:4px;padding:3px 8px;color:var(--text2);">⚖️ <b>Equilibrado</b> — Odd Casa ≥ 2.00 e Odd Fora ≥ 2.00</span>
+        <span style="font-size:10px;font-family:var(--mono);background:rgba(255,255,255,.06);border-radius:4px;padding:3px 8px;color:var(--text2);">✈️ <b>Fav. Fora</b> — 1.50 ≤ Odd Fora &lt; 2.00</span>
+        <span style="font-size:10px;font-family:var(--mono);background:rgba(255,255,255,.06);border-radius:4px;padding:3px 8px;color:var(--text2);">✈️ <b>Super Fav. Fora</b> — Odd Fora &lt; 1.50</span>
+      </div>
+      <div class="chart-wrap"><canvas id="cClassificacao" height="260"></canvas></div>
+    </div>
+    <div class="section-label">Classificação Under / Over (Odd U25)</div>
+    <div class="card">
+      <div class="card-title">Win Rate % — Under vs Over (U25)</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;">
+        <span style="font-size:10px;font-family:var(--mono);background:rgba(255,255,255,.06);border-radius:4px;padding:3px 8px;color:var(--text2);">📉 <b>Under</b> — Odd U25 ≤ 2.00 (jogo Under)</span>
+        <span style="font-size:10px;font-family:var(--mono);background:rgba(255,255,255,.06);border-radius:4px;padding:3px 8px;color:var(--text2);">📈 <b>Over</b> — Odd U25 &gt; 2.00 (jogo Over)</span>
+      </div>
+      <div class="chart-wrap"><canvas id="cU25Class" height="260"></canvas></div>
+    </div>
+    <div class="section-label">Classificação combinada — Confronto × Under/Over</div>
+    <div class="card">
+      <div class="card-title">Win Rate % — Confronto combinado com U25</div>
+      <div class="chart-wrap"><canvas id="cCombinado" height="300"></canvas></div>
+    </div>
   </div>
 
   <!-- ══════════════════════════════════════
@@ -546,46 +572,19 @@ footer{position:relative;z-index:1;margin-top:48px;padding:24px 32px;
   ══════════════════════════════════════ -->
   <div id="page-gols" class="page">
     <div class="section-label">Gols no placar do alerta · base completa</div>
-    <div class="grid2">
-      <div class="card">
-        <div class="card-title">Win Rate % — gols no placar do alerta</div>
-        <div class="chart-wrap"><canvas id="cGolsWR" height="240"></canvas></div>
-      </div>
-      <div class="card">
-        <div class="card-title">Volume — entradas por gols no placar</div>
-        <div class="chart-wrap"><canvas id="cGolsVol" height="240"></canvas></div>
-      </div>
+    <div class="card">
+      <div class="card-title">Win Rate % — gols no placar do alerta</div>
+      <div class="chart-wrap"><canvas id="cGolsWR" height="260"></canvas></div>
     </div>
-    <div class="grid2">
-      <div class="card">
-        <div class="card-title">Win Rate — placar no momento do alerta</div>
-        <div class="chart-wrap"><canvas id="cPlacarWR" height="240"></canvas></div>
-      </div>
-      <div class="card">
-        <div class="card-title">Lucro — por gols no placar do alerta</div>
-        <div class="chart-wrap"><canvas id="cGolsLucro" height="240"></canvas></div>
-      </div>
-    </div>
-    <div class="grid2">
-      <div class="card">
-        <div class="card-title">ROI % — por placar no momento do alerta</div>
-        <div class="chart-wrap"><canvas id="cPlacarROI" height="240"></canvas></div>
-      </div>
-      <div class="card">
-        <div class="card-title">Lucro (R$) — por placar no momento do alerta</div>
-        <div class="chart-wrap"><canvas id="cPlacarLucro" height="240"></canvas></div>
-      </div>
+    <div class="section-label">Placar no momento do alerta</div>
+    <div class="card">
+      <div class="card-title">Win Rate % — placar no momento do alerta</div>
+      <div class="chart-wrap"><canvas id="cPlacarWR" height="260"></canvas></div>
     </div>
     <div class="section-label">Silêncio antes do alerta · a partir de 10/10/25 (mín. 10 entradas por faixa)</div>
-    <div class="grid2">
-      <div class="card">
-        <div class="card-title">Win Rate % — por tempo sem gol antes do alerta</div>
-        <div class="chart-wrap"><canvas id="cSilencioWR" height="260"></canvas></div>
-      </div>
-      <div class="card">
-        <div class="card-title">Lucro (R$) — por tempo sem gol antes do alerta</div>
-        <div class="chart-wrap"><canvas id="cSilencioLucro" height="260"></canvas></div>
-      </div>
+    <div class="card">
+      <div class="card-title">Win Rate % — por tempo sem gol antes do alerta</div>
+      <div class="chart-wrap"><canvas id="cSilencioWR" height="260"></canvas></div>
     </div>
   </div>
 
@@ -662,6 +661,23 @@ footer{position:relative;z-index:1;margin-top:48px;padding:24px 32px;
           <span style="color:var(--text);font-weight:500;">Leitura prática:</span> a sequência mais comum de red é de 2 seguidos (172 vezes). Sequûncias de 5 ou mais reds ocorreram apenas 20 vezes em todo o histórico — menos de 2,5% das sequûncias.
         </p>
       </div>
+    </div>
+
+    <!-- Gols pós alerta -->
+    <div class="section-label">Gols após o alerta — coluna N da planilha</div>
+    <div class="grid2">
+      <div class="card">
+        <div class="card-title">Top 10 — campeonatos com mais jogos sem gol pós alerta</div>
+        <div class="chart-wrap"><canvas id="cTop10Zero" height="300"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Top 10 — campeonatos com mais gols pós alerta</div>
+        <div class="chart-wrap"><canvas id="cTop10Gols" height="300"></canvas></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Jogos com 0 gols pós alerta — por placar no momento do alerta</div>
+      <div class="chart-wrap"><canvas id="cPlacarZero" height="260"></canvas></div>
     </div>
 
   </div>
@@ -892,7 +908,8 @@ let rawGols      = null;
 let rawInterval  = null;
 let rawTimes     = null;
 let rawQtdGols   = null;
-let rawSilencio  = null;
+let rawSilencio      = null;
+let rawGolsPosAlerta = null;
 let rawLucroDiario = null;
 let calYear = null, calMonth = null;
 let rawMesDetalhe = null;
@@ -929,7 +946,7 @@ async function init() {
     await api('/api/ping');
     setLoadingText('Carregando dados...');
 
-    [rawKpisGeral, rawMensal, rawDias, rawCamp, rawOdds, rawGols, rawInterval, rawTimes, rawQtdGols, rawSilencio, rawLucroDiario] = await Promise.all([
+    [rawKpisGeral, rawMensal, rawDias, rawCamp, rawOdds, rawGols, rawInterval, rawTimes, rawQtdGols, rawSilencio, rawLucroDiario, rawGolsPosAlerta] = await Promise.all([
       api('/api/kpis'),
       api('/api/lucro-mensal'),
       api('/api/winrate-dias'),
@@ -941,6 +958,7 @@ async function init() {
       api('/api/qtd-gols').catch(() => null),
       api('/api/silencio-alerta').catch(() => null),
       api('/api/lucro-diario').catch(() => null),
+      api('/api/gols-pos-alerta').catch(() => null),
     ]);
 
     populateKpiSelects();
@@ -955,7 +973,8 @@ async function init() {
     if (rawInterval) renderInterval();
     if (rawTimes)    renderTimes();
     if (rawQtdGols)  renderQtdGols();
-    if (rawSilencio) renderSilencio();
+    if (rawSilencio)      renderSilencio();
+    if (rawGolsPosAlerta) renderGolsPosAlerta();
     if (rawLucroDiario) initCalendario();
 
     // Popula banner com dados reais
@@ -1442,6 +1461,48 @@ function renderOdds() {
   buildOddsChart('cFora',   rawOdds.por_fora);
   buildOddsChart('cU25',    rawOdds.por_u25);
   buildOddsChart('cEmpate', rawOdds.por_empate);
+
+  buildOddsChart('cClassificacao', rawOdds.por_classificacao);
+  buildOddsChart('cU25Class',     rawOdds.por_u25_class);
+
+  // Gráfico combinado — rótulos de duas linhas (split em " + ")
+  const comb = (rawOdds.por_combinado || []).filter(o => o.total > 0);
+  if (comb.length) {
+    const combLabels = comb.map(o => o.faixa.split(' + '));
+    const combWrs    = comb.map(o => o.win_rate);
+    const combVols   = comb.map(o => o.total);
+    destroyChart('cCombinado');
+    charts['cCombinado'] = new Chart(document.getElementById('cCombinado'), {
+      type: 'bar',
+      data: { labels: combLabels, datasets: [
+        {
+          data: combWrs,
+          backgroundColor: combWrs.map(v => v === 0 ? 'rgba(255,255,255,.06)' : v >= 60 ? 'rgba(46,204,138,.75)' : 'rgba(240,90,90,.65)'),
+          borderRadius: 4, barPercentage: .6, yAxisID: 'y'
+        },
+        {
+          data: combVols, type: 'line',
+          borderColor: 'rgba(255,255,255,.2)', backgroundColor: 'transparent',
+          pointBackgroundColor: 'rgba(255,255,255,.3)', pointRadius: 4,
+          tension: .3, yAxisID: 'y2', borderDash: [3,3]
+        }
+      ]},
+      options: { ...cd(),
+        plugins: { ...cd().plugins, tooltip: { ...cd().plugins.tooltip, callbacks: {
+          label: ctx => {
+            const r = comb[ctx.dataIndex];
+            if (ctx.datasetIndex === 0) return [` WR: ${ctx.raw}%`, ` Entradas: ${r.total}`, ` ROI: ${r.roi}%`];
+            return ` Volume: ${ctx.raw}`;
+          }
+        }}},
+        scales: {
+          y:  { min: 0, max: 100, ticks: { callback: v => v+'%', color:'#556070', font:{size:10} }, grid: { color:'rgba(255,255,255,.04)' } },
+          y2: { position: 'right', ticks: { color:'rgba(255,255,255,.2)', font:{size:10} }, grid: { display:false } },
+          x:  { ticks: { color:'#8A96A3', font:{size:9}, maxRotation: 0 }, grid: { display:false } }
+        }
+      }
+    });
+  }
 }
 
 // ══════════════════════════════════════════════
@@ -1450,109 +1511,46 @@ function renderOdds() {
 function renderGolsAlerta() {
   if (!rawGols) return;
 
-  // Por qtd gols
-  const gd     = rawGols.por_gols || [];
-  const labels = gd.map(g => g.gols_antes==='0'?'0 gols':g.gols_antes==='1'?'1 gol':g.gols_antes+' gols');
-  const wrs    = gd.map(g => g.win_rate);
-  const vols   = gd.map(g => g.total);
-  const lucros = gd.map(g => g.lucro);
-  const media  = wrs.filter(v=>v>0).reduce((a,b)=>a+b,0)/(wrs.filter(v=>v>0).length||1);
-
-  destroyChart('cGolsWR');
-  charts['cGolsWR'] = new Chart(document.getElementById('cGolsWR'), {
-    type: 'bar',
-    data: { labels, datasets: [{ data: wrs, backgroundColor: wrs.map(v=>v>=media?'rgba(46,204,138,.75)':'rgba(240,90,90,.65)'), borderRadius: 4, barPercentage: .55 }]},
-    options: { ...cd(), scales: {
-      y: { min:0, max:100, ticks:{ callback:v=>v+'%', color:'#556070', font:{size:10} }, grid:{ color:'rgba(255,255,255,.04)' } },
-      x: { ticks:{ color:'#8A96A3', font:{size:11} }, grid:{ display:false } }
-    }}
-  });
-
-  destroyChart('cGolsVol');
-  charts['cGolsVol'] = new Chart(document.getElementById('cGolsVol'), {
-    type: 'bar',
-    data: { labels, datasets: [{ data: vols, backgroundColor: 'rgba(74,158,240,.65)', borderRadius: 4, barPercentage: .55 }]},
-    options: { ...cd(), scales: {
-      y: { ticks:{ color:'#556070', font:{size:10} }, grid:{ color:'rgba(255,255,255,.04)' } },
-      x: { ticks:{ color:'#8A96A3', font:{size:11} }, grid:{ display:false } }
-    }}
-  });
-
-  destroyChart('cGolsLucro');
-  charts['cGolsLucro'] = new Chart(document.getElementById('cGolsLucro'), {
-    type: 'bar',
-    data: { labels, datasets: [{ data: lucros, backgroundColor: lucros.map(v=>v>=0?'rgba(46,204,138,.7)':'rgba(240,90,90,.65)'), borderRadius: 4, barPercentage: .55 }]},
-    options: { ...cd(), scales: {
-      y: { ticks:{ callback:v=>'R$'+(v/1000).toFixed(1)+'k', color:'#556070', font:{size:10} }, grid:{ color:'rgba(255,255,255,.04)' } },
-      x: { ticks:{ color:'#8A96A3', font:{size:11} }, grid:{ display:false } }
-    }}
-  });
-
-  // Por placar
-  const pd = rawGols.por_placar || [];
-  if (pd.length) {
-    const pLabels = pd.map(p => p.placar);
-    const pWrs    = pd.map(p => p.win_rate);
-    const pRois   = pd.map(p => p.roi);
-    const pLucros = pd.map(p => p.lucro);
-
-    // WR — verde fixo para ≥60%, vermelho abaixo
-    destroyChart('cPlacarWR');
-    charts['cPlacarWR'] = new Chart(document.getElementById('cPlacarWR'), {
+  function golsChart(id, labels, wrs, vols, tooltip) {
+    destroyChart(id);
+    charts[id] = new Chart(document.getElementById(id), {
       type: 'bar',
-      data: { labels: pLabels, datasets: [{ data: pWrs, backgroundColor: pWrs.map(v=>v>=60?'rgba(46,204,138,.75)':'rgba(240,90,90,.65)'), borderRadius: 4, barPercentage: .6 }]},
+      data: { labels, datasets: [
+        { data: wrs, backgroundColor: wrs.map(v => v >= 60 ? 'rgba(46,204,138,.75)' : 'rgba(240,90,90,.65)'), borderRadius: 4, barPercentage: .6, yAxisID: 'y' },
+        { data: vols, type: 'line', borderColor: 'rgba(255,255,255,.2)', backgroundColor: 'transparent', pointBackgroundColor: 'rgba(255,255,255,.3)', pointRadius: 4, tension: .3, yAxisID: 'y2', borderDash: [3,3] }
+      ]},
       options: { ...cd(),
-        plugins: { ...cd().plugins, tooltip: { ...cd().plugins.tooltip, callbacks: {
-          label: ctx => {
-            const r = pd[ctx.dataIndex];
-            return [` WR: ${ctx.raw}%`, ` Entradas: ${r.total}`];
-          }
-        }}},
+        plugins: { ...cd().plugins, tooltip: { ...cd().plugins.tooltip, callbacks: { label: tooltip } } },
         scales: {
-          y: { min:0, max:100, ticks:{ callback:v=>v+'%', color:'#556070', font:{size:10} }, grid:{ color:'rgba(255,255,255,.04)' } },
-          x: { ticks:{ color:'#8A96A3', font:{size:11} }, grid:{ display:false } }
-        }
-      }
-    });
-
-    // ROI por placar — verde ≥0%, vermelho abaixo
-    destroyChart('cPlacarROI');
-    charts['cPlacarROI'] = new Chart(document.getElementById('cPlacarROI'), {
-      type: 'bar',
-      data: { labels: pLabels, datasets: [{ data: pRois, backgroundColor: pRois.map(v=>v>=0?'rgba(46,204,138,.75)':'rgba(240,90,90,.65)'), borderRadius: 4, barPercentage: .6 }]},
-      options: { ...cd(),
-        plugins: { ...cd().plugins, tooltip: { ...cd().plugins.tooltip, callbacks: {
-          label: ctx => {
-            const r = pd[ctx.dataIndex];
-            return [` ROI: ${ctx.raw}%`, ` Entradas: ${r.total}`, ` WR: ${r.win_rate}%`];
-          }
-        }}},
-        scales: {
-          y: { ticks:{ callback:v=>v+'%', color:'#556070', font:{size:10} }, grid:{ color:'rgba(255,255,255,.04)' } },
-          x: { ticks:{ color:'#8A96A3', font:{size:11} }, grid:{ display:false } }
-        }
-      }
-    });
-
-    // Lucro por placar — verde ≥0, vermelho abaixo
-    destroyChart('cPlacarLucro');
-    charts['cPlacarLucro'] = new Chart(document.getElementById('cPlacarLucro'), {
-      type: 'bar',
-      data: { labels: pLabels, datasets: [{ data: pLucros, backgroundColor: pLucros.map(v=>v>=0?'rgba(46,204,138,.75)':'rgba(240,90,90,.65)'), borderRadius: 4, barPercentage: .6 }]},
-      options: { ...cd(),
-        plugins: { ...cd().plugins, tooltip: { ...cd().plugins.tooltip, callbacks: {
-          label: ctx => {
-            const r = pd[ctx.dataIndex];
-            return [` Lucro: R$${Math.abs(ctx.raw).toLocaleString('pt-BR',{minimumFractionDigits:2})}`, ` Entradas: ${r.total}`, ` WR: ${r.win_rate}%`];
-          }
-        }}},
-        scales: {
-          y: { ticks:{ callback:v=>'R$'+(v/1000).toFixed(1)+'k', color:'#556070', font:{size:10} }, grid:{ color:'rgba(255,255,255,.04)' } },
-          x: { ticks:{ color:'#8A96A3', font:{size:11} }, grid:{ display:false } }
+          y:  { min: 0, max: 100, ticks: { callback: v => v+'%', color: '#556070', font: {size:10} }, grid: { color: 'rgba(255,255,255,.04)' } },
+          y2: { position: 'right', ticks: { color: 'rgba(255,255,255,.2)', font: {size:10} }, grid: { display: false } },
+          x:  { ticks: { color: '#8A96A3', font: {size:11} }, grid: { display: false } }
         }
       }
     });
   }
+
+  // Gols no placar
+  const gd     = rawGols.por_gols || [];
+  const gLabels = gd.map(g => g.gols_antes==='0'?'0 gols':g.gols_antes==='1'?'1 gol':g.gols_antes+' gols');
+  const gWrs   = gd.map(g => g.win_rate);
+  const gVols  = gd.map(g => g.total);
+  golsChart('cGolsWR', gLabels, gWrs, gVols, (ctx) => {
+    const r = gd[ctx.dataIndex];
+    if (ctx.datasetIndex === 0) return [` WR: ${ctx.raw}%`, ` Entradas: ${r.total}`, ` ROI: ${r.roi}%`];
+    return ` Volume: ${ctx.raw}`;
+  });
+
+  // Placar no momento do alerta
+  const pd     = rawGols.por_placar || [];
+  const pLabels = pd.map(p => p.placar);
+  const pWrs   = pd.map(p => p.win_rate);
+  const pVols  = pd.map(p => p.total);
+  if (pd.length) golsChart('cPlacarWR', pLabels, pWrs, pVols, (ctx) => {
+    const r = pd[ctx.dataIndex];
+    if (ctx.datasetIndex === 0) return [` WR: ${ctx.raw}%`, ` Entradas: ${r.total}`, ` ROI: ${r.roi}%`];
+    return ` Volume: ${ctx.raw}`;
+  });
 }
 
 // ══════════════════════════════════════════════
@@ -2138,28 +2136,73 @@ function renderSilencio() {
     }
   });
 
-  // Lucro
-  destroyChart('cSilencioLucro');
-  charts['cSilencioLucro'] = new Chart(document.getElementById('cSilencioLucro'), {
+}
+
+// ══════════════════════════════════════════════
+// GOLS PÓS ALERTA
+// ══════════════════════════════════════════════
+function renderGolsPosAlerta() {
+  if (!rawGolsPosAlerta) return;
+
+  function rankingChart(id, labels, values, color, tooltipSuffix) {
+    destroyChart(id);
+    charts[id] = new Chart(document.getElementById(id), {
+      type: 'bar',
+      data: { labels, datasets: [{
+        data: values,
+        backgroundColor: color,
+        borderRadius: 4, barPercentage: .6
+      }]},
+      options: { ...cd(),
+        indexAxis: 'y',
+        plugins: { ...cd().plugins, tooltip: { ...cd().plugins.tooltip, callbacks: {
+          label: ctx => ` ${ctx.raw} ${tooltipSuffix}`
+        }}},
+        scales: {
+          x: { ticks: { color: '#556070', font: {size:10} }, grid: { color: 'rgba(255,255,255,.04)' } },
+          y: { ticks: { color: '#8A96A3', font: {size:10} }, grid: { display: false } }
+        }
+      }
+    });
+  }
+
+  // Top 10 zero gols
+  const z = rawGolsPosAlerta.top10_zero_gols || [];
+  rankingChart('cTop10Zero',
+    z.map(r => r.campeonato),
+    z.map(r => r.zero),
+    'rgba(46,204,138,.75)',
+    'jogos sem gol'
+  );
+
+  // Top 10 mais gols
+  const g = rawGolsPosAlerta.top10_mais_gols || [];
+  rankingChart('cTop10Gols',
+    g.map(r => r.campeonato),
+    g.map(r => r.gols),
+    'rgba(46,204,138,.75)',
+    'gols pós alerta'
+  );
+
+  // Por placar — 0 gols pós alerta
+  const p = rawGolsPosAlerta.por_placar_zero || [];
+  const pLabels = p.map(x => x.placar);
+  const pVals   = p.map(x => x.total);
+  destroyChart('cPlacarZero');
+  charts['cPlacarZero'] = new Chart(document.getElementById('cPlacarZero'), {
     type: 'bar',
-    data: { labels, datasets: [{
-      data: lucros,
-      backgroundColor: lucros.map(v => v >= 0 ? 'rgba(46,204,138,.75)' : 'rgba(240,90,90,.65)'),
-      borderRadius: 5, barPercentage: .6
+    data: { labels: pLabels, datasets: [{
+      data: pVals,
+      backgroundColor: 'rgba(46,204,138,.7)',
+      borderRadius: 4, barPercentage: .6
     }]},
     options: { ...cd(),
       plugins: { ...cd().plugins, tooltip: { ...cd().plugins.tooltip, callbacks: {
-        label: ctx => {
-          const r = lista[ctx.dataIndex];
-          return [
-            ` Lucro: R$${Math.abs(ctx.raw).toLocaleString('pt-BR',{minimumFractionDigits:2})}`,
-            ` ${r.total} entradas · WR: ${r.win_rate}%`
-          ];
-        }
+        label: ctx => ` ${ctx.raw} jogos`
       }}},
       scales: {
-        y: { ticks:{ callback:v=>'R$'+(v/1000).toFixed(1)+'k', color:'#556070', font:{size:10} }, grid:{ color:'rgba(255,255,255,.04)' } },
-        x: { ticks:{ color:'#8A96A3', font:{size:11} }, grid:{ display:false } }
+        y: { ticks: { color: '#556070', font: {size:10} }, grid: { color: 'rgba(255,255,255,.04)' } },
+        x: { ticks: { color: '#8A96A3', font: {size:10}, maxRotation: 45 }, grid: { display: false } }
       }
     }
   });
