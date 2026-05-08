@@ -54,59 +54,67 @@ h1 {
 .card {
   width: 405px;
   height: 720px;
-  background: #0a0c10;
-  border: 2px solid #FFD700;
-  border-radius: 18px;
+  background: #080a0f;
+  border: 2.5px solid #00e676;
+  border-radius: 20px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: space-between;
-  padding: 28px 24px 20px;
+  padding: 28px 24px 0;
   position: relative;
   overflow: hidden;
+  box-shadow: 0 0 30px rgba(0,230,118,0.15), 0 0 80px rgba(0,230,118,0.06), inset 0 0 40px rgba(0,230,118,0.03);
 }
 
-/* BG decorativo */
+/* Grade de fundo sutil */
 .card::before {
   content: '';
   position: absolute;
-  top: -60px; right: -60px;
-  width: 260px; height: 260px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(255,215,0,0.07) 0%, transparent 70%);
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+  background-size: 32px 32px;
   pointer-events: none;
+  border-radius: 18px;
 }
+
+/* Glow superior */
 .card::after {
   content: '';
   position: absolute;
-  bottom: -80px; left: -60px;
-  width: 300px; height: 300px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(255,215,0,0.05) 0%, transparent 70%);
+  top: -60px; left: 50%;
+  transform: translateX(-50%);
+  width: 260px; height: 130px;
+  background: radial-gradient(ellipse, rgba(0,230,118,0.22) 0%, transparent 70%);
   pointer-events: none;
 }
 
 /* HEADER do card */
 .card-header {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
   width: 100%;
   z-index: 1;
+  gap: 8px;
 }
 .card-logo {
-  height: 44px;
+  height: 64px;
   object-fit: contain;
 }
 .card-badge {
-  background: #FFD700;
-  color: #0a0c10;
+  background: rgba(0,230,118,0.12);
+  border: 1px solid rgba(0,230,118,0.4);
+  color: #00e676;
   font-family: 'Space Mono', monospace;
-  font-size: 0.6rem;
+  font-size: 0.55rem;
   font-weight: 700;
-  padding: 4px 10px;
+  padding: 4px 12px;
   border-radius: 20px;
-  letter-spacing: 1px;
+  letter-spacing: 1.5px;
 }
 
 /* DATA */
@@ -138,7 +146,7 @@ h1 {
 .divider {
   width: 100%;
   height: 1px;
-  background: linear-gradient(to right, transparent, #FFD700, transparent);
+  background: linear-gradient(to right, transparent, rgba(0,230,118,0.4), transparent);
   z-index: 1;
 }
 
@@ -193,16 +201,18 @@ h1 {
 .wr-bar-fill {
   height: 100%;
   border-radius: 4px;
-  background: linear-gradient(to right, #00e676, #FFD700);
+  background: linear-gradient(to right, #00e676, #7fff7f);
+  box-shadow: 0 0 8px rgba(0,230,118,0.5);
   transition: width 1s ease;
 }
 .wr-value {
   font-family: 'Space Mono', monospace;
-  font-size: 2rem;
+  font-size: 2.4rem;
   font-weight: 700;
   color: #00e676;
   text-align: center;
   margin-top: 6px;
+  text-shadow: 0 0 12px rgba(0,230,118,0.6);
 }
 
 /* BOLINHAS G/R */
@@ -242,43 +252,95 @@ h1 {
 .lucro-destaque {
   z-index: 1;
   text-align: center;
-  background: rgba(255,215,0,0.06);
-  border: 1px solid rgba(255,215,0,0.2);
-  border-radius: 12px;
-  padding: 12px 24px;
+  background: rgba(0,230,118,0.07);
+  border: 1.5px solid rgba(0,230,118,0.25);
+  border-radius: 14px;
+  padding: 12px 20px;
   width: 100%;
+  position: relative;
+  overflow: hidden;
 }
+.lucro-destaque::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at center top, rgba(0,230,118,0.1) 0%, transparent 60%);
+  pointer-events: none;
+}
+.lucro-destaque .lucro-top-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 8px;
+  position: relative;
+  z-index: 1;
+}
+.lucro-destaque .lucro-top-side { text-align: left; }
+.lucro-destaque .lucro-top-side:last-child { text-align: right; }
 .lucro-label {
-  font-size: 0.65rem;
+  font-size: 0.55rem;
+  color: #666;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 2px;
+}
+.lucro-label.main {
+  font-size: 0.6rem;
   color: #888;
   letter-spacing: 3px;
-  text-transform: uppercase;
-  margin-bottom: 4px;
+  margin-bottom: 2px;
+  position: relative;
+  z-index: 1;
 }
 .lucro-value {
   font-family: 'Space Mono', monospace;
-  font-size: 1.6rem;
   font-weight: 700;
 }
+.lucro-value.mini { font-size: 0.85rem; }
+.lucro-value.big  {
+  font-size: 2.6rem;
+  line-height: 1;
+  position: relative;
+  z-index: 1;
+}
 .lucro-value.pos { color: #00e676; }
+.lucro-value.pos.big { text-shadow: 0 0 20px rgba(0,230,118,0.7), 0 0 40px rgba(0,230,118,0.3); }
 .lucro-value.neg { color: #ff1744; }
+.lucro-value.neg.big { text-shadow: 0 0 20px rgba(255,23,68,0.7), 0 0 40px rgba(255,23,68,0.3); }
 .lucro-value.zero { color: #888; }
+.lucro-value.gold { color: #FFD700; }
 
-/* FOOTER do card */
+/* FOOTER do card — CTA */
 .card-footer {
   z-index: 1;
-  text-align: center;
+  width: calc(100% + 48px);
+  margin: 0 -24px;
+  background: #FFD700;
+  padding: 10px 24px 13px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  border-radius: 0 0 18px 18px;
+  flex-shrink: 0;
 }
 .card-footer .site {
-  font-size: 0.65rem;
-  color: #FFD700;
-  letter-spacing: 2px;
-  text-transform: uppercase;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #0a0c10;
+  letter-spacing: 0.5px;
+  text-transform: none;
 }
 .card-footer .disclaimer {
-  font-size: 0.5rem;
-  color: #555;
-  margin-top: 4px;
+  font-size: 0.45rem;
+  color: rgba(0,0,0,0.5);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  font-weight: 600;
+  margin-top: 0;
+  order: -1;
 }
 
 /* SEM DADOS */
@@ -418,6 +480,12 @@ function buildCard(dia, acumuladoMes) {
   const cardEl    = document.createElement('div');
   cardEl.className = 'card';
   cardEl.id = 'card-' + dia.data.replace(/\//g, '-');
+  const _lucroRaw = parseFloat(dia.lucro) || 0;
+  const _borderColor = _lucroRaw > 0 ? '#00e676' : _lucroRaw < 0 ? '#ff1744' : '#FFD700';
+  const _glowRgb    = _lucroRaw > 0 ? '0,230,118' : _lucroRaw < 0 ? '255,23,68' : '255,215,0';
+  cardEl.style.borderColor = _borderColor;
+  cardEl.style.boxShadow   = `0 0 30px rgba(${_glowRgb},0.15), 0 0 80px rgba(${_glowRgb},0.06), inset 0 0 40px rgba(${_glowRgb},0.03)`;
+  cardEl.style.setProperty('--glow-rgb', _glowRgb);
 
   let dataObj;
   if (dia.data && dia.data.includes('/')) {
@@ -446,7 +514,7 @@ function buildCard(dia, acumuladoMes) {
     <!-- HEADER -->
     <div class="card-header">
       <img class="card-logo" src="${LOGO_B64}" alt="Lay Goleada">
-      <div class="card-badge">OVER FREEFIRE</div>
+      <div class="card-badge">✦ OVER FREEFIRE · RESULTADO DIÁRIO</div>
     </div>
 
     <!-- DATA -->
@@ -489,22 +557,26 @@ function buildCard(dia, acumuladoMes) {
       <div class="balls-row">${buildBalls(greens, reds)}</div>
     </div>
 
-    <!-- LUCRO + ACUMULADO -->
-    <div style="display:flex;gap:8px;width:100%;z-index:1;">
-      <div class="lucro-destaque" style="flex:1;">
-        <div class="lucro-label">Lucro do Dia</div>
-        <div class="lucro-value ${lucroClass}" style="font-size:1.2rem">${fmtReais(lucro)}</div>
+    <!-- LUCRO DESTAQUE GRANDE -->
+    <div class="lucro-destaque">
+      <div class="lucro-top-row">
+        <div class="lucro-top-side">
+          <div class="lucro-label">Acum. Mês</div>
+          <div class="lucro-value mini ${acumClass}">${acumVal !== null ? fmtReais(acumVal) : '—'}</div>
+        </div>
+        <div class="lucro-top-side">
+          <div class="lucro-label">Entradas</div>
+          <div class="lucro-value mini gold">${entradas} op.</div>
+        </div>
       </div>
-      <div class="lucro-destaque" style="flex:1;background:rgba(255,215,0,0.04);border-color:rgba(255,215,0,0.15);">
-        <div class="lucro-label">Acum. Mês</div>
-        <div class="lucro-value ${acumClass}" style="font-size:1.2rem">${acumVal !== null ? fmtReais(acumVal) : '—'}</div>
-      </div>
+      <div class="lucro-label main">Lucro do Dia</div>
+      <div class="lucro-value big ${lucroClass}">${fmtReais(lucro)}</div>
     </div>
 
-    <!-- FOOTER -->
+    <!-- FOOTER CTA -->
     <div class="card-footer">
-      <div class="site">www.laygoleada.com.br</div>
-      <div class="disclaimer">+18 · Jogo responsável · Sem garantia de lucro</div>
+      <div class="disclaimer">Dados completos em</div>
+      <div class="site">laygoleada.com.br</div>
     </div>
   `;
 
