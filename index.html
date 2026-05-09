@@ -893,17 +893,17 @@ footer{position:relative;z-index:1;margin-top:48px;padding:24px 32px;
 
     <!-- LAY CS — 6 cards -->
     <div class="section-label" style="margin-top:32px;">
-      LAY Correct Score · saída no minuto 50 · desde 10/10/25
-      <span style="margin-left:10px;font-size:10px;opacity:.6;">Green = zebra não marcou só 1 &nbsp;|&nbsp; BE = sem gols &nbsp;|&nbsp; Red = zebra marcou exatamente 1</span>
+      LAY CS Limite · saída no minuto 50 · desde 10/10/25
+      <span style="margin-left:10px;font-size:10px;opacity:.6;">Green = favorito marcou ou zebra 2+ &nbsp;|&nbsp; BE = sem gols &nbsp;|&nbsp; Red = zebra marcou exatamente 1</span>
     </div>
 
     <div style="font-size:11px;color:var(--text3);margin-bottom:10px;font-family:var(--mono);">
-      LAY CS CASA &nbsp;·&nbsp; favorito = casa (odd C &lt; odd F)
+      LAY CS LIMITE CASA &nbsp;·&nbsp; favorito = casa (odd C &lt; odd F)
     </div>
     <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-bottom:20px;" id="layCsCasaCards"></div>
 
     <div style="font-size:11px;color:var(--text3);margin-bottom:10px;font-family:var(--mono);">
-      LAY CS FORA &nbsp;·&nbsp; favorito = fora (odd F &lt; odd C)
+      LAY CS LIMITE FORA &nbsp;·&nbsp; favorito = fora (odd F &lt; odd C)
     </div>
     <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-bottom:8px;" id="layCsForaCards"></div>
 
@@ -1067,6 +1067,7 @@ let rawGols      = null;
 let rawInterval  = null;
 let rawTimes     = null;
 let rawQtdGols   = null;
+let rawLayCs     = null;
 let rawSilencio      = null;
 let rawGolsPosAlerta = null;
 let rawLucroDiario = null;
@@ -1165,6 +1166,7 @@ async function init() {
     if (rawInterval) renderInterval();
     if (rawTimes)    renderTimes();
     if (rawQtdGols)  renderQtdGols();
+    if (rawLayCs)    renderLayCs();
     if (rawSilencio)      renderSilencio();
     if (rawGolsPosAlerta) renderGolsPosAlerta();
     if (rawLucroDiario) initCalendario();
@@ -1988,37 +1990,6 @@ function renderQtdGols() {
       </div>
     </div>`).join('');
 
-  // ── LAY CS CASA e FORA ──
-  if (rawLayCs) {
-    const COR_GREEN = 'rgba(46,204,138,.85)';
-    const COR_BE    = 'rgba(74,158,240,.85)';
-    const COR_RED   = 'rgba(240,90,90,.85)';
-
-    function renderLayCsCards(containerId, dados) {
-      const base = dados.base.toLocaleString('pt-BR');
-      const cards = [
-        { label: '🟢 Green',      pct: dados.green_pct, qtd: dados.green, odd: dados.green_odd, cor: COR_GREEN, desc: 'Favorito marcou ou zebra marcou 2+' },
-        { label: '⚪ Break Even', pct: dados.be_pct,    qtd: dados.be,    odd: dados.be_odd,    cor: COR_BE,    desc: 'Nenhum gol adicional até min.50'   },
-        { label: '🔴 Red',        pct: dados.red_pct,   qtd: dados.red,   odd: dados.red_odd,   cor: COR_RED,   desc: 'Zebra marcou exatamente +1'        },
-      ];
-      document.getElementById(containerId).innerHTML = cards.map(c => `
-        <div class="kpi" style="border-color:${c.cor.replace('.85','.3')}">
-          <div style="position:absolute;top:0;left:0;right:0;height:2px;background:${c.cor};border-radius:2px 2px 0 0;"></div>
-          <div class="kpi-label">${c.label}</div>
-          <div class="kpi-value" style="color:${c.cor};font-size:36px;">${c.pct}%</div>
-          <div class="kpi-sub" style="margin-top:6px;">${c.qtd.toLocaleString('pt-BR')} de ${base} jogos</div>
-          <div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border);">
-            <div style="font-size:10px;color:var(--text3);font-family:var(--mono);letter-spacing:.08em;margin-bottom:4px;">ODD JUSTA</div>
-            <div style="font-family:var(--mono);font-size:22px;font-weight:700;color:var(--text);">${c.odd ?? '—'}</div>
-            <div style="font-size:10px;color:var(--text3);margin-top:4px;">${c.desc}</div>
-          </div>
-        </div>`).join('');
-    }
-
-    renderLayCsCards('layCsCasaCards', rawLayCs.lay_cs_casa);
-    renderLayCsCards('layCsForaCards', rawLayCs.lay_cs_fora);
-  }
-
   // ── Gráfico de rosca — 4 grupos ──
   const labels4 = grupos.map(g => g.label);
   const pcts4   = grupos.map(g => g.pct);
@@ -2313,6 +2284,40 @@ function renderMesDetalhe() {
 
 
 // ══════════════════════════════════════════════
+// ══════════════════════════════════════════════
+// LAY CS LIMITE
+// ══════════════════════════════════════════════
+function renderLayCs() {
+  if (!rawLayCs) return;
+  const COR_GREEN = 'rgba(46,204,138,.85)';
+  const COR_BE    = 'rgba(74,158,240,.85)';
+  const COR_RED   = 'rgba(240,90,90,.85)';
+
+  function renderBloco(containerId, dados) {
+    const base = dados.base.toLocaleString('pt-BR');
+    const cards = [
+      { label: 'Green',      pct: dados.green_pct, qtd: dados.green, odd: dados.green_odd, cor: COR_GREEN, desc: 'Favorito marcou ou zebra marcou 2+' },
+      { label: 'Break Even', pct: dados.be_pct,    qtd: dados.be,    odd: dados.be_odd,    cor: COR_BE,    desc: 'Nenhum gol adicional até min.50'   },
+      { label: 'Red',        pct: dados.red_pct,   qtd: dados.red,   odd: dados.red_odd,   cor: COR_RED,   desc: 'Zebra marcou exatamente +1'        },
+    ];
+    document.getElementById(containerId).innerHTML = cards.map(c => `
+      <div class="kpi" style="border-color:${c.cor.replace('.85','.3')}">
+        <div style="position:absolute;top:0;left:0;right:0;height:2px;background:${c.cor};border-radius:2px 2px 0 0;"></div>
+        <div class="kpi-label">${c.label}</div>
+        <div class="kpi-value" style="color:${c.cor};font-size:36px;">${c.pct}%</div>
+        <div class="kpi-sub" style="margin-top:6px;">${c.qtd.toLocaleString('pt-BR')} de ${base} jogos</div>
+        <div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border);">
+          <div style="font-size:10px;color:var(--text3);font-family:var(--mono);letter-spacing:.08em;margin-bottom:4px;">ODD JUSTA</div>
+          <div style="font-family:var(--mono);font-size:22px;font-weight:700;color:var(--text);">${c.odd ?? '—'}</div>
+          <div style="font-size:10px;color:var(--text3);margin-top:4px;">${c.desc}</div>
+        </div>
+      </div>`).join('');
+  }
+
+  renderBloco('layCsCasaCards', rawLayCs.lay_cs_casa);
+  renderBloco('layCsForaCards', rawLayCs.lay_cs_fora);
+}
+
 // SILÊNCIO ANTES DO ALERTA
 // ══════════════════════════════════════════════
 function renderSilencio() {
