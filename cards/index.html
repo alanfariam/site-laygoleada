@@ -447,13 +447,13 @@ function fmtPct(v) {
   return isNaN(n) ? '—' : n.toFixed(1) + '%';
 }
 
-function buildBalls(greens, reds) {
-  const total = (greens || 0) + (reds || 0);
-  if (!total) return '<span style="color:#444;font-size:0.7rem">Sem entradas</span>';
-  let html = '';
-  for (let i = 0; i < (greens || 0); i++) html += '<div class="ball g">G</div>';
-  for (let i = 0; i < (reds   || 0); i++) html += '<div class="ball r">R</div>';
-  return html;
+function buildBalls(greens, reds, sequencia) {
+  const seq = Array.isArray(sequencia) && sequencia.length ? sequencia : [
+    ...Array(greens || 0).fill('G'),
+    ...Array(reds   || 0).fill('R')
+  ];
+  if (!seq.length) return '<span style="color:#444;font-size:0.7rem">Sem entradas</span>';
+  return seq.map(r => `<div class="ball ${r === 'G' ? 'g' : 'r'}">${r}</div>`).join('');
 }
 
 function buildCaption(d, lucro, wr, greens, reds, entradas, dataStr) {
@@ -554,7 +554,7 @@ function buildCard(dia, acumuladoMes) {
     <!-- BOLINHAS -->
     <div class="balls-section">
       <div class="balls-label">Resultado por entrada</div>
-      <div class="balls-row">${buildBalls(greens, reds)}</div>
+      <div class="balls-row">${buildBalls(greens, reds, dia.sequencia)}</div>
     </div>
 
     <!-- LUCRO DESTAQUE GRANDE -->
