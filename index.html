@@ -892,10 +892,9 @@ footer{position:relative;z-index:1;margin-top:48px;padding:24px 32px;
     </div>
 
     <!-- LAY CS — 6 cards -->
-    <div class="section-label" style="margin-top:32px;">
-      LAY CS Limite · saída no minuto 50 · desde 10/10/25
-      <span style="margin-left:10px;font-size:10px;opacity:.6;">Green = favorito marcou ou zebra 2+ &nbsp;|&nbsp; BE = sem gols &nbsp;|&nbsp; Red = zebra marcou exatamente 1</span>
-    </div>
+    <div class="section-label" style="margin-top:32px;">LAY CS Limite</div>
+
+    <div id="layCsExplicativo"></div>
 
     <div style="font-size:11px;color:var(--text3);margin-bottom:10px;font-family:var(--mono);">
       LAY CS LIMITE CASA &nbsp;·&nbsp; favorito = casa (odd C &lt; odd F)
@@ -2293,24 +2292,42 @@ function renderLayCs() {
   const COR_BE    = 'rgba(74,158,240,.85)';
   const COR_RED   = 'rgba(240,90,90,.85)';
 
+  // Card explicativo
+  document.getElementById('layCsExplicativo').innerHTML = `
+    <div class="card" style="border-color:rgba(255,255,255,.06);margin-bottom:24px;">
+      <div class="card-title" style="margin-bottom:14px;">Como funciona o LAY CS Limite?</div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;font-size:13px;line-height:1.6;color:var(--text2);">
+        <div style="padding:12px 14px;background:rgba(46,204,138,.07);border:1px solid rgba(46,204,138,.2);border-radius:8px;">
+          <div style="color:rgba(46,204,138,.9);font-weight:600;margin-bottom:6px;">🟢 Green</div>
+          O time favorito marcou pelo menos 1 gol até o minuto 50, <strong>ou</strong> o adversário marcou 2 ou mais. A estratégia LAY foi bem-sucedida.
+        </div>
+        <div style="padding:12px 14px;background:rgba(74,158,240,.07);border:1px solid rgba(74,158,240,.2);border-radius:8px;">
+          <div style="color:rgba(74,158,240,.9);font-weight:600;margin-bottom:6px;">⚪ Break Even</div>
+          Nenhum gol adicional foi marcado por nenhum dos lados até o minuto 50. O placar permaneceu o mesmo do alerta.
+        </div>
+        <div style="padding:12px 14px;background:rgba(240,90,90,.07);border:1px solid rgba(240,90,90,.2);border-radius:8px;">
+          <div style="color:rgba(240,90,90,.9);font-weight:600;margin-bottom:6px;">🔴 Red</div>
+          O adversário (zebra) marcou <strong>exatamente 1 gol</strong> e o favorito não marcou nada até o minuto 50. Único cenário de perda.
+        </div>
+      </div>
+      <div style="margin-top:12px;font-size:11px;color:var(--text3);">
+        Base: jogos com odds disponíveis desde 10/10/25 · alerta recebido antes do minuto 50 · favorito definido pela menor odd (casa ou fora)
+      </div>
+    </div>`;
+
   function renderBloco(containerId, dados) {
     const base = dados.base.toLocaleString('pt-BR');
     const cards = [
-      { label: 'Green',      pct: dados.green_pct, qtd: dados.green, odd: dados.green_odd, cor: COR_GREEN, desc: 'Favorito marcou ou zebra marcou 2+' },
-      { label: 'Break Even', pct: dados.be_pct,    qtd: dados.be,    odd: dados.be_odd,    cor: COR_BE,    desc: 'Nenhum gol adicional até min.50'   },
-      { label: 'Red',        pct: dados.red_pct,   qtd: dados.red,   odd: dados.red_odd,   cor: COR_RED,   desc: 'Zebra marcou exatamente +1'        },
+      { label: 'Green',      pct: dados.green_pct, qtd: dados.green, cor: COR_GREEN },
+      { label: 'Break Even', pct: dados.be_pct,    qtd: dados.be,    cor: COR_BE   },
+      { label: 'Red',        pct: dados.red_pct,   qtd: dados.red,   cor: COR_RED  },
     ];
     document.getElementById(containerId).innerHTML = cards.map(c => `
       <div class="kpi" style="border-color:${c.cor.replace('.85','.3')}">
         <div style="position:absolute;top:0;left:0;right:0;height:2px;background:${c.cor};border-radius:2px 2px 0 0;"></div>
         <div class="kpi-label">${c.label}</div>
-        <div class="kpi-value" style="color:${c.cor};font-size:36px;">${c.pct}%</div>
-        <div class="kpi-sub" style="margin-top:6px;">${c.qtd.toLocaleString('pt-BR')} de ${base} jogos</div>
-        <div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border);">
-          <div style="font-size:10px;color:var(--text3);font-family:var(--mono);letter-spacing:.08em;margin-bottom:4px;">ODD JUSTA</div>
-          <div style="font-family:var(--mono);font-size:22px;font-weight:700;color:var(--text);">${c.odd ?? '—'}</div>
-          <div style="font-size:10px;color:var(--text3);margin-top:4px;">${c.desc}</div>
-        </div>
+        <div class="kpi-value" style="color:${c.cor};font-size:42px;">${c.pct}%</div>
+        <div class="kpi-sub" style="margin-top:8px;">${c.qtd.toLocaleString('pt-BR')} de ${base} jogos</div>
       </div>`).join('');
   }
 
