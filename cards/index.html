@@ -595,7 +595,7 @@ function buildCard(dia, acumuladoMes, triaDia) {
       <div class="p-stats">
         <div class="p-stat g"><div class="p-sv ${lucro >= 0 ? 'g' : 'r'}">${fmtReais(lucro)}</div><div class="p-sl">Lucro Dia</div></div>
         <div class="p-stat g"><div class="p-sv wht">${entradas}</div><div class="p-sl">Entradas</div></div>
-        <div class="p-stat g"><div class="p-sv g">${greens}G · ${reds}R</div><div class="p-sl">Resultado</div></div>
+        <div class="p-stat g"><div class="p-sv wht"><span style="color:#00e676">${greens}G</span> · <span style="color:#ff1744">${reds}R</span></div><div class="p-sl">Resultado</div></div>
       </div>
       <div class="p-wr">
         <div class="p-wr-top"><span class="p-wr-lbl">Win Rate</span><span class="p-wr-val g">${fmtPct(wr)}</span></div>
@@ -623,7 +623,7 @@ function buildCard(dia, acumuladoMes, triaDia) {
       <div class="p-stats">
         <div class="p-stat p"><div class="p-sv ${tLuc >= 0 ? 'g' : 'r'}">${fmtReais(tLuc)}</div><div class="p-sl">Lucro Dia</div></div>
         <div class="p-stat p"><div class="p-sv wht">${tEnt}</div><div class="p-sl">Entradas</div></div>
-        <div class="p-stat p"><div class="p-sv p">${tG}G · ${tR}R</div><div class="p-sl">Resultado</div></div>
+        <div class="p-stat p"><div class="p-sv wht"><span style="color:#00e676">${tG}G</span> · <span style="color:#ff1744">${tR}R</span></div><div class="p-sl">Resultado</div></div>
       </div>
       <div class="p-wr">
         <div class="p-wr-top"><span class="p-wr-lbl">Win Rate</span><span class="p-wr-val ${tWr >= 50 ? 'g' : 'r'}">${fmtPct(tWr)}</span></div>
