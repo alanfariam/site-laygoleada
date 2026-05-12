@@ -2038,12 +2038,12 @@ async function buscaTime() {
         Resultado para: <strong style="color:var(--text);text-transform:capitalize;">${nome}</strong>
       </div>
       <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:4px;">
-        ${statCard('🌐 Geral (Casa + Fora)', d.geral, '#A855F7')}
-        ${statCard('🏠 Em Casa (Zebra)', d.casa, 'var(--green)')}
-        ${statCard('✈ Fora (Favorito)', d.fora, 'var(--gold)')}
+        ${statCard('🌐 Geral', d.geral, '#A855F7')}
+        ${statCard('🏠 Como Mandante', d.casa, 'var(--green)')}
+        ${statCard('✈ Como Visitante', d.fora, 'var(--gold)')}
       </div>
-      ${campRows(d.por_campeonato_casa, '🏠 Por Campeonato — Em Casa')}
-      ${campRows(d.por_campeonato_fora, '✈ Por Campeonato — Fora')}
+      ${campRows(d.por_campeonato_casa, '🏠 Por Campeonato — Como Mandante')}
+      ${campRows(d.por_campeonato_fora, '✈ Por Campeonato — Como Visitante')}
       ${histRows}`;
   } catch(e) {
     el.innerHTML = `<div style="color:var(--text3);font-size:13px;">Nenhuma entrada encontrada para "<strong>${nome}</strong>".</div>`;
