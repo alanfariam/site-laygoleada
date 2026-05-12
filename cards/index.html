@@ -539,9 +539,11 @@ function buildCard(dia, acumuladoMes, triaDia) {
   const cardEl    = document.createElement('div');
   cardEl.className = 'card';
   cardEl.id = 'card-' + dia.data.replace(/\//g, '-');
-  const _lucroRaw = parseFloat(dia.lucro) || 0;
-  const _borderColor = _lucroRaw > 0 ? '#00e676' : _lucroRaw < 0 ? '#ff1744' : '#FFD700';
-  const _glowRgb    = _lucroRaw > 0 ? '0,230,118' : _lucroRaw < 0 ? '255,23,68' : '255,215,0';
+  const _lucroRaw  = parseFloat(dia.lucro) || 0;
+  const _triaLucro = triaDia ? (parseFloat(triaDia.lucro) || 0) : 0;
+  const _lucroTotal = _lucroRaw + _triaLucro;
+  const _borderColor = _lucroTotal > 0 ? '#00e676' : _lucroTotal < 0 ? '#ff1744' : '#FFD700';
+  const _glowRgb    = _lucroTotal > 0 ? '0,230,118' : _lucroTotal < 0 ? '255,23,68' : '255,215,0';
   cardEl.style.borderColor = _borderColor;
   cardEl.style.boxShadow   = `0 0 30px rgba(${_glowRgb},0.15), 0 0 80px rgba(${_glowRgb},0.06), inset 0 0 40px rgba(${_glowRgb},0.03)`;
   cardEl.style.setProperty('--glow-rgb', _glowRgb);
