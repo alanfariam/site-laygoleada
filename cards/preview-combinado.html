@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Preview — Card Combinado</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: #0a0c10;
+  font-family: 'DM Sans', sans-serif;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 40px 20px;
+}
+
+/* ── CARD 9:16 ── */
+.card {
+  width: 405px;
+  height: 720px;
+  background: #080a0f;
+  border: 2.5px solid #00e676;
+  border-radius: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 22px 22px 0;
+  position: relative;
+  overflow: hidden;
+  box-shadow:
+    0 0 30px rgba(0,230,118,.18),
+    0 0 80px rgba(0,230,118,.07),
+    inset 0 0 40px rgba(0,230,118,.03);
+}
+
+/* Grid fundo */
+.card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
+  background-size: 28px 28px;
+  pointer-events: none;
+  border-radius: 18px;
+}
+
+/* Glow topo */
+.card::after {
+  content: '';
+  position: absolute;
+  top: -60px; left: 50%;
+  transform: translateX(-50%);
+  width: 260px; height: 130px;
+  background: radial-gradient(ellipse, rgba(0,230,118,.2) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+/* ── HEADER: logo + badge ── */
+.card-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  z-index: 1;
+  width: 100%;
+}
+.logo-circle {
+  width: 60px; height: 60px;
+  border-radius: 50%;
+  border: 2px solid rgba(0,230,118,.6);
+  box-shadow: 0 0 14px rgba(0,230,118,.35);
+  background: #111;
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden;
+}
+.logo-circle svg { width: 38px; height: 38px; }
+.card-badge {
+  background: rgba(0,230,118,.12);
+  border: 1px solid rgba(0,230,118,.4);
+  color: #00e676;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.52rem;
+  font-weight: 700;
+  padding: 4px 14px;
+  border-radius: 20px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+
+/* ── DATA ── */
+.card-date {
+  z-index: 1;
+  text-align: center;
+}
+.card-date .weekday {
+  font-size: 0.7rem;
+  color: #888;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+}
+.card-date .day {
+  font-family: 'Space Mono', monospace;
+  font-size: 3rem;
+  font-weight: 700;
+  color: #FFD700;
+  line-height: 1;
+}
+.card-date .month-year {
+  font-size: 0.85rem;
+  color: #ccc;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+/* ── DIVISORES ── */
+.div-line {
+  width: 100%;
+  height: 1px;
+  z-index: 1;
+}
+.div-line.green  { background: linear-gradient(to right, transparent, rgba(46,204,138,.55), transparent); }
+.div-line.purple { background: linear-gradient(to right, transparent, rgba(168,85,247,.55), transparent); }
+.div-line.mid    { background: linear-gradient(to right, transparent, rgba(255,255,255,.1), transparent); }
+
+/* ── PRODUCT BLOCK ── */
+.product-block {
+  z-index: 1;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+.product-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.product-pill {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.dot {
+  width: 7px; height: 7px;
+  border-radius: 50%; flex-shrink: 0;
+}
+.dot.g { background: #2ECC8A; box-shadow: 0 0 5px rgba(46,204,138,.9); }
+.dot.p { background: #A855F7; box-shadow: 0 0 5px rgba(168,85,247,.9); }
+.product-name {
+  font-family: 'Space Mono', monospace;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+.product-name.g  { color: #2ECC8A; }
+.product-name.p  { color: #A855F7; }
+.em-breve {
+  font-family: 'Space Mono', monospace;
+  font-size: 7px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: #A855F7;
+  background: rgba(168,85,247,.1);
+  border: 1px solid rgba(168,85,247,.3);
+  padding: 2px 8px;
+  border-radius: 99px;
+}
+
+/* Stats 3 colunas */
+.stats-row {
+  display: flex;
+  gap: 6px;
+}
+.stat-box {
+  flex: 1;
+  border-radius: 9px;
+  padding: 8px 6px 7px;
+  text-align: center;
+}
+.stat-box.g { background: rgba(46,204,138,.07); border: 1px solid rgba(46,204,138,.2); }
+.stat-box.p { background: rgba(168,85,247,.07); border: 1px solid rgba(168,85,247,.2); }
+.sv {
+  font-family: 'Space Mono', monospace;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.1;
+}
+.sv.g    { color: #2ECC8A; }
+.sv.p    { color: #A855F7; }
+.sv.gold { color: #FFD700; }
+.sv.wht  { color: #fff; }
+.sl {
+  font-size: 7px;
+  color: #555;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  margin-top: 2px;
+}
+
+/* WR bar */
+.wr-wrap { width: 100%; }
+.wr-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+.wr-label {
+  font-size: 7px;
+  color: #555;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+.wr-val {
+  font-family: 'Space Mono', monospace;
+  font-size: 13px;
+  font-weight: 700;
+}
+.wr-val.g { color: #2ECC8A; text-shadow: 0 0 8px rgba(46,204,138,.6); }
+.wr-val.p { color: #A855F7; text-shadow: 0 0 8px rgba(168,85,247,.6); }
+.wr-bar-bg {
+  width: 100%; height: 6px;
+  background: rgba(255,255,255,.08);
+  border-radius: 3px; overflow: hidden;
+}
+.wr-bar-fill {
+  height: 100%; border-radius: 3px;
+}
+.wr-bar-fill.g { background: linear-gradient(to right, #2ECC8A, #7fffb8); box-shadow: 0 0 6px rgba(46,204,138,.5); }
+.wr-bar-fill.p { background: linear-gradient(to right, #A855F7, #d886ff); box-shadow: 0 0 6px rgba(168,85,247,.5); }
+
+/* Balls */
+.balls-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.ball {
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 6.5px; font-weight: 700;
+  font-family: 'Space Mono', monospace;
+}
+.ball.g  { background: #2ECC8A; color: #0a0c10; }
+.ball.pg { background: #A855F7; color: #fff; }
+.ball.r  { background: #ff4d6d; color: #fff; }
+
+/* ── FOOTER AMARELO ── */
+.card-footer {
+  z-index: 1;
+  width: calc(100% + 44px);
+  margin: 0 -22px;
+  background: #FFD700;
+  padding: 9px 22px 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  border-radius: 0 0 18px 18px;
+  flex-shrink: 0;
+}
+.footer-disclaimer {
+  font-size: 0.45rem;
+  color: rgba(0,0,0,.45);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+.footer-site {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: #0a0c10;
+  letter-spacing: .5px;
+}
+</style>
+</head>
+<body>
+
+<div class="card">
+
+  <!-- HEADER -->
+  <div class="card-header">
+    <div class="logo-circle">
+      <!-- Soccer ball SVG -->
+      <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="32" cy="32" r="30" fill="#111" stroke="#00e676" stroke-width="2"/>
+        <circle cx="32" cy="32" r="30" fill="url(#ball-grad)" fill-opacity=".15"/>
+        <!-- Pentágono central -->
+        <polygon points="32,18 42,25 38,37 26,37 22,25" fill="#00e676" fill-opacity=".85"/>
+        <!-- Hexágonos -->
+        <polygon points="32,18 22,25 16,16 22,8 32,8" fill="none" stroke="#00e676" stroke-width="1.2" stroke-opacity=".5"/>
+        <polygon points="42,25 52,18 58,27 53,37 43,37" fill="none" stroke="#00e676" stroke-width="1.2" stroke-opacity=".5"/>
+        <polygon points="38,37 43,47 36,55 28,55 21,47 26,37" fill="none" stroke="#00e676" stroke-width="1.2" stroke-opacity=".5"/>
+        <defs>
+          <radialGradient id="ball-grad" cx="40%" cy="35%">
+            <stop offset="0%" stop-color="#fff"/>
+            <stop offset="100%" stop-color="#000"/>
+          </radialGradient>
+        </defs>
+      </svg>
+    </div>
+    <div class="card-badge">✦ Portal LayGoleada · Resultado Diário</div>
+  </div>
+
+  <!-- DATA -->
+  <div class="card-date">
+    <div class="weekday">Segunda-Feira</div>
+    <div class="day">12</div>
+    <div class="month-year">Maio · 2026</div>
+  </div>
+
+  <div class="div-line green"></div>
+
+  <!-- OVER FREEFIRE -->
+  <div class="product-block">
+    <div class="product-header">
+      <div class="product-pill">
+        <div class="dot g"></div>
+        <div class="product-name g">Over FREEFIRE</div>
+      </div>
+    </div>
+    <div class="stats-row">
+      <div class="stat-box g"><div class="sv g">+R$480</div><div class="sl">Lucro Dia</div></div>
+      <div class="stat-box g"><div class="sv wht">8</div><div class="sl">Entradas</div></div>
+      <div class="stat-box g"><div class="sv g">7G · 1R</div><div class="sl">Resultado</div></div>
+    </div>
+    <div class="wr-wrap">
+      <div class="wr-top">
+        <div class="wr-label">Win Rate</div>
+        <div class="wr-val g">87.5%</div>
+      </div>
+      <div class="wr-bar-bg"><div class="wr-bar-fill g" style="width:87.5%"></div></div>
+    </div>
+    <div class="balls-row">
+      <div class="ball g">G</div><div class="ball g">G</div><div class="ball g">G</div>
+      <div class="ball r">R</div><div class="ball g">G</div><div class="ball g">G</div>
+      <div class="ball g">G</div><div class="ball g">G</div>
+    </div>
+  </div>
+
+  <div class="div-line mid"></div>
+
+  <!-- LAY GOLEADA TRINITY -->
+  <div class="product-block">
+    <div class="product-header">
+      <div class="product-pill">
+        <div class="dot p"></div>
+        <div class="product-name p">Lay Goleada TRINITY</div>
+      </div>
+      <div class="em-breve">Em breve</div>
+    </div>
+    <div class="stats-row">
+      <div class="stat-box p"><div class="sv p">+R$620</div><div class="sl">Lucro Dia</div></div>
+      <div class="stat-box p"><div class="sv wht">12</div><div class="sl">Entradas</div></div>
+      <div class="stat-box p"><div class="sv p">11G · 1R</div><div class="sl">Resultado</div></div>
+    </div>
+    <div class="wr-wrap">
+      <div class="wr-top">
+        <div class="wr-label">Win Rate</div>
+        <div class="wr-val p">91.6%</div>
+      </div>
+      <div class="wr-bar-bg"><div class="wr-bar-fill p" style="width:91.6%"></div></div>
+    </div>
+    <div class="balls-row">
+      <div class="ball pg">G</div><div class="ball pg">G</div><div class="ball pg">G</div>
+      <div class="ball pg">G</div><div class="ball r">R</div><div class="ball pg">G</div>
+      <div class="ball pg">G</div><div class="ball pg">G</div><div class="ball pg">G</div>
+      <div class="ball pg">G</div><div class="ball pg">G</div><div class="ball pg">G</div>
+    </div>
+  </div>
+
+  <!-- FOOTER AMARELO -->
+  <div class="card-footer">
+    <div class="footer-disclaimer">Dados completos em</div>
+    <div class="footer-site">laygoleada.com.br</div>
+  </div>
+
+</div>
+
+</body>
+</html>

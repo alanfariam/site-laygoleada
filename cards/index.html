@@ -403,17 +403,57 @@ h1 {
   transition: background .15s;
 }
 .btn-copy:hover, .btn-copy:active { background: #FFD700; color: #0a0c10; }
+
+/* ── BLOCOS COMBINADOS (FreeFire + TRINITY) ── */
+.p-block { width:100%; z-index:1; display:flex; flex-direction:column; gap:6px; }
+.p-header { display:flex; align-items:center; justify-content:space-between; }
+.p-pill { display:flex; align-items:center; gap:6px; }
+.p-dot { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
+.p-dot.g { background:#00e676; box-shadow:0 0 5px rgba(0,230,118,.9); }
+.p-dot.p { background:#A855F7; box-shadow:0 0 5px rgba(168,85,247,.9); }
+.p-name { font-family:'Space Mono',monospace; font-size:9px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; }
+.p-name.g { color:#00e676; }
+.p-name.p { color:#A855F7; }
+.p-em-breve { font-family:'Space Mono',monospace; font-size:7px; letter-spacing:.1em; text-transform:uppercase; color:#A855F7; background:rgba(168,85,247,.1); border:1px solid rgba(168,85,247,.3); padding:2px 8px; border-radius:99px; }
+.p-stats { display:flex; gap:5px; }
+.p-stat { flex:1; border-radius:8px; padding:7px 5px; text-align:center; }
+.p-stat.g { background:rgba(0,230,118,.07); border:1px solid rgba(0,230,118,.2); }
+.p-stat.p { background:rgba(168,85,247,.07); border:1px solid rgba(168,85,247,.2); }
+.p-sv { font-family:'Space Mono',monospace; font-size:13px; font-weight:700; line-height:1.1; }
+.p-sv.g  { color:#00e676; }
+.p-sv.p  { color:#A855F7; }
+.p-sv.gold { color:#FFD700; }
+.p-sv.wht { color:#fff; }
+.p-sl { font-size:7px; color:#555; letter-spacing:.08em; text-transform:uppercase; margin-top:2px; }
+.p-wr { width:100%; }
+.p-wr-top { display:flex; justify-content:space-between; align-items:center; margin-bottom:3px; }
+.p-wr-lbl { font-size:7px; color:#555; letter-spacing:.1em; text-transform:uppercase; }
+.p-wr-val { font-family:'Space Mono',monospace; font-size:12px; font-weight:700; }
+.p-wr-val.g { color:#00e676; text-shadow:0 0 6px rgba(0,230,118,.6); }
+.p-wr-val.p { color:#A855F7; text-shadow:0 0 6px rgba(168,85,247,.6); }
+.p-wr-bar { width:100%; height:5px; background:rgba(255,255,255,.08); border-radius:3px; overflow:hidden; }
+.p-wr-fill { height:100%; border-radius:3px; }
+.p-wr-fill.g { background:linear-gradient(to right,#00e676,#7fffb8); box-shadow:0 0 5px rgba(0,230,118,.5); }
+.p-wr-fill.p { background:linear-gradient(to right,#A855F7,#d886ff); box-shadow:0 0 5px rgba(168,85,247,.5); }
+.p-balls { display:flex; flex-wrap:wrap; gap:3px; }
+.p-ball { width:17px; height:17px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:6px; font-weight:700; font-family:'Space Mono',monospace; }
+.p-ball.g  { background:#00e676; color:#0a0c10; }
+.p-ball.pg { background:#A855F7; color:#fff; }
+.p-ball.r  { background:#ff1744; color:#fff; }
+.p-divider { width:100%; height:1px; background:linear-gradient(to right,transparent,rgba(255,255,255,.1),transparent); z-index:1; }
+.p-sem-dados { font-family:'Space Mono',monospace; font-size:10px; color:#444; text-align:center; padding:10px 0; }
 </style>
 </head>
 <body>
 
 <h1>📸 LAY GOLEADA · CARDS REELS</h1>
-<p class="subtitle">Método Over FreeFire · Gerado automaticamente</p>
+<p class="subtitle">Portal LayGoleada · Over FreeFire + TRINITY · Gerado automaticamente</p>
 <div id="status">🔄 Conectando à API...</div>
 <div class="cards-grid" id="cardsGrid"></div>
 
 <script>
-const API = 'https://api.laygoleada.com.br';
+const API    = 'https://api.laygoleada.com.br';
+const TR_API = 'https://api.laygoleada.com.br/trinity';
 const LOGO_SRC = ''; // será preenchido inline
 
 // ── LOGO (do index.html original) ──
@@ -456,24 +496,43 @@ function buildBalls(greens, reds, sequencia) {
   return seq.map(r => `<div class="ball ${r === 'G' ? 'g' : 'r'}">${r}</div>`).join('');
 }
 
-function buildCaption(d, lucro, wr, greens, reds, entradas, dataStr) {
+function buildCaption(d, lucro, wr, greens, reds, entradas, dataStr, triaDia) {
   const lucroSign = lucro >= 0 ? '+R$ ' + lucro.toFixed(2).replace('.',',') : '-R$ ' + Math.abs(lucro).toFixed(2).replace('.',',');
   const emojis = lucro >= 0 ? '🟢✅📈' : '🔴❌📉';
+  let triaLine = '';
+  if (triaDia) {
+    const tLucro = parseFloat(triaDia.lucro) || 0;
+    const tSign  = tLucro >= 0 ? '+R$ ' + tLucro.toFixed(2).replace('.',',') : '-R$ ' + Math.abs(tLucro).toFixed(2).replace('.',',');
+    const tEnt   = triaDia.total || (triaDia.greens + triaDia.reds) || 0;
+    const tWr    = tEnt > 0 ? ((triaDia.greens / tEnt) * 100) : 0;
+    triaLine = `
+🟣 LAY GOLEADA TRINITY (Em breve)
+💰 Lucro: ${tSign}
+📊 Win Rate: ${fmtPct(tWr)}
+⚽ Entradas: ${tEnt} | ✅ Greens: ${triaDia.greens} | ❌ Reds: ${triaDia.reds}
+`;
+  }
   return `${emojis} RESULTADO DO DIA — ${dataStr.toUpperCase()}
 
+🟢 OVER FREEFIRE
 💰 Lucro: ${lucroSign}
 📊 Win Rate: ${fmtPct(wr)}
 ⚽ Entradas: ${entradas} | ✅ Greens: ${greens} | ❌ Reds: ${reds}
+${triaLine}
+Portal LayGoleada 🏆 | Dois métodos. Uma plataforma.
 
-Método Over FreeFire | Lay Goleada 🏆
-
-🔔 Acompanhe nossos resultados diários e entre para o grupo VIP!
+🔔 Acompanhe os resultados diários e entre para o grupo VIP!
 👉 www.laygoleada.com.br
 
-#LayGoleada #OverFreeFire #ApostasEsportivas #GreenDay #BetBrasil #MetodoFreefire #ResultadoDoDia #ApostasInteligentes #TipsGratuitas #WinRate`;
+#LayGoleada #OverFreeFire #LGTrinity #ApostasEsportivas #GreenDay #BetBrasil #ResultadoDoDia #ApostasInteligentes #TipsGratuitas #WinRate #TradeEsportivo`;
 }
 
-function buildCard(dia, acumuladoMes) {
+function buildPBalls(g, r, cls) {
+  const seq = [...Array(g||0).fill('G'), ...Array(r||0).fill('R')];
+  return seq.map(s => `<div class="p-ball ${s==='G'?cls:'r'}">${s}</div>`).join('');
+}
+
+function buildCard(dia, acumuladoMes, triaDia) {
   const wrapper   = document.createElement('div');
   wrapper.className = 'card-wrapper';
 
@@ -514,7 +573,7 @@ function buildCard(dia, acumuladoMes) {
     <!-- HEADER -->
     <div class="card-header">
       <img class="card-logo" src="${LOGO_B64}" alt="Lay Goleada">
-      <div class="card-badge">✦ OVER FREEFIRE · RESULTADO DIÁRIO</div>
+      <div class="card-badge">✦ PORTAL LAYGOLEADA · RESULTADO DIÁRIO</div>
     </div>
 
     <!-- DATA -->
@@ -526,51 +585,55 @@ function buildCard(dia, acumuladoMes) {
 
     <div class="divider"></div>
 
-    <!-- STATS -->
-    <div class="card-stats">
-      <div class="stat-row">
-        <span class="stat-label">Entradas</span>
-        <span class="stat-value gold">${entradas}</span>
+    <!-- OVER FREEFIRE -->
+    <div class="p-block">
+      <div class="p-header">
+        <div class="p-pill"><div class="p-dot g"></div><div class="p-name g">Over FREEFIRE</div></div>
       </div>
-      <div class="stat-row">
-        <span class="stat-label">Greens ✅</span>
-        <span class="stat-value green">${greens}</span>
+      <div class="p-stats">
+        <div class="p-stat g"><div class="p-sv g">${fmtReais(lucro)}</div><div class="p-sl">Lucro Dia</div></div>
+        <div class="p-stat g"><div class="p-sv wht">${entradas}</div><div class="p-sl">Entradas</div></div>
+        <div class="p-stat g"><div class="p-sv g">${greens}G · ${reds}R</div><div class="p-sl">Resultado</div></div>
       </div>
-      <div class="stat-row">
-        <span class="stat-label">Reds ❌</span>
-        <span class="stat-value red">${reds}</span>
+      <div class="p-wr">
+        <div class="p-wr-top"><span class="p-wr-lbl">Win Rate</span><span class="p-wr-val g">${fmtPct(wr)}</span></div>
+        <div class="p-wr-bar"><div class="p-wr-fill g" style="width:${wrPct}%"></div></div>
       </div>
+      <div class="p-balls">${buildPBalls(greens, reds, 'g')}</div>
     </div>
 
-    <div class="divider"></div>
+    <div class="p-divider"></div>
 
-    <!-- WIN RATE -->
-    <div class="wr-section">
-      <div class="wr-label">Win Rate</div>
-      <div class="wr-bar-bg"><div class="wr-bar-fill" style="width:${wrPct}%"></div></div>
-      <div class="wr-value">${fmtPct(wr)}</div>
-    </div>
-
-    <!-- BOLINHAS -->
-    <div class="balls-section">
-      <div class="balls-label">Resultado por entrada</div>
-      <div class="balls-row">${buildBalls(greens, reds, dia.sequencia)}</div>
-    </div>
-
-    <!-- LUCRO DESTAQUE GRANDE -->
-    <div class="lucro-destaque">
-      <div class="lucro-top-row">
-        <div class="lucro-top-side">
-          <div class="lucro-label">Acum. Mês</div>
-          <div class="lucro-value mini ${acumClass}">${acumVal !== null ? fmtReais(acumVal) : '—'}</div>
-        </div>
-        <div class="lucro-top-side">
-          <div class="lucro-label">Entradas</div>
-          <div class="lucro-value mini gold">${entradas} op.</div>
-        </div>
+    <!-- TRINITY -->
+    <div class="p-block">
+      ${triaDia ? (() => {
+        const tG   = triaDia.greens || 0;
+        const tR   = triaDia.reds   || 0;
+        const tEnt = triaDia.total  || (tG + tR);
+        const tWr  = tEnt > 0 ? (tG / tEnt * 100) : 0;
+        const tWrP = Math.min(tWr, 100);
+        const tLuc = parseFloat(triaDia.lucro) || 0;
+        return `
+      <div class="p-header">
+        <div class="p-pill"><div class="p-dot p"></div><div class="p-name p">Lay Goleada TRINITY</div></div>
+        <div class="p-em-breve">Em breve</div>
       </div>
-      <div class="lucro-label main">Lucro do Dia</div>
-      <div class="lucro-value big ${lucroClass}">${fmtReais(lucro)}</div>
+      <div class="p-stats">
+        <div class="p-stat p"><div class="p-sv p">${fmtReais(tLuc)}</div><div class="p-sl">Lucro Dia</div></div>
+        <div class="p-stat p"><div class="p-sv wht">${tEnt}</div><div class="p-sl">Entradas</div></div>
+        <div class="p-stat p"><div class="p-sv p">${tG}G · ${tR}R</div><div class="p-sl">Resultado</div></div>
+      </div>
+      <div class="p-wr">
+        <div class="p-wr-top"><span class="p-wr-lbl">Win Rate</span><span class="p-wr-val p">${fmtPct(tWr)}</span></div>
+        <div class="p-wr-bar"><div class="p-wr-fill p" style="width:${tWrP}%"></div></div>
+      </div>
+      <div class="p-balls">${buildPBalls(tG, tR, 'pg')}</div>`;
+      })() : `
+      <div class="p-header">
+        <div class="p-pill"><div class="p-dot p"></div><div class="p-name p">Lay Goleada TRINITY</div></div>
+        <div class="p-em-breve">Em breve</div>
+      </div>
+      <div class="p-sem-dados">Sem entradas neste dia</div>`}
     </div>
 
     <!-- FOOTER CTA -->
@@ -587,7 +650,7 @@ function buildCard(dia, acumuladoMes) {
   btnSave.onclick = () => salvarCard(cardEl, dataStr);
 
   // Legenda
-  const captionText = buildCaption(dia, lucro, wr, greens, reds, entradas, dataStr);
+  const captionText = buildCaption(dia, lucro, wr, greens, reds, entradas, dataStr, triaDia);
   const caption = document.createElement('div');
   caption.className = 'caption-box';
   caption.innerHTML = `<strong>📋 Legenda para o Reels</strong>${captionText.replace(/\n/g,'<br>')}`;
@@ -635,7 +698,13 @@ async function init() {
     const mes   = now.getMonth() + 1;
     const ano   = now.getFullYear();
 
-    const data = await fetchApi(`/api/lucro-diario`);
+    const [data, triaData] = await Promise.all([
+      fetchApi(`/api/lucro-diario`),
+      fetch(TR_API + '/api/lucro-diario').then(r => r.json()).catch(() => [])
+    ]);
+    // Mapear TRINITY por data para lookup rápido
+    const triaMap = {};
+    (Array.isArray(triaData) ? triaData : []).forEach(d => { triaMap[d.data] = d; });
 
     // Filtrar pelo mês corrente
     const dias = (Array.isArray(data) ? data : data.dias || [])
@@ -684,7 +753,7 @@ async function init() {
 
     const grid = document.getElementById('cardsGrid');
     grid.innerHTML = '';
-    dias.forEach(d => grid.appendChild(buildCard(d, acumPorData[d.data])));
+    dias.forEach(d => grid.appendChild(buildCard(d, acumPorData[d.data], triaMap[d.data] || null)));
 
   } catch(e) {
     setStatus('❌ Erro: ' + e.message);
