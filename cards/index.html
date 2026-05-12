@@ -629,7 +629,7 @@ function buildCard(dia, acumuladoMes, triaDia) {
         <div class="p-wr-top"><span class="p-wr-lbl">Win Rate</span><span class="p-wr-val ${tWr >= 50 ? 'g' : 'r'}">${fmtPct(tWr)}</span></div>
         <div class="p-wr-bar"><div class="p-wr-fill ${tWr >= 50 ? 'g' : 'r'}" style="width:${tWrP}%"></div></div>
       </div>
-      <div class="p-balls">${buildPBalls(tG, tR, 'pg')}</div>`;
+      <div class="p-balls">${buildPBalls(tG, tR, 'g')}</div>`;
       })() : `
       <div class="p-header">
         <div class="p-pill"><div class="p-dot p"></div><div class="p-name p">Lay Goleada TRINITY</div></div>
