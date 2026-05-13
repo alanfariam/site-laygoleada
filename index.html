@@ -55,10 +55,24 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
   font-size:36px;font-weight:800;line-height:1.2;letter-spacing:-.02em;margin-bottom:20px;
 }
 .hero-title span{color:var(--red);}
+.hero-credentials{
+  display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-bottom:20px;
+}
+.cred-chip{
+  display:flex;align-items:center;gap:7px;
+  background:var(--bg2);border:1px solid var(--border2);border-radius:99px;
+  padding:6px 14px;font-family:var(--mono);font-size:11px;color:var(--text2);
+  white-space:nowrap;
+}
+.cred-chip-icon{color:var(--gold);font-size:13px;}
+.cred-chip.red{border-color:var(--red-glow);background:var(--red-dim);}
+.cred-chip.red .cred-chip-icon{color:var(--red2);}
 .hero-bio{
   font-size:15px;color:var(--text2);max-width:620px;margin:0 auto 32px;
   line-height:1.8;
 }
+.hero-bio strong{color:var(--text);}
+.hero-bio em{color:var(--green);font-style:normal;font-weight:600;}
 .hero-social{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;}
 .social-btn{
   display:flex;align-items:center;gap:8px;
@@ -204,10 +218,16 @@ footer a{color:var(--red);text-decoration:none;}
   </div>
   <div class="hero-name">Portal LayGoleada</div>
   <h1 class="hero-title">Trade esportivo<br><span>Métodos sem achismo baseado em dados</span></h1>
+  <div class="hero-credentials">
+    <div class="cred-chip"><span class="cred-chip-icon">💻</span> Analista de Sistemas Pós-Graduado</div>
+    <div class="cred-chip"><span class="cred-chip-icon">🏢</span> 25 anos em grandes empresas de TI</div>
+    <div class="cred-chip red"><span class="cred-chip-icon">📊</span> Metodologia de dados aplicada ao trade</div>
+  </div>
   <p class="hero-bio">
-    Sou analista de sistemas pós-graduado com mais de 25 anos de experiência em grandes empresas
-    e apaixonado por futebol. Decidi unir essas duas paixões criando métodos de trade esportivo
-    para geração de renda extra — e resolvi compartilhar esse trabalho com a comunidade.
+    Trabalhei 25 anos em TI em grandes empresas analisando dados e construindo sistemas.
+    Decidi <strong>aplicar essa mesma metodologia ao trade esportivo</strong> — com rastreamento de
+    entradas, backtesting e automatização de resultados.
+    <em>O resultado está aqui, auditável, sem edição.</em>
   </p>
   <div class="hero-social">
     <a class="social-btn yt" href="https://www.youtube.com/@laygoleada" target="_blank">
