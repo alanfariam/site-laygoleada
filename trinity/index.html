@@ -454,12 +454,12 @@ function renderBanner(d,mensal){
 }
 async function renderKpis(){
   const ids=['k-lucro','k-ent','k-wr','k-roi','k-greens','k-reds'];
-  let data=rawKpis;const params=[];
+  let data=rawKpis,diario=rawDiario;const params=[];
   if(metodoKpi!=='todos')params.push('metodo='+encodeURIComponent(metodoKpi));
   if(kpiMode==='mes'){const sel=document.getElementById('kpiMesSelect').value;if(sel)params.push('mes='+encodeURIComponent(sel));}
   else if(kpiMode==='ano'){const sel=document.getElementById('kpiAnoSelect').value;if(sel)params.push('ano='+sel);}
   if(params.length){ids.forEach(id=>{const el=document.getElementById(id);el.textContent='...';el.style.opacity='.3';});setStatus('loading','BUSCANDO');
-    try{data=await apiFetch('/api/kpis?'+params.join('&'));}catch{data=null;}
+    try{const fetches=[apiFetch('/api/kpis?'+params.join('&'))];if(metodoKpi!=='todos')fetches.push(apiFetch('/api/lucro-diario?metodo='+encodeURIComponent(metodoKpi)).catch(()=>rawDiario));const[kpiRes,...rest]=await Promise.all(fetches);data=kpiRes;if(metodoKpi!=='todos'&&rest[0])diario=rest[0];}catch{data=null;}
     ids.forEach(id=>{document.getElementById(id).style.opacity='1';});setStatus('ok','AO VIVO');}
   if(!data||data.erro){ids.forEach(id=>{document.getElementById(id).textContent='\u2014';});document.getElementById('k-lucro-s').textContent='Sem dados';renderUltimas(null);renderLucroDiario([]);return;}
   const sv=(id,val,cls,sub,sid)=>{const el=document.getElementById(id);el.textContent=val;el.className='kpi-value'+(cls?' '+cls:'');if(sid)document.getElementById(sid).textContent=sub||'';};
@@ -472,7 +472,7 @@ async function renderKpis(){
   document.getElementById('k-good-run').textContent=(data.maior_good_run||0)+' greens';
   document.getElementById('k-bad-run').textContent=(data.maior_bad_run||0)+' reds';
   document.getElementById('k-drawdown').textContent=data.max_drawdown!=null?'-R$ '+data.max_drawdown.toLocaleString('pt-BR',{minimumFractionDigits:2}):'—';
-  renderAcumulado(data);renderUltimas(data);renderLucroDiario(rawDiario||[]);
+  renderAcumulado(data);renderUltimas(data);renderLucroDiario(diario||[]);
 }
 function renderUltimas(data){
   const tbody=document.getElementById('tblUltimas');
