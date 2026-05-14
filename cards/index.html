@@ -130,7 +130,7 @@ h1 {
 }
 .card-date .day {
   font-family: 'Space Mono', monospace;
-  font-size: 3.5rem;
+  font-size: 5rem;
   font-weight: 700;
   color: #FFD700;
   line-height: 1;
@@ -421,6 +421,7 @@ h1 {
 .p-stat.p { background:rgba(168,85,247,.07); border:1px solid rgba(168,85,247,.2); }
 .p-sv { font-family:'Space Mono',monospace; font-size:13px; font-weight:700; line-height:1.1; }
 .p-sv.g  { color:#00e676; }
+.p-sv.r  { color:#ff1744; }
 .p-sv.p  { color:#A855F7; }
 .p-sv.gold { color:#FFD700; }
 .p-sv.wht { color:#fff; }
@@ -527,8 +528,10 @@ Portal LayGoleada 🏆 | Dois métodos. Uma plataforma.
 #LayGoleada #OverFreeFire #LGTrinity #ApostasEsportivas #GreenDay #BetBrasil #ResultadoDoDia #ApostasInteligentes #TipsGratuitas #WinRate #TradeEsportivo`;
 }
 
-function buildPBalls(g, r, cls) {
-  const seq = [...Array(g||0).fill('G'), ...Array(r||0).fill('R')];
+function buildPBalls(g, r, cls, sequencia) {
+  const seq = Array.isArray(sequencia) && sequencia.length
+    ? sequencia
+    : [...Array(g||0).fill('G'), ...Array(r||0).fill('R')];
   return seq.map(s => `<div class="p-ball ${s==='G'?cls:'r'}">${s}</div>`).join('');
 }
 
@@ -601,7 +604,7 @@ function buildCard(dia, acumuladoMes, triaDia) {
         <div class="p-wr-top"><span class="p-wr-lbl">Win Rate</span><span class="p-wr-val g">${fmtPct(wr)}</span></div>
         <div class="p-wr-bar"><div class="p-wr-fill g" style="width:${wrPct}%"></div></div>
       </div>
-      <div class="p-balls">${buildPBalls(greens, reds, 'g')}</div>
+      <div class="p-balls">${buildPBalls(greens, reds, 'g', dia.sequencia)}</div>
     </div>
 
     <div class="p-divider"></div>
@@ -629,7 +632,7 @@ function buildCard(dia, acumuladoMes, triaDia) {
         <div class="p-wr-top"><span class="p-wr-lbl">Win Rate</span><span class="p-wr-val ${tWr >= 50 ? 'g' : 'r'}">${fmtPct(tWr)}</span></div>
         <div class="p-wr-bar"><div class="p-wr-fill ${tWr >= 50 ? 'g' : 'r'}" style="width:${tWrP}%"></div></div>
       </div>
-      <div class="p-balls">${buildPBalls(tG, tR, 'g')}</div>`;
+      <div class="p-balls">${buildPBalls(tG, tR, 'g', triaDia.sequencia)}</div>`;
       })() : `
       <div class="p-header">
         <div class="p-pill"><div class="p-dot p"></div><div class="p-name p">Lay Goleada TRINITY</div></div>
@@ -755,7 +758,7 @@ async function init() {
 
     const grid = document.getElementById('cardsGrid');
     grid.innerHTML = '';
-    dias.forEach(d => grid.appendChild(buildCard(d, acumPorData[d.data], triaMap[d.data] || null)));
+    dias.slice(0, 3).forEach(d => grid.appendChild(buildCard(d, acumPorData[d.data], triaMap[d.data] || null)));
 
   } catch(e) {
     setStatus('❌ Erro: ' + e.message);
