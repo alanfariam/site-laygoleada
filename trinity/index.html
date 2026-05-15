@@ -408,7 +408,7 @@ footer{margin-top:48px;padding:24px 32px;border-top:1px solid var(--border);
       <div class="kpi grn-accent"><div class="kpi-label">Sequência Atual</div><div class="kpi-value g" id="gr-atual">&#8212;</div><div class="kpi-sub">Greens seguidos agora</div></div>
     </div>
     <div class="card">
-      <div class="card-title">Corrida de Greens</div>
+      <div class="card-title">Sequência de Greens</div>
       <div class="chart-wrap"><canvas id="cGoodRun" height="220"></canvas></div>
     </div>
     <div class="card">
@@ -618,7 +618,8 @@ async function renderGoodRun(){
   destroyChart('cGoodRun');
   const canvas=document.getElementById('cGoodRun');
   if(canvas){
-    charts['cGoodRun']=new Chart(canvas,{type:'line',data:{labels,datasets:[{data:vals,borderColor:'#2ECC8A',backgroundColor:'rgba(46,204,138,.12)',pointBackgroundColor:ptColors,pointBorderColor:ptColors,pointRadius:4,pointHoverRadius:6,fill:true,tension:.3,borderWidth:2}]},options:{...cd(),plugins:{...cd().plugins,tooltip:{...cd().plugins.tooltip,mode:'index',intersect:false,callbacks:{title:ctx=>sorted[ctx[0].dataIndex].data,label:ctx=>ctx.raw>0?' '+ctx.raw+' green'+(ctx.raw>1?'s':'')+' seguido'+(ctx.raw>1?'s':''):' RED — sequência zerada'}}},scales:{x:{ticks:{color:'#8A96A3',font:{size:9},maxTicksLimit:14,autoSkip:true,maxRotation:0},grid:{color:'rgba(255,255,255,.03)'}},y:{ticks:{stepSize:1,color:'#556070',font:{size:10}},grid:{color:'rgba(255,255,255,.04)'},beginAtZero:true,title:{display:true,text:'Greens consecutivos',color:'#8A96A3',font:{size:10}}}}}});
+    const dobraLinha=labels.map(()=>15);
+    charts['cGoodRun']=new Chart(canvas,{type:'line',data:{labels,datasets:[{data:vals,borderColor:'#2ECC8A',backgroundColor:'rgba(46,204,138,.12)',pointBackgroundColor:ptColors,pointBorderColor:ptColors,pointRadius:4,pointHoverRadius:6,fill:true,tension:.3,borderWidth:2,order:1},{data:dobraLinha,borderColor:'rgba(245,158,11,.7)',backgroundColor:'transparent',borderWidth:1.5,borderDash:[6,4],pointRadius:0,pointHoverRadius:0,fill:false,tension:0,order:0,label:'2x banca'}]},options:{...cd(),plugins:{...cd().plugins,legend:{display:false},tooltip:{...cd().plugins.tooltip,mode:'index',intersect:false,callbacks:{title:ctx=>sorted[ctx[0].dataIndex]?.data||'',label:ctx=>ctx.datasetIndex===1?' Zona dobra banca (15 greens)':ctx.raw>0?' '+ctx.raw+' green'+(ctx.raw>1?'s':'')+' seguido'+(ctx.raw>1?'s':''):' RED — sequência zerada'}}},scales:{x:{ticks:{color:'#8A96A3',font:{size:9},maxTicksLimit:14,autoSkip:true,maxRotation:0},grid:{color:'rgba(255,255,255,.03)'}},y:{ticks:{stepSize:1,color:'#556070',font:{size:10}},grid:{color:'rgba(255,255,255,.04)'},beginAtZero:true,title:{display:true,text:'Greens consecutivos',color:'#8A96A3',font:{size:10}}}}}});
   }
   const wrap=document.getElementById('grMapWrap');
   if(!wrap)return;
