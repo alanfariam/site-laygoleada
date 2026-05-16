@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ADM · Lay Goleada</title>
+<style>
+  :root {
+    --bg: #0d1117; --surface: #161b22; --border: #30363d;
+    --green: #2ECC8A; --red: #F05A5A; --amber: #F59E0B;
+    --text: #e6edf3; --text2: #c9d1d9; --text3: #8b949e;
+    --mono: 'Courier New', monospace;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; padding: 24px 20px; max-width: 960px; margin: 0 auto; }
+
+  header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 28px; flex-wrap: wrap; gap: 12px; }
+  .header-title { font-size: 1rem; font-weight: 700; font-family: var(--mono); letter-spacing: .08em; }
+  .header-sub { font-size: 0.72rem; color: var(--text3); margin-top: 2px; }
+  .btn-refresh { background: var(--surface); border: 1px solid var(--border); color: var(--text2); padding: 8px 18px; border-radius: 8px; cursor: pointer; font-size: 0.82rem; font-family: var(--mono); transition: border-color .15s; }
+  .btn-refresh:hover { border-color: var(--green); color: var(--green); }
+  .btn-refresh:disabled { opacity: .4; cursor: default; }
+
+  .status-row { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; margin-bottom: 28px; }
+  .proc-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 16px; }
+  .proc-card.on  { border-color: rgba(46,204,138,.35); }
+  .proc-card.off { border-color: rgba(240,90,90,.35); }
+  .proc-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 6px; }
+  .proc-dot.on  { background: var(--green); box-shadow: 0 0 6px var(--green); }
+  .proc-dot.off { background: var(--red); }
+  .proc-name { font-size: 0.85rem; font-weight: 700; }
+  .proc-meta { font-size: 0.7rem; color: var(--text3); margin-top: 6px; font-family: var(--mono); }
+
+  .section-label { font-size: 0.68rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--text3); margin-bottom: 10px; }
+
+  .log-tabs { display: flex; gap: 6px; margin-bottom: 0; flex-wrap: wrap; }
+  .log-tab { background: var(--surface); border: 1px solid var(--border); color: var(--text3); padding: 6px 14px; border-radius: 6px 6px 0 0; cursor: pointer; font-size: 0.75rem; font-family: var(--mono); border-bottom: none; }
+  .log-tab.active { background: #1c2330; color: var(--text); border-color: var(--border); border-bottom: 1px solid #1c2330; }
+
+  .log-box { background: #1c2330; border: 1px solid var(--border); border-radius: 0 8px 8px 8px; padding: 14px; font-family: var(--mono); font-size: 0.72rem; line-height: 1.6; color: var(--text2); height: 420px; overflow-y: auto; white-space: pre-wrap; word-break: break-all; }
+  .log-box .l-info  { color: var(--text2); }
+  .log-box .l-warn  { color: var(--amber); }
+  .log-box .l-error { color: var(--red); }
+  .log-empty { color: var(--text3); font-style: italic; }
+
+  .last-update { font-size: 0.68rem; color: var(--text3); font-family: var(--mono); margin-top: 10px; text-align: right; }
+
+  @media(max-width:500px){ .status-row { grid-template-columns: 1fr 1fr; } }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <div class="header-title">LAY GOLEADA · ADM</div>
+    <div class="header-sub">Cockpit de monitoramento</div>
+  </div>
+  <button class="btn-refresh" id="btnRefresh" onclick="load()">↻ Atualizar</button>
+</header>
+
+<div class="section-label">Processos</div>
+<div class="status-row" id="procGrid">
+  <div class="proc-card" style="opacity:.4">Carregando...</div>
+</div>
+
+<div class="section-label">Logs</div>
+<div class="log-tabs" id="logTabs"></div>
+<div class="log-box" id="logBox"><span class="log-empty">Selecione um processo acima.</span></div>
+<div class="last-update" id="lastUpdate"></div>
+
+<script>
+const API = 'https://api.laygoleada.com.br/adm/api/status';
+let currentLog = null, logsData = {};
+
+const LABELS = {
+  api_freefire: 'API FreeFire',
+  api_trinity:  'API Trinity',
+  bot_trinity:  'Bot Trinity',
+  bot_freefire: 'Bot FreeFire',
+};
+
+function colorLog(text) {
+  if (!text) return '<span class="log-empty">Log vazio.</span>';
+  return text.split('\n').map(line => {
+    if (/\[ERROR\]/.test(line)) return `<span class="l-error">${esc(line)}</span>`;
+    if (/\[WARNING\]/.test(line)) return `<span class="l-warn">${esc(line)}</span>`;
+    return `<span class="l-info">${esc(line)}</span>`;
+  }).join('\n');
+}
+
+function esc(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function showLog(key) {
+  currentLog = key;
+  document.querySelectorAll('.log-tab').forEach(t => t.classList.toggle('active', t.dataset.key === key));
+  const box = document.getElementById('logBox');
+  box.innerHTML = colorLog(logsData[key] || '');
+  box.scrollTop = box.scrollHeight;
+}
+
+async function load() {
+  const btn = document.getElementById('btnRefresh');
+  btn.disabled = true;
+  btn.textContent = '↻ Buscando...';
+  try {
+    const r = await fetch(API);
+    const d = await r.json();
+
+    // Processos
+    const grid = document.getElementById('procGrid');
+    grid.innerHTML = d.processes.map(p => `
+      <div class="proc-card ${p.running ? 'on' : 'off'}">
+        <div><span class="proc-dot ${p.running ? 'on' : 'off'}"></span><span class="proc-name">${p.name}</span></div>
+        <div class="proc-meta">
+          ${p.running ? `● RODANDO${p.pid ? ' · PID ' + p.pid : ''}` : '○ PARADO'}
+          ${p.port ? `<br>Porta ${p.port}` : ''}
+        </div>
+      </div>`).join('');
+
+    // Logs
+    logsData = d.logs;
+    const tabs = document.getElementById('logTabs');
+    if (!tabs.children.length) {
+      tabs.innerHTML = Object.keys(d.logs).map(k =>
+        `<div class="log-tab" data-key="${k}" onclick="showLog('${k}')">${LABELS[k] || k}</div>`
+      ).join('');
+      currentLog = Object.keys(d.logs)[0];
+    }
+    showLog(currentLog || Object.keys(d.logs)[0]);
+
+    const now = new Date().toLocaleTimeString('pt-BR');
+    document.getElementById('lastUpdate').textContent = `Atualizado às ${now}`;
+  } catch(e) {
+    document.getElementById('procGrid').innerHTML = `<div class="proc-card off"><div class="proc-name">Erro ao conectar</div><div class="proc-meta">${e.message}</div></div>`;
+  }
+  btn.disabled = false;
+  btn.textContent = '↻ Atualizar';
+}
+
+load();
+</script>
+</body>
+</html>
