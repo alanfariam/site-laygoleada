@@ -52,6 +52,17 @@
   .res-bar-fill { height: 100%; border-radius: 2px; transition: width .4s; }
   .last-update { font-size: 0.68rem; color: var(--text3); font-family: var(--mono); margin-top: 10px; text-align: right; }
 
+  .data-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; margin-bottom: 28px; }
+  .data-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 16px; }
+  .data-card-title { font-size: 0.85rem; font-weight: 700; margin-bottom: 4px; }
+  .data-card-sub { font-size: 0.7rem; color: var(--text3); font-family: var(--mono); margin-bottom: 12px; }
+  .btn-action { background: var(--surface); border: 1px solid var(--border); color: var(--text2); padding: 7px 16px; border-radius: 8px; cursor: pointer; font-size: 0.8rem; font-family: var(--mono); transition: border-color .15s, color .15s; width: 100%; }
+  .btn-action:hover { border-color: var(--green); color: var(--green); }
+  .btn-action:disabled { opacity: .4; cursor: default; }
+  .action-msg { font-size: 0.68rem; font-family: var(--mono); margin-top: 8px; min-height: 1em; }
+  .action-msg.ok  { color: var(--green); }
+  .action-msg.err { color: var(--red); }
+
   @media(max-width:500px){ .status-row { grid-template-columns: 1fr 1fr; } }
 </style>
 </head>
@@ -73,6 +84,22 @@
 <div class="section-label">Recursos da VM</div>
 <div class="res-grid" id="resGrid">
   <div class="res-card" style="opacity:.4">Carregando...</div>
+</div>
+
+<div class="section-label">Cache da Planilha</div>
+<div class="data-grid">
+  <div class="data-card">
+    <div class="data-card-title">LG TRINITY</div>
+    <div class="data-card-sub" id="cacheInfoTrinity">Cache: 30 min</div>
+    <button class="btn-action" id="btnCacheTrinity" onclick="clearCache('trinity')">⟳ Forçar atualização</button>
+    <div class="action-msg" id="cacheMsgTrinity"></div>
+  </div>
+  <div class="data-card">
+    <div class="data-card-title">LG FREE FIRE</div>
+    <div class="data-card-sub" id="cacheInfoFreefire">Cache: 30 min</div>
+    <button class="btn-action" id="btnCacheFreefire" onclick="clearCache('freefire')">⟳ Forçar atualização</button>
+    <div class="action-msg" id="cacheMsgFreefire"></div>
+  </div>
 </div>
 
 <div class="section-label">Logs</div>
@@ -166,6 +193,32 @@ async function load() {
   }
   btn.disabled = false;
   btn.textContent = '↻ Atualizar';
+}
+
+const CACHE_ENDPOINTS = {
+  trinity:  'https://api.laygoleada.com.br/trinity/api/cache/clear',
+  freefire: 'https://api.laygoleada.com.br/api/cache/clear',
+};
+
+async function clearCache(product) {
+  const btn = document.getElementById(`btnCache${product.charAt(0).toUpperCase()+product.slice(1)}`);
+  const msg = document.getElementById(`cacheMsg${product.charAt(0).toUpperCase()+product.slice(1)}`);
+  const info = document.getElementById(`cacheInfo${product.charAt(0).toUpperCase()+product.slice(1)}`);
+  btn.disabled = true;
+  btn.textContent = '⟳ Limpando...';
+  msg.className = 'action-msg';
+  msg.textContent = '';
+  try {
+    await fetch(CACHE_ENDPOINTS[product], { method: 'POST' });
+    msg.className = 'action-msg ok';
+    msg.textContent = '✓ Cache limpo — próxima visita já busca a planilha.';
+    info.textContent = `Limpo às ${new Date().toLocaleTimeString('pt-BR')}`;
+  } catch(e) {
+    msg.className = 'action-msg err';
+    msg.textContent = '✗ Erro: ' + e.message;
+  }
+  btn.disabled = false;
+  btn.textContent = '⟳ Forçar atualização';
 }
 
 load();
