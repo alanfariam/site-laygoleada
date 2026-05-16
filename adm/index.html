@@ -43,6 +43,13 @@
   .log-box .l-error { color: var(--red); }
   .log-empty { color: var(--text3); font-style: italic; }
 
+  .res-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 28px; }
+  .res-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 16px; }
+  .res-label { font-size: 0.68rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--text3); margin-bottom: 8px; }
+  .res-val { font-size: 1.5rem; font-weight: 800; font-family: var(--mono); line-height: 1; }
+  .res-sub { font-size: 0.68rem; color: var(--text3); margin-top: 5px; font-family: var(--mono); }
+  .res-bar { height: 4px; background: var(--border); border-radius: 2px; margin-top: 8px; overflow: hidden; }
+  .res-bar-fill { height: 100%; border-radius: 2px; transition: width .4s; }
   .last-update { font-size: 0.68rem; color: var(--text3); font-family: var(--mono); margin-top: 10px; text-align: right; }
 
   @media(max-width:500px){ .status-row { grid-template-columns: 1fr 1fr; } }
@@ -61,6 +68,11 @@
 <div class="section-label">Processos</div>
 <div class="status-row" id="procGrid">
   <div class="proc-card" style="opacity:.4">Carregando...</div>
+</div>
+
+<div class="section-label">Recursos da VM</div>
+<div class="res-grid" id="resGrid">
+  <div class="res-card" style="opacity:.4">Carregando...</div>
 </div>
 
 <div class="section-label">Logs</div>
@@ -129,6 +141,23 @@ async function load() {
       currentLog = Object.keys(d.logs)[0];
     }
     showLog(currentLog || Object.keys(d.logs)[0]);
+
+    // Recursos
+    const r = d.resources;
+    const fmt = b => b >= 1e9 ? (b/1e9).toFixed(1)+' GB' : (b/1e6).toFixed(0)+' MB';
+    const barColor = p => p < 60 ? 'var(--green)' : p < 85 ? 'var(--amber)' : 'var(--red)';
+    const resItems = [
+      { label: 'CPU', val: r.cpu+'%', sub: 'Uso atual', pct: r.cpu },
+      { label: 'RAM', val: r.ram.pct+'%', sub: `${fmt(r.ram.used)} de ${fmt(r.ram.total)}`, pct: r.ram.pct },
+      { label: 'Disco', val: r.disk.pct+'%', sub: `${fmt(r.disk.used)} de ${fmt(r.disk.total)}`, pct: r.disk.pct },
+    ];
+    document.getElementById('resGrid').innerHTML = resItems.map(i => `
+      <div class="res-card">
+        <div class="res-label">${i.label}</div>
+        <div class="res-val" style="color:${barColor(i.pct)}">${i.val}</div>
+        <div class="res-sub">${i.sub}</div>
+        <div class="res-bar"><div class="res-bar-fill" style="width:${i.pct}%;background:${barColor(i.pct)}"></div></div>
+      </div>`).join('');
 
     const now = new Date().toLocaleTimeString('pt-BR');
     document.getElementById('lastUpdate').textContent = `Atualizado às ${now}`;
