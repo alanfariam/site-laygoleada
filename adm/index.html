@@ -117,8 +117,8 @@ async function load() {
   btn.disabled = true;
   btn.textContent = '↻ Buscando...';
   try {
-    const r = await fetch(API);
-    const d = await r.json();
+    const resp = await fetch(API);
+    const d = await resp.json();
 
     // Processos
     const grid = document.getElementById('procGrid');
