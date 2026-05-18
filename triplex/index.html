@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lay Goleada · LG OVER TRIPLEX</title>
+<title>Lay Goleada · OVER TRIPLEX</title>
+<link rel="icon" type="image/png" href="/favicon.png">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
 :root{
@@ -174,7 +175,7 @@ footer{border-top:1px solid var(--border);padding:16px 24px;display:flex;justify
 <body>
 
 <div id="loading">
-  <div class="loader-logo">LG OVER TRIPLEX</div>
+  <div class="loader-logo">OVER TRIPLEX</div>
   <div class="loader-bar"><div class="loader-fill"></div></div>
   <div id="loadingText">Conectando à planilha...</div>
 </div>
@@ -183,7 +184,7 @@ footer{border-top:1px solid var(--border);padding:16px 24px;display:flex;justify
 
 <div class="banner">
   <div class="banner-left">
-    <div class="logo-method">LG OVER TRIPLEX</div>
+    <div class="logo-method">OVER TRIPLEX</div>
     <span class="status-pill loading" id="statusPill">CARREGANDO</span>
   </div>
   <div class="banner-stats">
@@ -195,7 +196,13 @@ footer{border-top:1px solid var(--border);padding:16px 24px;display:flex;justify
     <div class="bstat"><div class="bstat-label">Total Entradas</div><div class="bstat-val" id="bannerTotal">&#8212;</div></div>
     <div class="bstat"><div class="bstat-label">ROI Geral</div><div class="bstat-val" id="bannerROI">&#8212;%</div></div>
   </div>
-  <div style="font-family:var(--mono);font-size:10px;color:var(--text3);" id="lastUpdate">&#8212;</div>
+  <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
+    <a href="https://instagram.com/overftriplex" target="_blank" style="font-family:var(--mono);font-size:10px;color:var(--text3);text-decoration:none;display:flex;align-items:center;gap:5px;transition:color .15s;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text3)'">
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+      @overftriplex
+    </a>
+    <div style="font-family:var(--mono);font-size:10px;color:var(--text3);" id="lastUpdate">&#8212;</div>
+  </div>
 </div>
 
 <div class="tabs">
@@ -238,7 +245,7 @@ footer{border-top:1px solid var(--border);padding:16px 24px;display:flex;justify
     <div class="section-label">O Método</div>
     <div style="background:var(--bg2);border:1px solid rgba(249,115,22,.2);border-radius:var(--r2);margin-bottom:28px;overflow:hidden;">
       <div style="padding:18px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;">
-        <span style="font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);">LG OVER TRIPLEX</span>
+        <span style="font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);">OVER TRIPLEX</span>
         <span style="font-family:var(--mono);font-size:10px;background:var(--accent-dim);border:1px solid rgba(249,115,22,.3);border-radius:99px;padding:2px 10px;color:var(--accent);">Lay Under Limite</span>
       </div>
       <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:0;">
@@ -323,12 +330,6 @@ footer{border-top:1px solid var(--border);padding:16px 24px;display:flex;justify
   <!-- ══════════════════════════════════════════ KPIs ══ -->
   <div id="page-kpis" class="page">
     <div class="section-label">Filtros</div>
-    <div class="filter-row">
-      <span class="filter-label">Método:</span>
-      <div id="kpiFiltroMetodos" style="display:flex;flex-wrap:wrap;gap:8px;">
-        <button class="fp-btn active" onclick="setMetodo('todos',this)">Todos</button>
-      </div>
-    </div>
     <div class="kf-row">
       <span class="filter-label">Período:</span>
       <button class="kf-btn active" onclick="setKpiFilter('geral',this)">Geral</button>
@@ -367,7 +368,7 @@ footer{border-top:1px solid var(--border);padding:16px 24px;display:flex;justify
       <div class="tbl-wrap">
         <table class="tbl">
           <thead><tr>
-            <th>Data</th><th>Método</th><th>Jogo</th><th>Placar Ent.</th>
+            <th>Data</th><th>Jogo</th><th>Placar Ent.</th>
             <th>Min.</th><th>Campeonato</th><th>Placar Final</th><th>Result.</th><th>Lucro</th>
           </tr></thead>
           <tbody id="tblUltimas"></tbody>
@@ -379,12 +380,6 @@ footer{border-top:1px solid var(--border);padding:16px 24px;display:flex;justify
   <!-- ══════════════════════════════════════════ LUCRO ══ -->
   <div id="page-lucro" class="page">
     <div class="section-label">Filtros</div>
-    <div class="filter-row">
-      <span class="filter-label">Método:</span>
-      <div id="lucroFiltroMetodos" style="display:flex;flex-wrap:wrap;gap:8px;">
-        <button class="fp-btn active" onclick="setMetodoLucro('todos',this)">Todos</button>
-      </div>
-    </div>
 
     <div class="card">
       <div class="card-title">Lucro mensal + volume de operações</div>
@@ -433,7 +428,7 @@ footer{border-top:1px solid var(--border);padding:16px 24px;display:flex;justify
 </div>
 
 <footer>
-  <span id="footerInfo">LG OVER TRIPLEX · Lay Goleada</span>
+  <span id="footerInfo">OVER TRIPLEX · Lay Goleada</span>
   <span>laygoleada.com.br/overtriplex</span>
 </footer>
 
@@ -582,10 +577,9 @@ async function renderKpis(){
 
 function renderUltimas(data){
   const tbody=document.getElementById('tblUltimas');
-  if(!data?.ultimas_operacoes?.length){tbody.innerHTML='<tr><td colspan="9" style="text-align:center;color:var(--text3);padding:24px;">Sem dados</td></tr>';return;}
+  if(!data?.ultimas_operacoes?.length){tbody.innerHTML='<tr><td colspan="8" style="text-align:center;color:var(--text3);padding:24px;">Sem dados</td></tr>';return;}
   tbody.innerHTML=data.ultimas_operacoes.map(op=>`<tr>
     <td style="font-family:var(--mono);font-size:11px;white-space:nowrap;">${op.data}</td>
-    <td style="font-family:var(--mono);font-size:10px;color:var(--accent);white-space:nowrap;">${op.metodo||'—'}</td>
     <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${op.jogo}</td>
     <td style="font-family:var(--mono);">${op.placar||'—'}</td>
     <td style="font-family:var(--mono);text-align:center;">${op.min_alerta!=null?op.min_alerta+"'":'—'}</td>
