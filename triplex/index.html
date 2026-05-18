@@ -459,22 +459,7 @@ function showTab(id){
 async function apiFetch(path){const r=await fetch(API+path);if(r.status===404)return null;if(!r.ok)throw new Error('HTTP '+r.status);return r.json();}
 
 // ── Filtros dinâmicos de método ──
-function buildMetodoBtns(metodos){
-  if(metodosCarregados)return;
-  metodosCarregados=true;
-  const containers=['kpiFiltroMetodos','lucroFiltroMetodos'];
-  const handlers=['setMetodo','setMetodoLucro'];
-  containers.forEach((cid,i)=>{
-    const c=document.getElementById(cid);
-    metodos.forEach(m=>{
-      const btn=document.createElement('button');
-      btn.className='fp-btn';
-      btn.textContent=m;
-      btn.onclick=function(){window[handlers[i]](m,this);};
-      c.appendChild(btn);
-    });
-  });
-}
+function buildMetodoBtns(){}
 
 function setMetodo(m,btn){metodoKpi=m;document.querySelectorAll('#kpiFiltroMetodos .fp-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderKpis();}
 function setMetodoLucro(m,btn){metodoLucro=m;document.querySelectorAll('#lucroFiltroMetodos .fp-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderLucro();if(calYear!==null)fetchMesDetalhe();}
