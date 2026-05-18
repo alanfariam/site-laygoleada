@@ -122,6 +122,12 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
 .card-purple::before{background:linear-gradient(90deg,transparent,#A855F7,transparent);}
 .card-purple .pc-tag{color:#A855F7;background:rgba(168,85,247,.1);border-color:rgba(168,85,247,.3);}
 .card-purple .btn-produto{background:#A855F7;color:#fff;box-shadow:0 4px 20px rgba(168,85,247,.35);}
+/* Over Triplex = laranja */
+.card-orange{border-color:rgba(249,115,22,.2);}
+.card-orange:hover{border-color:rgba(249,115,22,.5);}
+.card-orange::before{background:linear-gradient(90deg,transparent,#F97316,transparent);}
+.card-orange .pc-tag{color:#F97316;background:rgba(249,115,22,.1);border-color:rgba(249,115,22,.3);}
+.card-orange .btn-produto{background:#F97316;color:#fff;box-shadow:0 4px 20px rgba(249,115,22,.35);}
 .pc-header{padding:22px 22px 16px;border-bottom:1px solid var(--border);}
 .pc-tag{
   font-family:var(--mono);font-size:9px;letter-spacing:.12em;text-transform:uppercase;
@@ -292,6 +298,28 @@ footer a{color:var(--red);text-decoration:none;}
       </div>
     </div>
 
+    <!-- OVER TRIPLEX -->
+    <div class="product-card card-orange">
+      <div class="pc-header">
+        <div class="pc-tag">Over Goals</div>
+        <div class="pc-name">Lay Goleada OVER TRIPLEX</div>
+        <div class="pc-desc">Estratégia de Over com sinais automáticos e resultados mapeados em tempo real.</div>
+      </div>
+      <div class="pc-stats" id="ot-stats">
+        <div class="pc-stat"><div class="pc-stat-val" id="ot-wr">—</div><div class="pc-stat-lbl">Win Rate</div></div>
+        <div class="pc-stat"><div class="pc-stat-val" id="ot-lucro">—</div><div class="pc-stat-lbl">Lucro Total</div></div>
+        <div class="pc-stat"><div class="pc-stat-val" id="ot-roi">—</div><div class="pc-stat-lbl">ROI</div></div>
+      </div>
+      <div class="pc-chart">
+        <div class="pc-chart-label">Curva de lucro acumulado</div>
+        <canvas id="cOT" height="120"></canvas>
+        <div class="pc-loading" id="ot-loading">Carregando dados...</div>
+      </div>
+      <div class="pc-footer">
+        <a class="btn-produto" href="/overtriplex">Ver dashboard OVER TRIPLEX →</a>
+      </div>
+    </div>
+
   </div>
 </div>
 
@@ -398,7 +426,8 @@ footer a{color:var(--red);text-decoration:none;}
 <script>
 const IS_LOCAL = window.location.hostname === 'localhost' || window.location.protocol === 'file:';
 const FF_API  = IS_LOCAL ? 'http://localhost:5000'         : 'https://api.laygoleada.com.br';
-const TR_API  = IS_LOCAL ? 'http://localhost:5001/trinity' : 'https://api.laygoleada.com.br/trinity';
+const TR_API  = IS_LOCAL ? 'http://localhost:5001/trinity'     : 'https://api.laygoleada.com.br/trinity';
+const OT_API  = IS_LOCAL ? 'http://localhost:5001/overtriplex' : 'https://api.laygoleada.com.br/overtriplex';
 
 function fmtBRL(v) {
   const abs = Math.abs(v).toLocaleString('pt-BR', {minimumFractionDigits:2});
@@ -473,8 +502,22 @@ async function loadTR() {
   }
 }
 
+async function loadOT() {
+  try {
+    const d = await fetch(OT_API + '/api/kpis').then(r => r.json());
+    document.getElementById('ot-lucro').textContent = fmtK(d.lucro_total);
+    document.getElementById('ot-wr').textContent    = d.win_rate.toFixed(1) + '%';
+    document.getElementById('ot-roi').textContent   = (d.roi >= 0 ? '+' : '') + d.roi.toFixed(1) + '%';
+    document.getElementById('ot-loading').style.display = 'none';
+    renderMiniChart('cOT', d.acumulado_serie, '#F97316');
+  } catch(e) {
+    document.getElementById('ot-loading').textContent = 'Dados indisponíveis';
+  }
+}
+
 loadFF();
 loadTR();
+loadOT();
 </script>
 </body>
 </html>

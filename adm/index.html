@@ -112,10 +112,10 @@ const API = 'https://api.laygoleada.com.br/adm/api/status';
 let currentLog = null, logsData = {};
 
 const LABELS = {
-  api_freefire: 'API FreeFire',
-  api_trinity:  'API Trinity',
-  bot_trinity:  'Bot Trinity',
-  bot_freefire: 'Bot FreeFire',
+  api_freefire:    'API FreeFire',
+  api_parceiros:   'API Parceiros',
+  bot_trinity:     'Bot Trinity',
+  bot_freefire:    'Bot FreeFire',
 };
 
 function colorLog(text) {
@@ -196,8 +196,9 @@ async function load() {
 }
 
 const CACHE_ENDPOINTS = {
-  trinity:  'https://api.laygoleada.com.br/trinity/api/cache/clear',
-  freefire: 'https://api.laygoleada.com.br/api/cache/clear',
+  freefire:    'https://api.laygoleada.com.br/api/cache/clear',
+  trinity:     'https://api.laygoleada.com.br/trinity/api/cache/clear',
+  overtriplex: 'https://api.laygoleada.com.br/overtriplex/api/cache/clear',
 };
 
 async function clearCache(product) {
