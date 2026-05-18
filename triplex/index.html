@@ -461,7 +461,7 @@ function showTab(id){
   ['inicio','kpis','lucro'].forEach((n,i)=>{if(n===id)document.querySelectorAll('.tab')[i].classList.add('active');});
 }
 
-async function apiFetch(path){const r=await fetch(API+path);if(!r.ok)throw new Error('HTTP '+r.status);return r.json();}
+async function apiFetch(path){const r=await fetch(API+path);if(r.status===404)return null;if(!r.ok)throw new Error('HTTP '+r.status);return r.json();}
 
 // ── Filtros dinâmicos de método ──
 function buildMetodoBtns(metodos){
@@ -712,7 +712,12 @@ async function init(){
       apiFetch('/api/lucro-mensal'),
       apiFetch('/api/lucro-diario'),
     ]);
-    rawKpis=kpiRes; rawMensal=mensalRes; rawDiario=diarioRes;
+    rawKpis=kpiRes; rawMensal=mensalRes||[]; rawDiario=diarioRes||[];
+    if(!rawKpis){
+      setStatus('ok','SEM DADOS');
+      hideLoading();
+      return;
+    }
     setStatus('ok','AO VIVO');
     // Botões dinâmicos de método
     if(rawKpis.metodos_disponiveis?.length){
