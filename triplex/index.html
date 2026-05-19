@@ -382,7 +382,7 @@ footer{border-top:1px solid var(--border);padding:16px 24px;display:flex;justify
       <div class="chart-wrap"><canvas id="cLucroDiarioKpi" height="200"></canvas></div>
     </div>
     <div class="card">
-      <div class="card-title">Lucro por dia da semana (R$)</div>
+      <div class="card-title">Win Rate por dia da semana</div>
       <div class="chart-wrap"><canvas id="cDiaSemana" height="200"></canvas></div>
     </div>
 
@@ -625,17 +625,21 @@ function renderDiaSemana(dados){
   const canvas=document.getElementById('cDiaSemana');
   if(!canvas||!dados.length)return;
   const labels=['Seg','Ter','Qua','Qui','Sex','Sáb','Dom'];
-  const totais=[0,0,0,0,0,0,0];
+  const greens=[0,0,0,0,0,0,0], total=[0,0,0,0,0,0,0];
   dados.forEach(d=>{
     const p=d.data.split('/');
     const y=p[2].length===2?2000+parseInt(p[2]):parseInt(p[2]);
     const dow=new Date(y,parseInt(p[1])-1,parseInt(p[0])).getDay();
-    const idx=dow===0?6:dow-1; // 0=Dom→6, 1=Seg→0 ...
-    totais[idx]+=parseFloat(d.lucro)||0;
+    const idx=dow===0?6:dow-1;
+    total[idx]+=(d.greens||0)+(d.reds||0);
+    greens[idx]+=(d.greens||0);
   });
-  const vals=totais.map(v=>parseFloat(v.toFixed(2)));
+  const wr=total.map((t,i)=>t>0?parseFloat((greens[i]/t*100).toFixed(1)):0);
   destroyChart('cDiaSemana');
-  charts['cDiaSemana']=new Chart(canvas,{type:'bar',data:{labels,datasets:[{data:vals,backgroundColor:vals.map(v=>v>=0?'rgba(249,115,22,.7)':'rgba(240,90,90,.7)'),borderColor:vals.map(v=>v>=0?'#F97316':'#F05A5A'),borderWidth:1,borderRadius:4,borderSkipped:false}]},options:{...cd(),scales:{y:{ticks:{callback:v=>'R$'+v.toLocaleString('pt-BR',{minimumFractionDigits:0}),color:'#556070',font:{size:10}},grid:{color:'rgba(255,255,255,.04)'}},x:{ticks:{color:'#8A96A3',font:{size:11}},grid:{display:false}}}}});
+  charts['cDiaSemana']=new Chart(canvas,{type:'bar',data:{labels,datasets:[
+    {type:'bar',data:wr,backgroundColor:wr.map(v=>v>=50?'rgba(249,115,22,.7)':'rgba(240,90,90,.5)'),borderColor:wr.map(v=>v>=50?'#F97316':'#F05A5A'),borderWidth:1,borderRadius:4,borderSkipped:false,yAxisID:'y',label:'Win Rate %'},
+    {type:'line',data:total,borderColor:'rgba(255,255,255,.4)',backgroundColor:'rgba(255,255,255,.05)',borderWidth:2,pointRadius:4,pointBackgroundColor:'rgba(255,255,255,.8)',tension:.3,fill:false,yAxisID:'y2',label:'Jogos'}
+  ]},options:{...cd(),plugins:{...cd().plugins,legend:{display:true,labels:{color:'#8A96A3',font:{size:10},boxWidth:10}}},scales:{y:{min:0,max:100,ticks:{callback:v=>v+'%',color:'#556070',font:{size:10}},grid:{color:'rgba(255,255,255,.04)'}},y2:{position:'right',ticks:{callback:v=>v+'j',color:'rgba(255,255,255,.35)',font:{size:10}},grid:{display:false}},x:{ticks:{color:'#8A96A3',font:{size:11}},grid:{display:false}}}}});
 }
 
 async function renderLucro(){
