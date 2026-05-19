@@ -306,8 +306,15 @@ footer a{color:var(--red);text-decoration:none;}
         <div class="pc-name">OVER TRIPLEX</div>
         <div class="pc-desc">Estratégia de Over com análise manual pré-live e live. Sinais via canal do Telegram.</div>
       </div>
-      <div class="pc-chart" style="padding:32px 22px;text-align:center;">
-        <div style="font-family:var(--mono);font-size:11px;color:var(--text3);letter-spacing:.1em;text-transform:uppercase;">Em breve</div>
+      <div class="pc-stats">
+        <div class="pc-stat"><div class="pc-stat-val w" id="ot-wr">—</div><div class="pc-stat-lbl">Win Rate</div></div>
+        <div class="pc-stat"><div class="pc-stat-val g" id="ot-lucro">—</div><div class="pc-stat-lbl">Lucro Total</div></div>
+        <div class="pc-stat"><div class="pc-stat-val" id="ot-ent">—</div><div class="pc-stat-lbl">Operações</div></div>
+      </div>
+      <div class="pc-chart">
+        <div class="pc-chart-label">Curva de lucro acumulado</div>
+        <canvas id="cOT" height="120"></canvas>
+        <div class="pc-loading" id="ot-loading">Carregando dados...</div>
       </div>
       <div class="pc-footer">
         <div class="btn-soon">Em breve · lançamento</div>
@@ -421,6 +428,7 @@ footer a{color:var(--red);text-decoration:none;}
 const IS_LOCAL = window.location.hostname === 'localhost' || window.location.protocol === 'file:';
 const FF_API  = IS_LOCAL ? 'http://localhost:5000'         : 'https://api.laygoleada.com.br';
 const TR_API  = IS_LOCAL ? 'http://localhost:5001/trinity'     : 'https://api.laygoleada.com.br/trinity';
+const OT_API  = IS_LOCAL ? 'http://localhost:5001/overtriplex' : 'https://api.laygoleada.com.br/overtriplex';
 
 function fmtBRL(v) {
   const abs = Math.abs(v).toLocaleString('pt-BR', {minimumFractionDigits:2});
@@ -495,8 +503,23 @@ async function loadTR() {
   }
 }
 
+async function loadOT() {
+  try {
+    const d = await fetch(OT_API + '/api/kpis').then(r => r.json());
+    if (!d) return;
+    document.getElementById('ot-lucro').textContent = fmtK(d.lucro_total);
+    document.getElementById('ot-wr').textContent    = d.win_rate.toFixed(1) + '%';
+    document.getElementById('ot-ent').textContent   = d.total_entradas;
+    document.getElementById('ot-loading').style.display = 'none';
+    renderMiniChart('cOT', d.acumulado_serie, '#F97316');
+  } catch(e) {
+    document.getElementById('ot-loading').textContent = 'Dados indisponíveis';
+  }
+}
+
 loadFF();
 loadTR();
+loadOT();
 </script>
 </body>
 </html>

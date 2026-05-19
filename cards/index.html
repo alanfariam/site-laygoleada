@@ -411,14 +411,18 @@ h1 {
 .p-dot { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
 .p-dot.g { background:#00e676; box-shadow:0 0 5px rgba(0,230,118,.9); }
 .p-dot.p { background:#A855F7; box-shadow:0 0 5px rgba(168,85,247,.9); }
+.p-dot.o { background:#F97316; box-shadow:0 0 5px rgba(249,115,22,.9); }
 .p-name { font-family:'Space Mono',monospace; font-size:9px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; }
 .p-name.g { color:#00e676; }
 .p-name.p { color:#A855F7; }
+.p-name.o { color:#F97316; }
 .p-em-breve { font-family:'Space Mono',monospace; font-size:7px; letter-spacing:.1em; text-transform:uppercase; color:#A855F7; background:rgba(168,85,247,.1); border:1px solid rgba(168,85,247,.3); padding:2px 8px; border-radius:99px; }
+.p-em-breve.o { color:#F97316; background:rgba(249,115,22,.1); border-color:rgba(249,115,22,.3); }
 .p-stats { display:flex; gap:5px; }
 .p-stat { flex:1; border-radius:8px; padding:7px 5px; text-align:center; }
 .p-stat.g { background:rgba(0,230,118,.07); border:1px solid rgba(0,230,118,.2); }
 .p-stat.p { background:rgba(168,85,247,.07); border:1px solid rgba(168,85,247,.2); }
+.p-stat.o { background:rgba(249,115,22,.07); border:1px solid rgba(249,115,22,.2); }
 .p-sv { font-family:'Space Mono',monospace; font-size:13px; font-weight:700; line-height:1.1; }
 .p-sv.g  { color:#00e676; }
 .p-sv.r  { color:#ff1744; }
@@ -448,13 +452,14 @@ h1 {
 <body>
 
 <h1>📸 LAY GOLEADA · CARDS REELS</h1>
-<p class="subtitle">Portal LayGoleada · Over FreeFire + TRINITY · Gerado automaticamente</p>
+<p class="subtitle">Portal LayGoleada · Over FreeFire + TRINITY + OVER TRIPLEX · Gerado automaticamente</p>
 <div id="status">🔄 Conectando à API...</div>
 <div class="cards-grid" id="cardsGrid"></div>
 
 <script>
 const API    = 'https://api.laygoleada.com.br';
 const TR_API = 'https://api.laygoleada.com.br/trinity';
+const OT_API = 'https://api.laygoleada.com.br/overtriplex';
 const LOGO_SRC = ''; // será preenchido inline
 
 // ── LOGO (do index.html original) ──
@@ -497,7 +502,7 @@ function buildBalls(greens, reds, sequencia) {
   return seq.map(r => `<div class="ball ${r === 'G' ? 'g' : 'r'}">${r}</div>`).join('');
 }
 
-function buildCaption(d, lucro, wr, greens, reds, entradas, dataStr, triaDia) {
+function buildCaption(d, lucro, wr, greens, reds, entradas, dataStr, triaDia, otDia) {
   const lucroSign = lucro >= 0 ? '+R$ ' + lucro.toFixed(2).replace('.',',') : '-R$ ' + Math.abs(lucro).toFixed(2).replace('.',',');
   const emojis = lucro >= 0 ? '🟢✅📈' : '🔴❌📉';
   let triaLine = '';
@@ -507,10 +512,23 @@ function buildCaption(d, lucro, wr, greens, reds, entradas, dataStr, triaDia) {
     const tEnt   = triaDia.total || (triaDia.greens + triaDia.reds) || 0;
     const tWr    = tEnt > 0 ? ((triaDia.greens / tEnt) * 100) : 0;
     triaLine = `
-🟣 LAY GOLEADA TRINITY (Em breve)
+🟣 LAY GOLEADA TRINITY
 💰 Lucro: ${tSign}
 📊 Win Rate: ${fmtPct(tWr)}
 ⚽ Entradas: ${tEnt} | ✅ Greens: ${triaDia.greens} | ❌ Reds: ${triaDia.reds}
+`;
+  }
+  let otLine = '';
+  if (otDia) {
+    const oLucro = parseFloat(otDia.lucro) || 0;
+    const oSign  = oLucro >= 0 ? '+R$ ' + oLucro.toFixed(2).replace('.',',') : '-R$ ' + Math.abs(oLucro).toFixed(2).replace('.',',');
+    const oEnt   = otDia.total || (otDia.greens + otDia.reds) || 0;
+    const oWr    = oEnt > 0 ? ((otDia.greens / oEnt) * 100) : 0;
+    otLine = `
+🟠 OVER TRIPLEX
+💰 Lucro: ${oSign}
+📊 Win Rate: ${fmtPct(oWr)}
+⚽ Entradas: ${oEnt} | ✅ Greens: ${otDia.greens} | ❌ Reds: ${otDia.reds}
 `;
   }
   return `${emojis} RESULTADO DO DIA — ${dataStr.toUpperCase()}
@@ -519,13 +537,13 @@ function buildCaption(d, lucro, wr, greens, reds, entradas, dataStr, triaDia) {
 💰 Lucro: ${lucroSign}
 📊 Win Rate: ${fmtPct(wr)}
 ⚽ Entradas: ${entradas} | ✅ Greens: ${greens} | ❌ Reds: ${reds}
-${triaLine}
-Portal LayGoleada 🏆 | Dois métodos. Uma plataforma.
+${triaLine}${otLine}
+Portal LayGoleada 🏆 | Três métodos. Uma plataforma.
 
 🔔 Acompanhe os resultados diários e entre para o grupo VIP!
 👉 www.laygoleada.com.br
 
-#LayGoleada #OverFreeFire #LGTrinity #ApostasEsportivas #GreenDay #BetBrasil #ResultadoDoDia #ApostasInteligentes #TipsGratuitas #WinRate #TradeEsportivo`;
+#LayGoleada #OverFreeFire #LGTrinity #OverTriplex #ApostasEsportivas #GreenDay #BetBrasil #ResultadoDoDia #ApostasInteligentes #TipsGratuitas #WinRate #TradeEsportivo`;
 }
 
 function buildPBalls(g, r, cls, sequencia) {
@@ -535,7 +553,7 @@ function buildPBalls(g, r, cls, sequencia) {
   return seq.map(s => `<div class="p-ball ${s==='G'?cls:'r'}">${s}</div>`).join('');
 }
 
-function buildCard(dia, acumuladoMes, triaDia) {
+function buildCard(dia, acumuladoMes, triaDia, otDia) {
   const wrapper   = document.createElement('div');
   wrapper.className = 'card-wrapper';
 
@@ -544,7 +562,8 @@ function buildCard(dia, acumuladoMes, triaDia) {
   cardEl.id = 'card-' + dia.data.replace(/\//g, '-');
   const _lucroRaw  = parseFloat(dia.lucro) || 0;
   const _triaLucro = triaDia ? (parseFloat(triaDia.lucro) || 0) : 0;
-  const _lucroTotal = _lucroRaw + _triaLucro;
+  const _otLucro   = otDia   ? (parseFloat(otDia.lucro)   || 0) : 0;
+  const _lucroTotal = _lucroRaw + _triaLucro + _otLucro;
   const _borderColor = _lucroTotal > 0 ? '#00e676' : _lucroTotal < 0 ? '#ff1744' : '#FFD700';
   const _glowRgb    = _lucroTotal > 0 ? '0,230,118' : _lucroTotal < 0 ? '255,23,68' : '255,215,0';
   cardEl.style.borderColor = _borderColor;
@@ -641,6 +660,40 @@ function buildCard(dia, acumuladoMes, triaDia) {
       <div class="p-sem-dados">Sem entradas neste dia</div>`}
     </div>
 
+    <div class="p-divider"></div>
+
+    <!-- OVER TRIPLEX -->
+    <div class="p-block">
+      ${otDia ? (() => {
+        const oG   = otDia.greens || 0;
+        const oR   = otDia.reds   || 0;
+        const oEnt = otDia.total  || (oG + oR);
+        const oWr  = oEnt > 0 ? (oG / oEnt * 100) : 0;
+        const oWrP = Math.min(oWr, 100);
+        const oLuc = parseFloat(otDia.lucro) || 0;
+        return `
+      <div class="p-header">
+        <div class="p-pill"><div class="p-dot o"></div><div class="p-name o">OVER TRIPLEX</div></div>
+        <a href="https://www.laygoleada.com.br/triplex" target="_blank" class="p-em-breve o" style="text-decoration:none;">Ver TRIPLEX →</a>
+      </div>
+      <div class="p-stats">
+        <div class="p-stat o"><div class="p-sv ${oLuc >= 0 ? 'g' : 'r'}">${fmtReais(oLuc)}</div><div class="p-sl">Lucro Dia</div></div>
+        <div class="p-stat o"><div class="p-sv wht">${oEnt}</div><div class="p-sl">Entradas</div></div>
+        <div class="p-stat o"><div class="p-sv wht"><span style="color:#00e676">${oG}G</span> · <span style="color:#ff1744">${oR}R</span></div><div class="p-sl">Resultado</div></div>
+      </div>
+      <div class="p-wr">
+        <div class="p-wr-top"><span class="p-wr-lbl">Win Rate</span><span class="p-wr-val ${oWr >= 50 ? 'g' : 'r'}">${fmtPct(oWr)}</span></div>
+        <div class="p-wr-bar"><div class="p-wr-fill ${oWr >= 50 ? 'g' : 'r'}" style="width:${oWrP}%"></div></div>
+      </div>
+      <div class="p-balls">${buildPBalls(oG, oR, 'g', otDia.sequencia)}</div>`;
+      })() : `
+      <div class="p-header">
+        <div class="p-pill"><div class="p-dot o"></div><div class="p-name o">OVER TRIPLEX</div></div>
+        <a href="https://www.laygoleada.com.br/triplex" target="_blank" class="p-em-breve o" style="text-decoration:none;">Ver TRIPLEX →</a>
+      </div>
+      <div class="p-sem-dados">Sem entradas neste dia</div>`}
+    </div>
+
     <!-- FOOTER CTA -->
     <div class="card-footer">
       <div class="disclaimer">Dados completos em</div>
@@ -655,7 +708,7 @@ function buildCard(dia, acumuladoMes, triaDia) {
   btnSave.onclick = () => salvarCard(cardEl, dataStr);
 
   // Legenda
-  const captionText = buildCaption(dia, lucro, wr, greens, reds, entradas, dataStr, triaDia);
+  const captionText = buildCaption(dia, lucro, wr, greens, reds, entradas, dataStr, triaDia, otDia);
   const caption = document.createElement('div');
   caption.className = 'caption-box';
   caption.innerHTML = `<strong>📋 Legenda para o Reels</strong>${captionText.replace(/\n/g,'<br>')}`;
@@ -703,13 +756,16 @@ async function init() {
     const mes   = now.getMonth() + 1;
     const ano   = now.getFullYear();
 
-    const [data, triaData] = await Promise.all([
+    const [data, triaData, otData] = await Promise.all([
       fetchApi(`/api/lucro-diario`),
-      fetch(TR_API + '/api/lucro-diario').then(r => r.json()).catch(() => [])
+      fetch(TR_API + '/api/lucro-diario').then(r => r.json()).catch(() => []),
+      fetch(OT_API + '/api/lucro-diario').then(r => r.json()).catch(() => [])
     ]);
-    // Mapear TRINITY por data para lookup rápido
+    // Mapear TRINITY e OVER TRIPLEX por data para lookup rápido
     const triaMap = {};
     (Array.isArray(triaData) ? triaData : []).forEach(d => { triaMap[d.data] = d; });
+    const otMap = {};
+    (Array.isArray(otData) ? otData : []).forEach(d => { otMap[d.data] = d; });
 
     // Filtrar pelo mês corrente
     const dias = (Array.isArray(data) ? data : data.dias || [])
@@ -758,7 +814,7 @@ async function init() {
 
     const grid = document.getElementById('cardsGrid');
     grid.innerHTML = '';
-    dias.slice(0, 3).forEach(d => grid.appendChild(buildCard(d, acumPorData[d.data], triaMap[d.data] || null)));
+    dias.slice(0, 3).forEach(d => grid.appendChild(buildCard(d, acumPorData[d.data], triaMap[d.data] || null, otMap[d.data] || null)));
 
   } catch(e) {
     setStatus('❌ Erro: ' + e.message);
