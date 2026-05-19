@@ -101,6 +101,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
   font-size:14px;color:var(--text2);text-align:center;margin-bottom:40px;
 }
 .products-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;}
+.products-grid > .product-card:last-child:nth-child(odd){grid-column:1/2;justify-self:center;width:100%;}
 .product-card{
   background:var(--bg2);border-radius:var(--r2);overflow:hidden;
   border:1px solid var(--border);transition:border-color .2s,transform .2s;
@@ -302,13 +303,13 @@ footer a{color:var(--red);text-decoration:none;}
     <!-- OVER TRIPLEX -->
     <div class="product-card card-orange">
       <div class="pc-header">
-        <div class="pc-tag">Over Goals</div>
+        <div class="pc-tag">Over Gols</div>
         <div class="pc-name">OVER TRIPLEX</div>
         <div class="pc-desc">Estratégia de Over com análise manual pré-live e live. Sinais via canal do Telegram.</div>
       </div>
       <div class="pc-stats">
-        <div class="pc-stat"><div class="pc-stat-val w" id="ot-wr">—</div><div class="pc-stat-lbl">Win Rate</div></div>
         <div class="pc-stat"><div class="pc-stat-val g" id="ot-lucro">—</div><div class="pc-stat-lbl">Lucro Total</div></div>
+        <div class="pc-stat"><div class="pc-stat-val w" id="ot-wr">—</div><div class="pc-stat-lbl">Win Rate</div></div>
         <div class="pc-stat"><div class="pc-stat-val" id="ot-ent">—</div><div class="pc-stat-lbl">Operações</div></div>
       </div>
       <div class="pc-chart">
