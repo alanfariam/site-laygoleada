@@ -32,7 +32,12 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 /* ── BANNER ── */
 .banner{background:var(--bg2);border-bottom:1px solid var(--border);padding:10px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;}
 .banner-left{display:flex;align-items:center;gap:16px;}
-.logo-method{font-family:var(--mono);font-size:13px;font-weight:700;letter-spacing:.12em;color:var(--accent);}
+.logo-wrap{display:flex;align-items:center;gap:10px;text-decoration:none;}
+.logo-img{width:34px;height:34px;border-radius:50%;object-fit:cover;border:2px solid var(--accent);flex-shrink:0;}
+.logo-info{display:flex;flex-direction:column;gap:1px;}
+.logo-brand{font-family:var(--mono);font-size:13px;font-weight:700;color:var(--text);letter-spacing:.04em;line-height:1;}
+.logo-method{font-family:var(--mono);font-size:9px;color:var(--accent);letter-spacing:.1em;text-transform:uppercase;}
+.logo-parceiro{font-family:var(--mono);font-size:8px;color:var(--text3);letter-spacing:.08em;text-transform:uppercase;}
 .status-pill{font-family:var(--mono);font-size:10px;padding:3px 10px;border-radius:99px;letter-spacing:.06em;}
 .status-pill.ok{background:rgba(46,204,138,.12);color:var(--green);border:1px solid rgba(46,204,138,.25);}
 .status-pill.loading{background:rgba(249,115,22,.12);color:var(--accent);border:1px solid rgba(249,115,22,.25);}
@@ -184,7 +189,14 @@ footer{border-top:1px solid var(--border);padding:16px 24px;display:flex;justify
 
 <div class="banner">
   <div class="banner-left">
-    <div class="logo-method">OVER TRIPLEX</div>
+    <a href="/" class="logo-wrap">
+      <img src="/favicon.png" class="logo-img" alt="Lay Goleada">
+      <div class="logo-info">
+        <div class="logo-brand">LAY GOLEADA</div>
+        <div class="logo-method">Método Over Triplex</div>
+        <div class="logo-parceiro">Parceiros</div>
+      </div>
+    </a>
     <span class="status-pill loading" id="statusPill">CARREGANDO</span>
   </div>
   <div class="banner-stats">
@@ -196,13 +208,20 @@ footer{border-top:1px solid var(--border);padding:16px 24px;display:flex;justify
     <div class="bstat"><div class="bstat-label">Total Entradas</div><div class="bstat-val" id="bannerTotal">&#8212;</div></div>
     <div class="bstat"><div class="bstat-label">ROI Geral</div><div class="bstat-val" id="bannerROI">&#8212;%</div></div>
   </div>
-  <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
-    <a href="https://instagram.com/overftriplex" target="_blank" style="font-family:var(--mono);font-size:10px;color:var(--text3);text-decoration:none;display:flex;align-items:center;gap:5px;transition:color .15s;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text3)'">
-      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
-      @overftriplex
+  <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;">
+    <a href="https://instagram.com/overftriplex" target="_blank" style="font-family:var(--mono);font-size:11px;font-weight:700;color:#fff;text-decoration:none;display:flex;align-items:center;gap:7px;background:rgba(249,115,22,.15);border:1px solid rgba(249,115,22,.5);padding:5px 12px;border-radius:99px;transition:all .15s;" onmouseover="this.style.background='rgba(249,115,22,.3)'" onmouseout="this.style.background='rgba(249,115,22,.15)'">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#F97316" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+      <span style="color:#F97316;">Método por:</span>&nbsp;@overftriplex
     </a>
     <div style="font-family:var(--mono);font-size:10px;color:var(--text3);" id="lastUpdate">&#8212;</div>
   </div>
+</div>
+
+<!-- FAIXA DE SUPORTE -->
+<div style="background:rgba(249,115,22,.08);border-bottom:1px solid rgba(249,115,22,.2);padding:7px 24px;display:flex;align-items:center;justify-content:center;gap:10px;">
+  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#F97316" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+  <span style="font-family:var(--mono);font-size:10px;color:var(--text3);letter-spacing:.06em;">Este método é criado e gerenciado por:</span>
+  <a href="https://instagram.com/overftriplex" target="_blank" style="font-family:var(--mono);font-size:11px;font-weight:700;color:#F97316;text-decoration:none;letter-spacing:.04em;">@overftriplex</a>
 </div>
 
 <div class="tabs">
@@ -361,6 +380,10 @@ footer{border-top:1px solid var(--border);padding:16px 24px;display:flex;justify
     <div class="card">
       <div class="card-title">Lucro diário (R$)</div>
       <div class="chart-wrap"><canvas id="cLucroDiarioKpi" height="200"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Lucro por dia da semana (R$)</div>
+      <div class="chart-wrap"><canvas id="cDiaSemana" height="200"></canvas></div>
     </div>
 
     <div class="section-label">Últimas 100 entradas</div>
@@ -545,7 +568,7 @@ async function renderKpis(){
   if(!data||data.erro){
     ids.forEach(id=>{document.getElementById(id).textContent='—';});
     document.getElementById('k-lucro-s').textContent='Sem dados';
-    renderUltimas(null);renderLucroDiario([]);return;
+    renderUltimas(null);renderLucroDiario([]);renderDiaSemana([]);return;
   }
   const sv=(id,val,cls,sub,sid)=>{const el=document.getElementById(id);el.textContent=val;el.className='kpi-value'+(cls?' '+cls:'');if(sid)document.getElementById(sid).textContent=sub||'';};
   sv('k-lucro',fmtBRL(data.lucro_total),data.lucro_total>=0?'g':'r','Responsabilidade R$1.000','k-lucro-s');
@@ -557,7 +580,7 @@ async function renderKpis(){
   document.getElementById('k-good-run').textContent=(data.maior_good_run||0)+' greens';
   document.getElementById('k-bad-run').textContent=(data.maior_bad_run||0)+' reds';
   document.getElementById('k-drawdown').textContent=data.max_drawdown!=null?'-R$ '+data.max_drawdown.toLocaleString('pt-BR',{minimumFractionDigits:2}):'—';
-  renderAcumulado(data);renderUltimas(data);renderLucroDiario(diario||[]);
+  renderAcumulado(data);renderUltimas(data);renderLucroDiario(diario||[]);renderDiaSemana(diario||[]);
 }
 
 function renderUltimas(data){
@@ -596,6 +619,23 @@ function renderLucroDiario(dados){
   const labels=f.map(d=>d.data), vals=f.map(d=>parseFloat(d.lucro.toFixed(2)));
   destroyChart('cLucroDiarioKpi');
   charts['cLucroDiarioKpi']=new Chart(canvas,{type:'bar',data:{labels,datasets:[{data:vals,backgroundColor:vals.map(v=>v>=0?'rgba(46,204,138,.75)':'rgba(240,90,90,.75)'),borderColor:vals.map(v=>v>=0?'#2ECC8A':'#F05A5A'),borderWidth:1,borderRadius:3,borderSkipped:false}]},options:{...cd(),scales:{y:{ticks:{callback:v=>'R$'+v.toLocaleString('pt-BR',{minimumFractionDigits:0}),color:'#556070',font:{size:10}},grid:{color:'rgba(255,255,255,.04)'}},x:{ticks:{color:'#8A96A3',font:{size:9},maxRotation:45,autoSkip:true,maxTicksLimit:20},grid:{display:false}}}}});
+}
+
+function renderDiaSemana(dados){
+  const canvas=document.getElementById('cDiaSemana');
+  if(!canvas||!dados.length)return;
+  const labels=['Seg','Ter','Qua','Qui','Sex','Sáb','Dom'];
+  const totais=[0,0,0,0,0,0,0];
+  dados.forEach(d=>{
+    const p=d.data.split('/');
+    const y=p[2].length===2?2000+parseInt(p[2]):parseInt(p[2]);
+    const dow=new Date(y,parseInt(p[1])-1,parseInt(p[0])).getDay();
+    const idx=dow===0?6:dow-1; // 0=Dom→6, 1=Seg→0 ...
+    totais[idx]+=parseFloat(d.lucro)||0;
+  });
+  const vals=totais.map(v=>parseFloat(v.toFixed(2)));
+  destroyChart('cDiaSemana');
+  charts['cDiaSemana']=new Chart(canvas,{type:'bar',data:{labels,datasets:[{data:vals,backgroundColor:vals.map(v=>v>=0?'rgba(249,115,22,.7)':'rgba(240,90,90,.7)'),borderColor:vals.map(v=>v>=0?'#F97316':'#F05A5A'),borderWidth:1,borderRadius:4,borderSkipped:false}]},options:{...cd(),scales:{y:{ticks:{callback:v=>'R$'+v.toLocaleString('pt-BR',{minimumFractionDigits:0}),color:'#556070',font:{size:10}},grid:{color:'rgba(255,255,255,.04)'}},x:{ticks:{color:'#8A96A3',font:{size:11}},grid:{display:false}}}}});
 }
 
 async function renderLucro(){
