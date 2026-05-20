@@ -748,23 +748,6 @@ footer{position:relative;z-index:1;margin-top:48px;padding:24px 32px;
       <div class="chart-wrap"><canvas id="cSaude" height="220"></canvas></div>
     </div>
 
-    <!-- Distribuição do intervalo + Resumo -->
-    <div class="section-label">Intervalo entre alerta e gol (greens com MIN. GOL preenchido)</div>
-    <div class="grid2">
-      <div class="card">
-        <div class="card-title">Distribuição dos intervalos (%) — apenas considerando os greens</div>
-        <div class="leg">
-          <span><span class="ld" style="background:#2ECC8A;"></span>Dentro de 20 min</span>
-          <span><span class="ld" style="background:#F05A5A;"></span>Fora de 20 min</span>
-        </div>
-        <div class="chart-wrap"><canvas id="cInterval" height="260"></canvas></div>
-      </div>
-      <div class="card">
-        <div class="card-title">Resumo estatístico — apenas considerando os greens</div>
-        <div id="intResumoContent"></div>
-      </div>
-    </div>
-
     <!-- 1T vs 2T -->
     <div class="section-label">Greens por tempo — base total vs mês atual</div>
     <div class="card">
@@ -788,6 +771,20 @@ footer{position:relative;z-index:1;margin-top:48px;padding:24px 32px;
     <div class="card">
       <div class="card-title">% de gols saídos em cada faixa de minuto (incl. sem gol → &gt; 101)</div>
       <div class="chart-wrap"><canvas id="cDistMinGol" height="260"></canvas></div>
+    </div>
+
+    <!-- Distribuição Primeiro Gol pós-alerta -->
+    <div class="section-label">Primeiro gol após o alerta — distribuição em faixas de 5 min (todas as entradas)</div>
+    <div class="card">
+      <div class="card-title">Em quantos minutos chegou o primeiro gol após o alerta?</div>
+      <div class="chart-wrap"><canvas id="cDistPrimGol" height="260"></canvas></div>
+    </div>
+
+    <!-- WR por Minuto de Alerta -->
+    <div class="section-label">Win Rate % por minuto de alerta (mín. 3 entradas por minuto)</div>
+    <div class="card">
+      <div class="card-title">Win Rate de acordo com o minuto em que o alerta chegou</div>
+      <div class="chart-wrap"><canvas id="cWRMinAlerta" height="260"></canvas></div>
     </div>
 
     <!-- Sequencias consecutivas -->
@@ -1086,6 +1083,8 @@ let rawLayCs     = null;
 let rawSilencio      = null;
 let rawGolsPosAlerta = null;
 let rawLucroDiario = null;
+let rawDistPrimGol   = null;
+let rawWRMinAlerta   = null;
 let calYear = null, calMonth = null;
 let rawMesDetalhe = null;
 let campData     = [];
@@ -1152,7 +1151,7 @@ async function init() {
     await api('/api/ping');
     setLoadingText('Carregando dados...');
 
-    [rawKpisGeral, rawMensal, rawDias, rawCamp, rawOdds, rawGols, rawInterval, rawTimes, rawQtdGols, rawSilencio, rawLayCs, rawLucroDiario, rawGolsPosAlerta] = await Promise.all([
+    [rawKpisGeral, rawMensal, rawDias, rawCamp, rawOdds, rawGols, rawInterval, rawTimes, rawQtdGols, rawSilencio, rawLayCs, rawLucroDiario, rawGolsPosAlerta, rawDistPrimGol, rawWRMinAlerta] = await Promise.all([
       api('/api/kpis'),
       api('/api/lucro-mensal'),
       api('/api/winrate-dias'),
@@ -1166,6 +1165,8 @@ async function init() {
       api('/api/lay-cs').catch(() => null),
       api('/api/lucro-diario').catch(() => null),
       api('/api/gols-pos-alerta').catch(() => null),
+      api('/api/dist-primeiro-gol').catch(() => null),
+      api('/api/wr-minuto-alerta').catch(() => null),
     ]);
 
     populateKpiSelects();
@@ -1184,6 +1185,8 @@ async function init() {
     if (rawLayCs)    renderLayCs();
     if (rawSilencio)      renderSilencio();
     if (rawGolsPosAlerta) renderGolsPosAlerta();
+    if (rawDistPrimGol)   renderDistPrimGol();
+    if (rawWRMinAlerta)   renderWRMinAlerta();
     if (rawLucroDiario) initCalendario();
 
     // Popula banner com dados reais
@@ -1905,6 +1908,65 @@ function renderInterval() {
 }
 
 function round1(v) { return Math.round(v * 10) / 10; }
+
+// ══════════════════════════════════════════════
+// DIST PRIMEIRO GOL PÓS-ALERTA
+// ══════════════════════════════════════════════
+function renderDistPrimGol() {
+  if (!rawDistPrimGol) return;
+  const faixas = rawDistPrimGol.faixas;
+  const labels = faixas.map(f => f.faixa);
+  const counts = faixas.map(f => f.count);
+  const isSemGol = (_, i) => labels[i] === 'Sem Gols';
+  const colors = counts.map((_, i) => isSemGol(_, i) ? 'rgba(240,90,90,.65)' : 'rgba(46,204,138,.7)');
+
+  destroyChart('cDistPrimGol');
+  charts['cDistPrimGol'] = new Chart(document.getElementById('cDistPrimGol'), {
+    type: 'bar',
+    data: { labels, datasets: [{ data: counts, backgroundColor: colors, borderRadius: 4, barPercentage: .8 }] },
+    options: { ...cd(),
+      scales: {
+        y: { min: 0, ticks: { stepSize: 1, color: '#556070', font: { size: 10 } }, grid: { color: 'rgba(255,255,255,.04)' } },
+        x: { ticks: { color: '#8A96A3', font: { size: 10 } }, grid: { display: false } }
+      },
+      plugins: { ...cd().plugins, tooltip: { ...cd().plugins.tooltip, callbacks: {
+        label: ctx => ` ${ctx.raw} entrada${ctx.raw !== 1 ? 's' : ''}`
+      }}}
+    }
+  });
+}
+
+// ══════════════════════════════════════════════
+// WR POR MINUTO DE ALERTA
+// ══════════════════════════════════════════════
+function renderWRMinAlerta() {
+  if (!rawWRMinAlerta) return;
+  const lista = rawWRMinAlerta.minutos;
+  if (!lista || !lista.length) return;
+  const labels = lista.map(m => 'Min ' + m.minuto);
+  const wrs    = lista.map(m => m.wr);
+
+  destroyChart('cWRMinAlerta');
+  charts['cWRMinAlerta'] = new Chart(document.getElementById('cWRMinAlerta'), {
+    type: 'bar',
+    data: { labels, datasets: [{ data: wrs,
+      backgroundColor: wrs.map(v => v >= 60 ? 'rgba(46,204,138,.75)' : v >= 45 ? 'rgba(240,160,48,.75)' : 'rgba(240,90,90,.65)'),
+      borderRadius: 3, barPercentage: .8
+    }]},
+    options: { ...cd(),
+      scales: {
+        y: { min: 0, max: 100, ticks: { callback: v => v + '%', color: '#556070', font: { size: 10 } }, grid: { color: 'rgba(255,255,255,.04)' } },
+        x: { ticks: { color: '#8A96A3', font: { size: 9 }, maxRotation: 45 }, grid: { display: false } }
+      },
+      plugins: { ...cd().plugins, tooltip: { ...cd().plugins.tooltip, callbacks: {
+        label: ctx => {
+          const m = lista[ctx.dataIndex];
+          return ` ${ctx.raw}% WR  (${m.green} green / ${m.total} entradas)`;
+        }
+      }}}
+    }
+  });
+}
 
 // ══════════════════════════════════════════════
 // HELPERS
