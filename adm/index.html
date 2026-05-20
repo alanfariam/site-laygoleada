@@ -12,7 +12,7 @@
     --mono: 'Courier New', monospace;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; padding: 24px 20px; max-width: 960px; margin: 0 auto; }
+  body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; padding: 24px 20px; max-width: 1100px; margin: 0 auto; }
 
   header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 28px; flex-wrap: wrap; gap: 12px; }
   .header-title { font-size: 1rem; font-weight: 700; font-family: var(--mono); letter-spacing: .08em; }
@@ -21,36 +21,45 @@
   .btn-refresh:hover { border-color: var(--green); color: var(--green); }
   .btn-refresh:disabled { opacity: .4; cursor: default; }
 
-  .status-row { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; margin-bottom: 28px; }
-  .proc-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 16px; }
+  /* Layout de duas colunas para as VMs */
+  .vms-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 28px; }
+  @media(max-width:700px){ .vms-grid { grid-template-columns: 1fr; } }
+
+  .vm-panel { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 18px; }
+  .vm-panel-title { font-size: 0.75rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--text3); margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+  .vm-badge { font-size: 0.65rem; background: rgba(46,204,138,.12); color: var(--green); border: 1px solid rgba(46,204,138,.25); border-radius: 4px; padding: 2px 7px; }
+  .vm-badge.offline { background: rgba(240,90,90,.12); color: var(--red); border-color: rgba(240,90,90,.25); }
+
+  .proc-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px; }
+  .proc-card { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 12px; }
   .proc-card.on  { border-color: rgba(46,204,138,.35); }
   .proc-card.off { border-color: rgba(240,90,90,.35); }
-  .proc-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 6px; }
-  .proc-dot.on  { background: var(--green); box-shadow: 0 0 6px var(--green); }
+  .proc-card.unknown { border-color: rgba(139,148,158,.25); }
+  .proc-dot { width: 7px; height: 7px; border-radius: 50%; display: inline-block; margin-right: 5px; }
+  .proc-dot.on  { background: var(--green); box-shadow: 0 0 5px var(--green); }
   .proc-dot.off { background: var(--red); }
-  .proc-name { font-size: 0.85rem; font-weight: 700; }
-  .proc-meta { font-size: 0.7rem; color: var(--text3); margin-top: 6px; font-family: var(--mono); }
+  .proc-dot.unknown { background: var(--text3); }
+  .proc-name { font-size: 0.8rem; font-weight: 700; }
+  .proc-meta { font-size: 0.65rem; color: var(--text3); margin-top: 5px; font-family: var(--mono); }
+
+  .res-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 14px; }
+  .res-card { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 10px; }
+  .res-label { font-size: 0.6rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--text3); margin-bottom: 5px; }
+  .res-val { font-size: 1.2rem; font-weight: 800; font-family: var(--mono); line-height: 1; }
+  .res-sub { font-size: 0.6rem; color: var(--text3); margin-top: 4px; font-family: var(--mono); }
+  .res-bar { height: 3px; background: var(--border); border-radius: 2px; margin-top: 6px; overflow: hidden; }
+  .res-bar-fill { height: 100%; border-radius: 2px; transition: width .4s; }
 
   .section-label { font-size: 0.68rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--text3); margin-bottom: 10px; }
 
   .log-tabs { display: flex; gap: 6px; margin-bottom: 0; flex-wrap: wrap; }
   .log-tab { background: var(--surface); border: 1px solid var(--border); color: var(--text3); padding: 6px 14px; border-radius: 6px 6px 0 0; cursor: pointer; font-size: 0.75rem; font-family: var(--mono); border-bottom: none; }
   .log-tab.active { background: #1c2330; color: var(--text); border-color: var(--border); border-bottom: 1px solid #1c2330; }
-
-  .log-box { background: #1c2330; border: 1px solid var(--border); border-radius: 0 8px 8px 8px; padding: 14px; font-family: var(--mono); font-size: 0.72rem; line-height: 1.6; color: var(--text2); height: 420px; overflow-y: auto; white-space: pre-wrap; word-break: break-all; }
+  .log-box { background: #1c2330; border: 1px solid var(--border); border-radius: 0 8px 8px 8px; padding: 14px; font-family: var(--mono); font-size: 0.72rem; line-height: 1.6; color: var(--text2); height: 380px; overflow-y: auto; white-space: pre-wrap; word-break: break-all; }
   .log-box .l-info  { color: var(--text2); }
   .log-box .l-warn  { color: var(--amber); }
   .log-box .l-error { color: var(--red); }
   .log-empty { color: var(--text3); font-style: italic; }
-
-  .res-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 28px; }
-  .res-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 16px; }
-  .res-label { font-size: 0.68rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--text3); margin-bottom: 8px; }
-  .res-val { font-size: 1.5rem; font-weight: 800; font-family: var(--mono); line-height: 1; }
-  .res-sub { font-size: 0.68rem; color: var(--text3); margin-top: 5px; font-family: var(--mono); }
-  .res-bar { height: 4px; background: var(--border); border-radius: 2px; margin-top: 8px; overflow: hidden; }
-  .res-bar-fill { height: 100%; border-radius: 2px; transition: width .4s; }
-  .last-update { font-size: 0.68rem; color: var(--text3); font-family: var(--mono); margin-top: 10px; text-align: right; }
 
   .data-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; margin-bottom: 28px; }
   .data-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 16px; }
@@ -63,7 +72,7 @@
   .action-msg.ok  { color: var(--green); }
   .action-msg.err { color: var(--red); }
 
-  @media(max-width:500px){ .status-row { grid-template-columns: 1fr 1fr; } }
+  .last-update { font-size: 0.68rem; color: var(--text3); font-family: var(--mono); margin-top: 10px; text-align: right; }
 </style>
 </head>
 <body>
@@ -76,35 +85,59 @@
   <button class="btn-refresh" id="btnRefresh" onclick="load()">↻ Atualizar</button>
 </header>
 
-<div class="section-label">Processos</div>
-<div class="status-row" id="procGrid">
-  <div class="proc-card" style="opacity:.4">Carregando...</div>
+<!-- VMs lado a lado -->
+<div class="section-label">Máquinas Virtuais</div>
+<div class="vms-grid">
+
+  <!-- VM APIs -->
+  <div class="vm-panel">
+    <div class="vm-panel-title">
+      api-amd <span class="vm-badge" id="badgeApis">APIs</span>
+    </div>
+    <div class="proc-row" id="procApis">
+      <div class="proc-card" style="opacity:.4">Carregando...</div>
+    </div>
+    <div class="res-row" id="resApis">
+      <div class="res-card" style="opacity:.4">...</div>
+    </div>
+  </div>
+
+  <!-- VM Bots -->
+  <div class="vm-panel">
+    <div class="vm-panel-title">
+      bot-telegram <span class="vm-badge" id="badgeBots">Bots</span>
+    </div>
+    <div class="proc-row" id="procBots">
+      <div class="proc-card" style="opacity:.4">Carregando...</div>
+    </div>
+    <div class="res-row" id="resBots">
+      <div class="res-card" style="opacity:.4">...</div>
+    </div>
+  </div>
+
 </div>
 
-<div class="section-label">Recursos da VM</div>
-<div class="res-grid" id="resGrid">
-  <div class="res-card" style="opacity:.4">Carregando...</div>
-</div>
-
+<!-- Cache -->
 <div class="section-label">Cache da Planilha</div>
 <div class="data-grid">
-  <div class="data-card">
-    <div class="data-card-title">LG TRINITY</div>
-    <div class="data-card-sub" id="cacheInfoTrinity">Cache: 30 min</div>
-    <button class="btn-action" id="btnCacheTrinity" onclick="clearCache('trinity')">⟳ Forçar atualização</button>
-    <div class="action-msg" id="cacheMsgTrinity"></div>
-  </div>
   <div class="data-card">
     <div class="data-card-title">LG FREE FIRE</div>
     <div class="data-card-sub" id="cacheInfoFreefire">Cache: 30 min</div>
     <button class="btn-action" id="btnCacheFreefire" onclick="clearCache('freefire')">⟳ Forçar atualização</button>
     <div class="action-msg" id="cacheMsgFreefire"></div>
   </div>
+  <div class="data-card">
+    <div class="data-card-title">LG TRINITY</div>
+    <div class="data-card-sub" id="cacheInfoTrinity">Cache: 30 min</div>
+    <button class="btn-action" id="btnCacheTrinity" onclick="clearCache('trinity')">⟳ Forçar atualização</button>
+    <div class="action-msg" id="cacheMsgTrinity"></div>
+  </div>
 </div>
 
+<!-- Logs -->
 <div class="section-label">Logs</div>
 <div class="log-tabs" id="logTabs"></div>
-<div class="log-box" id="logBox"><span class="log-empty">Selecione um processo acima.</span></div>
+<div class="log-box" id="logBox"><span class="log-empty">Selecione uma aba acima.</span></div>
 <div class="last-update" id="lastUpdate"></div>
 
 <script>
@@ -112,16 +145,16 @@ const API = 'https://api.laygoleada.com.br/adm/api/status';
 let currentLog = null, logsData = {};
 
 const LABELS = {
-  api_freefire:    'API FreeFire',
-  api_parceiros:   'API Parceiros',
-  bot_trinity:     'Bot Trinity',
-  bot_freefire:    'Bot FreeFire',
+  api_freefire:  'API FreeFire',
+  api_parceiros: 'API Parceiros',
+  bot_trinity:   'Bot Trinity',
+  bot_freefire:  'Bot FreeFire',
 };
 
 function colorLog(text) {
   if (!text) return '<span class="log-empty">Log vazio.</span>';
   return text.split('\n').map(line => {
-    if (/\[ERROR\]/.test(line)) return `<span class="l-error">${esc(line)}</span>`;
+    if (/\[ERROR\]/.test(line))   return `<span class="l-error">${esc(line)}</span>`;
     if (/\[WARNING\]/.test(line)) return `<span class="l-warn">${esc(line)}</span>`;
     return `<span class="l-info">${esc(line)}</span>`;
   }).join('\n');
@@ -139,6 +172,38 @@ function showLog(key) {
   box.scrollTop = box.scrollHeight;
 }
 
+function renderProcs(containerId, processes) {
+  const el = document.getElementById(containerId);
+  if (!processes || !processes.length) { el.innerHTML = '<div class="proc-card unknown"><div class="proc-name">Sem dados</div></div>'; return; }
+  el.innerHTML = processes.map(p => {
+    const state = p.running === null ? 'unknown' : p.running ? 'on' : 'off';
+    const label = p.running === null ? '? DESCONHECIDO' : p.running ? `● RODANDO${p.pid ? ' · PID '+p.pid : ''}` : '○ PARADO';
+    return `<div class="proc-card ${state}">
+      <div><span class="proc-dot ${state}"></span><span class="proc-name">${p.name}</span></div>
+      <div class="proc-meta">${label}${p.port ? '<br>Porta '+p.port : ''}</div>
+    </div>`;
+  }).join('');
+}
+
+function renderRes(containerId, r) {
+  const el = document.getElementById(containerId);
+  if (!r) { el.innerHTML = '<div class="res-card" style="opacity:.4;grid-column:span 3">Inacessível</div>'; return; }
+  const fmt = b => b >= 1e9 ? (b/1e9).toFixed(1)+' GB' : (b/1e6).toFixed(0)+' MB';
+  const col = p => p < 60 ? 'var(--green)' : p < 85 ? 'var(--amber)' : 'var(--red)';
+  const items = [
+    { label:'CPU',   val:r.cpu+'%',      sub:'uso atual',                                              pct:r.cpu      },
+    { label:'RAM',   val:r.ram.pct+'%',  sub:`${fmt(r.ram.used)} / ${fmt(r.ram.total)}`,               pct:r.ram.pct  },
+    { label:'Disco', val:r.disk.pct+'%', sub:`${fmt(r.disk.used)} / ${fmt(r.disk.total)}`,             pct:r.disk.pct },
+  ];
+  el.innerHTML = items.map(i => `
+    <div class="res-card">
+      <div class="res-label">${i.label}</div>
+      <div class="res-val" style="color:${col(i.pct)}">${i.val}</div>
+      <div class="res-sub">${i.sub}</div>
+      <div class="res-bar"><div class="res-bar-fill" style="width:${i.pct}%;background:${col(i.pct)}"></div></div>
+    </div>`).join('');
+}
+
 async function load() {
   const btn = document.getElementById('btnRefresh');
   btn.disabled = true;
@@ -147,64 +212,45 @@ async function load() {
     const resp = await fetch(API);
     const d = await resp.json();
 
-    // Processos
-    const grid = document.getElementById('procGrid');
-    grid.innerHTML = d.processes.map(p => `
-      <div class="proc-card ${p.running ? 'on' : 'off'}">
-        <div><span class="proc-dot ${p.running ? 'on' : 'off'}"></span><span class="proc-name">${p.name}</span></div>
-        <div class="proc-meta">
-          ${p.running ? `● RODANDO${p.pid ? ' · PID ' + p.pid : ''}` : '○ PARADO'}
-          ${p.port ? `<br>Porta ${p.port}` : ''}
-        </div>
-      </div>`).join('');
+    // VM APIs
+    renderProcs('procApis', d.apis.processes);
+    renderRes('resApis', d.apis.resources);
 
-    // Logs
-    logsData = d.logs;
+    // VM Bots
+    const botsOk = d.bots && d.bots.resources;
+    document.getElementById('badgeBots').className = 'vm-badge' + (botsOk ? '' : ' offline');
+    renderProcs('procBots', d.bots ? d.bots.processes : null);
+    renderRes('resBots', d.bots ? d.bots.resources : null);
+
+    // Logs — combina as duas VMs
+    logsData = { ...d.apis.logs, ...(d.bots ? d.bots.logs : {}) };
     const tabs = document.getElementById('logTabs');
     if (!tabs.children.length) {
-      tabs.innerHTML = Object.keys(d.logs).map(k =>
+      tabs.innerHTML = Object.keys(logsData).map(k =>
         `<div class="log-tab" data-key="${k}" onclick="showLog('${k}')">${LABELS[k] || k}</div>`
       ).join('');
-      currentLog = Object.keys(d.logs)[0];
+      currentLog = Object.keys(logsData)[0];
     }
-    showLog(currentLog || Object.keys(d.logs)[0]);
+    showLog(currentLog || Object.keys(logsData)[0]);
 
-    // Recursos
-    const r = d.resources;
-    const fmt = b => b >= 1e9 ? (b/1e9).toFixed(1)+' GB' : (b/1e6).toFixed(0)+' MB';
-    const barColor = p => p < 60 ? 'var(--green)' : p < 85 ? 'var(--amber)' : 'var(--red)';
-    const resItems = [
-      { label: 'CPU', val: r.cpu+'%', sub: 'Uso atual', pct: r.cpu },
-      { label: 'RAM', val: r.ram.pct+'%', sub: `${fmt(r.ram.used)} de ${fmt(r.ram.total)}`, pct: r.ram.pct },
-      { label: 'Disco', val: r.disk.pct+'%', sub: `${fmt(r.disk.used)} de ${fmt(r.disk.total)}`, pct: r.disk.pct },
-    ];
-    document.getElementById('resGrid').innerHTML = resItems.map(i => `
-      <div class="res-card">
-        <div class="res-label">${i.label}</div>
-        <div class="res-val" style="color:${barColor(i.pct)}">${i.val}</div>
-        <div class="res-sub">${i.sub}</div>
-        <div class="res-bar"><div class="res-bar-fill" style="width:${i.pct}%;background:${barColor(i.pct)}"></div></div>
-      </div>`).join('');
-
-    const now = new Date().toLocaleTimeString('pt-BR');
-    document.getElementById('lastUpdate').textContent = `Atualizado às ${now}`;
+    document.getElementById('lastUpdate').textContent = `Atualizado às ${new Date().toLocaleTimeString('pt-BR')}`;
   } catch(e) {
-    document.getElementById('procGrid').innerHTML = `<div class="proc-card off"><div class="proc-name">Erro ao conectar</div><div class="proc-meta">${e.message}</div></div>`;
+    document.getElementById('procApis').innerHTML = `<div class="proc-card off"><div class="proc-name">Erro</div><div class="proc-meta">${e.message}</div></div>`;
   }
   btn.disabled = false;
   btn.textContent = '↻ Atualizar';
 }
 
 const CACHE_ENDPOINTS = {
-  freefire:    'https://api.laygoleada.com.br/api/cache/clear',
-  trinity:     'https://api.laygoleada.com.br/trinity/api/cache/clear',
-  overtriplex: 'https://api.laygoleada.com.br/overtriplex/api/cache/clear',
+  freefire: 'https://api.laygoleada.com.br/api/cache/clear',
+  trinity:  'https://api.laygoleada.com.br/trinity/api/cache/clear',
 };
 
 async function clearCache(product) {
-  const btn = document.getElementById(`btnCache${product.charAt(0).toUpperCase()+product.slice(1)}`);
-  const msg = document.getElementById(`cacheMsg${product.charAt(0).toUpperCase()+product.slice(1)}`);
-  const info = document.getElementById(`cacheInfo${product.charAt(0).toUpperCase()+product.slice(1)}`);
+  const cap = product.charAt(0).toUpperCase()+product.slice(1);
+  const btn = document.getElementById('btnCache'+cap);
+  const msg = document.getElementById('cacheMsg'+cap);
+  const info = document.getElementById('cacheInfo'+cap);
   btn.disabled = true;
   btn.textContent = '⟳ Limpando...';
   msg.className = 'action-msg';
