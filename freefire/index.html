@@ -1799,37 +1799,6 @@ function renderInterval() {
     }
   });
 
-  // ── 2. DISTRIBUIÇÃO INTERVALO em % ──
-  const dist = d.distribuicao || [];
-  const labs = dist.map(x => x.faixa);
-  const pcts = dist.map(x => x.pct);
-  const isGr = labs.map(l => ['0–5','6–10','11–15','16–20'].includes(l));
-
-  destroyChart('cInterval');
-  charts['cInterval'] = new Chart(document.getElementById('cInterval'), {
-    type: 'bar',
-    data: { labels: labs, datasets: [{ data: pcts, backgroundColor: isGr.map(v=>v?'rgba(46,204,138,.7)':'rgba(240,90,90,.65)'), borderRadius: 4, barPercentage: .6 }]},
-    options: { ...cd(), scales: {
-      y: { max:100, ticks:{ callback:v=>v+'%', color:'#556070', font:{size:10} }, grid:{ color:'rgba(255,255,255,.04)' } },
-      x: { ticks:{ color:'#8A96A3', font:{size:11} }, grid:{ display:false } }
-    }, plugins: { ...cd().plugins, tooltip: { ...cd().plugins.tooltip, callbacks: { label: ctx => ` ${ctx.raw}% dos greens` } } } }
-  });
-
-  // ── 3. RESUMO ESTATÍSTICO (sem descartados) ──
-  document.getElementById('intResumoContent').innerHTML = `
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:4px;">
-      ${[
-        ['Greens analisados',  d.total_greens_iv,           'var(--text)'],
-        ['Gol em até 20 min',  d.dentro_20min,              'var(--green)'],
-        ['% dentro de 20 min', d.pct_dentro_20min + '%',    'var(--green)'],
-        ['Intervalo médio',    d.media_intervalo + ' min',  'var(--amber)'],
-      ].map(([l,v,c]) => `
-        <div style="background:var(--bg3);border-radius:10px;padding:16px 18px;">
-          <div style="font-size:10px;color:var(--text3);font-family:var(--mono);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px;">${l}</div>
-          <div style="font-size:26px;font-weight:600;font-family:var(--mono);color:${c};">${v}</div>
-        </div>`).join('')}
-    </div>`;
-
   // ── 4. 1T vs 2T: barras agrupadas base total vs mês atual ──
   const gtTotal = d.greens_total || 1;
   const gtMes   = d.greens_mes   || 1;
