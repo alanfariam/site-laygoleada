@@ -248,7 +248,7 @@ footer{border-top:1px solid var(--border);padding:16px 24px;display:flex;justify
 
     <div class="section-label">Desempenho consolidado</div>
     <div class="ini-kpi-grid">
-      <div class="kpi"><div class="kpi-label">Lucro Total</div><div class="kpi-value g" id="iniKpiLucro">&#8212;</div><div class="kpi-sub">Responsabilidade R$1.000/entrada</div></div>
+      <div class="kpi"><div class="kpi-label">Lucro Total</div><div class="kpi-value g" id="iniKpiLucro">&#8212;</div><div class="kpi-sub">Responsabilidade R$300/entrada</div></div>
       <div class="kpi"><div class="kpi-label">Win Rate</div><div class="kpi-value a" id="iniKpiWR">&#8212;</div><div class="kpi-sub">Percentual de greens</div></div>
       <div class="kpi"><div class="kpi-label">ROI</div><div class="kpi-value a" id="iniKpiROI">&#8212;</div><div class="kpi-sub">Retorno sobre investimento</div></div>
       <div class="kpi"><div class="kpi-label">Total Entradas</div><div class="kpi-value" id="iniKpiEntradas">&#8212;</div><div class="kpi-sub">Operações registradas</div></div>
@@ -395,7 +395,7 @@ footer{border-top:1px solid var(--border);padding:16px 24px;display:flex;justify
     </div>
 
     <div class="kpi-grid">
-      <div class="kpi"><div class="kpi-label">Lucro Total</div><div class="kpi-value g" id="k-lucro">&#8212;</div><div class="kpi-sub" id="k-lucro-s">Responsabilidade R$1.000</div></div>
+      <div class="kpi"><div class="kpi-label">Lucro Total</div><div class="kpi-value g" id="k-lucro">&#8212;</div><div class="kpi-sub" id="k-lucro-s">Responsabilidade R$300</div></div>
       <div class="kpi"><div class="kpi-label">Entradas</div><div class="kpi-value" id="k-ent">&#8212;</div><div class="kpi-sub" id="k-ent-s"></div></div>
       <div class="kpi"><div class="kpi-label">Win Rate</div><div class="kpi-value a" id="k-wr">&#8212;</div><div class="kpi-sub" id="k-wr-s"></div></div>
       <div class="kpi"><div class="kpi-label">ROI</div><div class="kpi-value a" id="k-roi">&#8212;</div><div class="kpi-sub" id="k-roi-s"></div></div>
@@ -607,7 +607,7 @@ async function renderKpis(){
     renderUltimas(null);renderLucroDiario([]);renderDiaSemana([]);return;
   }
   const sv=(id,val,cls,sub,sid)=>{const el=document.getElementById(id);el.textContent=val;el.className='kpi-value'+(cls?' '+cls:'');if(sid)document.getElementById(sid).textContent=sub||'';};
-  sv('k-lucro',fmtBRL(data.lucro_total),data.lucro_total>=0?'g':'r','Responsabilidade R$1.000','k-lucro-s');
+  sv('k-lucro',fmtBRL(data.lucro_total),data.lucro_total>=0?'g':'r','Responsabilidade R$300','k-lucro-s');
   sv('k-ent',data.total_entradas.toLocaleString('pt-BR'),'',data.periodo||'','k-ent-s');
   sv('k-wr',data.win_rate.toFixed(1)+'%','a','','k-wr-s');
   sv('k-roi',(data.roi>=0?'+':'')+data.roi.toFixed(2)+'%',data.roi>=0?'a':'r','','k-roi-s');
