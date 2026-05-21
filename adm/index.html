@@ -140,6 +140,33 @@
   </div>
 </div>
 
+<!-- Migração Diária -->
+<div class="section-label">Migração Diária FreeFire</div>
+<div class="data-card" style="max-width:100%;margin-bottom:16px;">
+  <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
+    <div>
+      <div class="data-card-title" style="margin-bottom:4px;">Última execução</div>
+      <div id="migExecucao" style="font-size:1rem;color:var(--text1);font-weight:600;">—</div>
+    </div>
+    <div>
+      <div class="data-card-title" style="margin-bottom:4px;">Status</div>
+      <div id="migStatus" style="font-size:0.95rem;font-weight:600;">—</div>
+    </div>
+    <div>
+      <div class="data-card-title" style="margin-bottom:4px;">Total no banco</div>
+      <div id="migTotal" style="font-size:0.95rem;color:var(--text1);">—</div>
+    </div>
+    <div>
+      <div class="data-card-title" style="margin-bottom:4px;">Gravadas (última run)</div>
+      <div id="migGravadas" style="font-size:0.95rem;color:var(--text1);">—</div>
+    </div>
+  </div>
+  <div style="margin-top:12px;border-top:1px solid var(--border);padding-top:10px;">
+    <div class="data-card-title" style="margin-bottom:4px;">Última linha do log</div>
+    <div id="migUltimaLinha" style="font-family:var(--mono);font-size:0.72rem;color:var(--text2);word-break:break-all;">—</div>
+  </div>
+</div>
+
 <!-- Logs -->
 <div class="section-label">Logs</div>
 <div class="log-tabs" id="logTabs"></div>
@@ -153,7 +180,6 @@ let currentLog = null, logsData = {};
 const LABELS = {
   api_freefire:  'API FreeFire',
   api_parceiros: 'API Parceiros',
-  migrar_mes:    'Migração Mensal FF',
   bot_trinity:   'Bot Trinity',
   bot_freefire:  'Bot FreeFire',
   bot_triplex:   'Bot Over Triplex',
@@ -229,6 +255,18 @@ async function load() {
     document.getElementById('badgeBots').className = 'vm-badge' + (botsOk ? '' : ' offline');
     renderProcs('procBots', d.bots ? d.bots.processes : null);
     renderRes('resBots', d.bots ? d.bots.resources : null);
+
+    // Migração Diária
+    const mg = d.migration || {};
+    document.getElementById('migExecucao').textContent  = mg.ultima_execucao || 'Nunca executado';
+    const stEl = document.getElementById('migStatus');
+    stEl.textContent  = mg.status || '—';
+    stEl.style.color  = mg.status && mg.status.includes('SUCESSO') ? 'var(--green)'
+                      : mg.status && mg.status.includes('ERRO')    ? 'var(--red)'
+                      : 'var(--amber)';
+    document.getElementById('migTotal').textContent     = mg.total_bd    != null ? mg.total_bd.toLocaleString('pt-BR') + ' registros' : '—';
+    document.getElementById('migGravadas').textContent  = mg.gravadas    != null ? '+' + mg.gravadas : '—';
+    document.getElementById('migUltimaLinha').textContent = mg.ultima_linha || '—';
 
     // Logs — combina as duas VMs
     logsData = { ...d.apis.logs, ...(d.bots ? d.bots.logs : {}) };
