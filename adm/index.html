@@ -140,25 +140,31 @@
   </div>
 </div>
 
-<!-- Migração Diária -->
-<div class="section-label">Migração Diária FreeFire</div>
+<!-- Sincronização -->
+<div class="section-label">Sincronização FreeFire (Sheets → SQLite)</div>
 <div class="data-card" style="max-width:100%;margin-bottom:16px;">
-  <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
-    <div>
-      <div class="data-card-title" style="margin-bottom:4px;">Última execução</div>
-      <div id="migExecucao" style="font-size:1rem;color:var(--text1);font-weight:600;">—</div>
+  <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;justify-content:space-between;">
+    <div style="display:flex;gap:24px;flex-wrap:wrap;">
+      <div>
+        <div class="data-card-title" style="margin-bottom:4px;">Última execução</div>
+        <div id="migExecucao" style="font-size:1rem;color:var(--text1);font-weight:600;">—</div>
+      </div>
+      <div>
+        <div class="data-card-title" style="margin-bottom:4px;">Status</div>
+        <div id="migStatus" style="font-size:0.95rem;font-weight:600;">—</div>
+      </div>
+      <div>
+        <div class="data-card-title" style="margin-bottom:4px;">Total no banco</div>
+        <div id="migTotal" style="font-size:0.95rem;color:var(--text1);">—</div>
+      </div>
+      <div>
+        <div class="data-card-title" style="margin-bottom:4px;">Gravadas (última run)</div>
+        <div id="migGravadas" style="font-size:0.95rem;color:var(--text1);">—</div>
+      </div>
     </div>
-    <div>
-      <div class="data-card-title" style="margin-bottom:4px;">Status</div>
-      <div id="migStatus" style="font-size:0.95rem;font-weight:600;">—</div>
-    </div>
-    <div>
-      <div class="data-card-title" style="margin-bottom:4px;">Total no banco</div>
-      <div id="migTotal" style="font-size:0.95rem;color:var(--text1);">—</div>
-    </div>
-    <div>
-      <div class="data-card-title" style="margin-bottom:4px;">Gravadas (última run)</div>
-      <div id="migGravadas" style="font-size:0.95rem;color:var(--text1);">—</div>
+    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;">
+      <button class="btn-action" id="btnSync" onclick="forceSync()" style="font-size:0.85rem;padding:8px 18px;">↻ Sincronizar Agora</button>
+      <div class="action-msg" id="syncMsg" style="font-size:0.78rem;text-align:right;"></div>
     </div>
   </div>
   <div style="margin-top:12px;border-top:1px solid var(--border);padding-top:10px;">
@@ -256,17 +262,8 @@ async function load() {
     renderProcs('procBots', d.bots ? d.bots.processes : null);
     renderRes('resBots', d.bots ? d.bots.resources : null);
 
-    // Migração Diária
-    const mg = d.migration || {};
-    document.getElementById('migExecucao').textContent  = mg.ultima_execucao || 'Nunca executado';
-    const stEl = document.getElementById('migStatus');
-    stEl.textContent  = mg.status || '—';
-    stEl.style.color  = mg.status && mg.status.includes('SUCESSO') ? 'var(--green)'
-                      : mg.status && mg.status.includes('ERRO')    ? 'var(--red)'
-                      : 'var(--amber)';
-    document.getElementById('migTotal').textContent     = mg.total_bd    != null ? mg.total_bd.toLocaleString('pt-BR') + ' registros' : '—';
-    document.getElementById('migGravadas').textContent  = mg.gravadas    != null ? '+' + mg.gravadas : '—';
-    document.getElementById('migUltimaLinha').textContent = mg.ultima_linha || '—';
+    // Sincronização
+    renderSync(d.migration || {});
 
     // Logs — combina as duas VMs
     logsData = { ...d.apis.logs, ...(d.bots ? d.bots.logs : {}) };
@@ -285,6 +282,47 @@ async function load() {
   }
   btn.disabled = false;
   btn.textContent = '↻ Atualizar';
+}
+
+const SYNC_URL = 'https://api.laygoleada.com.br/adm/api/sync-force';
+
+function renderSync(mg) {
+  document.getElementById('migExecucao').textContent = mg.ultima_execucao || 'Nunca executado';
+  const stEl = document.getElementById('migStatus');
+  stEl.textContent = mg.status || '—';
+  stEl.style.color = mg.status && mg.status.includes('SUCESSO') ? 'var(--green)'
+                   : mg.status && mg.status.includes('ERRO')    ? 'var(--red)'
+                   : 'var(--amber)';
+  document.getElementById('migTotal').textContent    = mg.total_bd  != null ? mg.total_bd.toLocaleString('pt-BR') + ' registros' : '—';
+  document.getElementById('migGravadas').textContent = mg.gravadas  != null ? mg.gravadas.toLocaleString('pt-BR') + ' registros' : '—';
+  document.getElementById('migUltimaLinha').textContent = mg.ultima_linha || '—';
+}
+
+async function forceSync() {
+  const btn = document.getElementById('btnSync');
+  const msg = document.getElementById('syncMsg');
+  btn.disabled = true;
+  btn.textContent = '⟳ Sincronizando...';
+  msg.className = 'action-msg';
+  msg.textContent = 'Aguarde — pode levar até 60s...';
+  try {
+    const resp = await fetch(SYNC_URL, { method: 'POST' });
+    const data = await resp.json();
+    if (data.ok) {
+      msg.className = 'action-msg ok';
+      msg.textContent = '✓ Sincronização concluída com sucesso!';
+      // Recarregar status para refletir novo log
+      await load();
+    } else {
+      msg.className = 'action-msg err';
+      msg.textContent = '✗ Erro: ' + (data.error || 'verifique o log');
+    }
+  } catch(e) {
+    msg.className = 'action-msg err';
+    msg.textContent = '✗ Erro de rede: ' + e.message;
+  }
+  btn.disabled = false;
+  btn.textContent = '↻ Sincronizar Agora';
 }
 
 const CACHE_ENDPOINTS = {
