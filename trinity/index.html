@@ -415,6 +415,11 @@ footer{margin-top:48px;padding:24px 32px;border-top:1px solid var(--border);
       <div class="card-title">Mapa de Sequências</div>
       <div id="grMapWrap" style="margin-top:4px;"></div>
     </div>
+    <div class="card">
+      <div class="card-title">Gestão Fixa vs Gestão de Ciclos — Lucro Acumulado</div>
+      <div id="grComparativoInfo" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px;"></div>
+      <div class="chart-wrap"><canvas id="cComparativoGestao" height="260"></canvas></div>
+    </div>
   </div>
 
 </div>
@@ -621,6 +626,7 @@ async function renderGoodRun(){
     const refLine=n=>({data:labels.map(()=>n),borderColor:'rgba(245,158,11,.6)',backgroundColor:'transparent',borderWidth:1.5,borderDash:[6,4],pointRadius:0,pointHoverRadius:0,fill:false,tension:0,order:0,label:n+'x'});
     charts['cGoodRun']=new Chart(canvas,{type:'line',data:{labels,datasets:[{data:vals,borderColor:'#2ECC8A',backgroundColor:'rgba(46,204,138,.12)',pointBackgroundColor:ptColors,pointBorderColor:ptColors,pointRadius:4,pointHoverRadius:6,fill:true,tension:.3,borderWidth:2,order:1},refLine(15),refLine(30),refLine(45),refLine(60)]},options:{...cd(),plugins:{...cd().plugins,legend:{display:false},tooltip:{...cd().plugins.tooltip,mode:'index',intersect:false,callbacks:{title:ctx=>sorted[ctx[0].dataIndex]?.data||'',label:ctx=>ctx.datasetIndex===1?' Zona dobra banca (15 greens)':ctx.raw>0?' '+ctx.raw+' green'+(ctx.raw>1?'s':'')+' seguido'+(ctx.raw>1?'s':''):' RED — sequência zerada'}}},scales:{x:{ticks:{color:'#8A96A3',font:{size:9},maxTicksLimit:14,autoSkip:true,maxRotation:0},grid:{color:'rgba(255,255,255,.03)'}},y:{ticks:{stepSize:1,color:'#556070',font:{size:10}},grid:{color:'rgba(255,255,255,.04)'},beginAtZero:true,title:{display:true,text:'Greens consecutivos',color:'#8A96A3',font:{size:10}}}}}});
   }
+  renderComparativoGestao(sorted);
   const wrap=document.getElementById('grMapWrap');
   if(!wrap)return;
   const segs=[];let i=0;
@@ -628,6 +634,32 @@ async function renderGoodRun(){
   const total=segs.reduce((s,g)=>s+g.len,0);
   const barHtml=segs.map(seg=>{const pct=(seg.len/total*100).toFixed(2);const isG=seg.type==='GREEN';const bg=isG?'#2ECC8A':'#F05A5A';const lbl=seg.len>=4?`<span style="font-size:10px;font-weight:700;color:#fff;">${seg.len}</span>`:'';return`<div title="${isG?'🟢':'🔴'} ${seg.len} entrada${seg.len>1?'s':''} · ${seg.start}–${seg.end}" style="flex:0 0 ${pct}%;height:100%;background:${bg};display:flex;align-items:center;justify-content:center;border-radius:2px;cursor:default;transition:opacity .15s;" onmouseenter="this.style.opacity='.7'" onmouseleave="this.style.opacity='1'">${lbl}</div>`;}).join('');
   wrap.innerHTML=`<div style="display:flex;height:48px;gap:2px;border-radius:8px;overflow:hidden;margin-bottom:6px;">${barHtml}</div><div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text3);font-family:var(--mono);"><span>${sorted[0].data}</span><span>${sorted[Math.floor(sorted.length/2)].data}</span><span>${sorted[sorted.length-1].data}</span></div>`;
+}
+function calcCiclos(ops,base){
+  base=base||1000;
+  var ca=0,ga=0,vals=[];
+  for(var i=0;i<ops.length;i++){
+    var le=parseFloat((ops[i].lucro*((base+ca)/base)).toFixed(2));
+    ga=parseFloat((ga+le).toFixed(2));
+    if(le>=0){ca=parseFloat((ca+le).toFixed(2));if(ca>=base)ca=0;}
+    else if(Math.abs(le)>=ca)ca=0;
+    else ca=parseFloat((ca+le).toFixed(2));
+    vals.push(ga);
+  }
+  return vals;
+}
+function renderComparativoGestao(ops){
+  destroyChart('cComparativoGestao');
+  const c=document.getElementById('cComparativoGestao');
+  if(!c||!ops||!ops.length)return;
+  var fa=0;
+  const fv=ops.map(o=>{fa=parseFloat((fa+o.lucro).toFixed(2));return fa;});
+  const cv=calcCiclos(ops);
+  const ff=fv[fv.length-1],cf=cv[cv.length-1];
+  const fmt=v=>(v>=0?'+R$ ':'-R$ ')+Math.abs(v).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+  const ie=document.getElementById('grComparativoInfo');
+  if(ie)ie.innerHTML=`<div style="padding:6px 14px;background:rgba(168,85,247,.12);border:1px solid rgba(168,85,247,.25);border-radius:8px;font-size:11px;color:#8A96A3;font-family:var(--mono);"><span style="color:#A855F7;font-weight:700;">Gestão Fixa</span>&nbsp;${fmt(ff)}</div><div style="padding:6px 14px;background:rgba(46,204,138,.12);border:1px solid rgba(46,204,138,.25);border-radius:8px;font-size:11px;color:#8A96A3;font-family:var(--mono);"><span style="color:#2ECC8A;font-weight:700;">Gestão Ciclos</span>&nbsp;${fmt(cf)}</div><div style="padding:6px 14px;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.2);border-radius:8px;font-size:11px;color:#8A96A3;font-family:var(--mono);"><span style="color:#F59E0B;font-weight:700;">Diferença</span>&nbsp;${fmt(cf-ff)}</div>`;
+  charts['cComparativoGestao']=new Chart(c,{type:'line',data:{labels:ops.map((_,i)=>i+1),datasets:[{label:'Gestão Fixa',data:fv,borderColor:'#A855F7',borderWidth:2,pointRadius:0,pointHoverRadius:4,pointBackgroundColor:'#A855F7',tension:.3,fill:false},{label:'Gestão Ciclos',data:cv,borderColor:'#2ECC8A',borderWidth:2,pointRadius:0,pointHoverRadius:4,pointBackgroundColor:'#2ECC8A',tension:.3,fill:false}]},options:{...cd(),plugins:{...cd().plugins,legend:{display:true,labels:{color:'#8A96A3',font:{size:11},boxWidth:14,padding:16}},tooltip:{...cd().plugins.tooltip,mode:'index',intersect:false,callbacks:{title:ctx=>'Entrada #'+ctx[0].label+' · '+(ops[ctx[0].dataIndex]?.data||''),label:ctx=>' '+ctx.dataset.label+': R$ '+ctx.raw.toLocaleString('pt-BR',{minimumFractionDigits:2})}}},scales:{x:{ticks:{color:'#8A96A3',font:{size:9},maxTicksLimit:14,autoSkip:true,maxRotation:0},grid:{color:'rgba(255,255,255,.03)'}},y:{ticks:{callback:v=>'R$'+(v>=0?'':'-')+(Math.abs(v)/1000).toFixed(1)+'k',color:'#556070',font:{size:10}},grid:{color:'rgba(255,255,255,.04)'}}}}});
 }
 async function init(){
   setStatus('loading','CARREGANDO');setLoadingText('Verificando conex\xe3o...');
