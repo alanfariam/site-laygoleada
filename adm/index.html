@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ADM · Lay Goleada</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
   :root {
     --bg: #0d1117; --surface: #161b22; --border: #30363d;
@@ -73,6 +74,17 @@
   .action-msg.err { color: var(--red); }
 
   .last-update { font-size: 0.68rem; color: var(--text3); font-family: var(--mono); margin-top: 10px; text-align: right; }
+
+  /* Visitas */
+  .visits-summary { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; margin-bottom: 20px; }
+  .visit-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 14px; }
+  .visit-card-title { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--green); margin-bottom: 8px; }
+  .visit-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; }
+  .visit-stat-label { font-size: 0.55rem; color: var(--text3); text-transform: uppercase; letter-spacing: .06em; }
+  .visit-stat-val { font-size: 1.1rem; font-weight: 800; font-family: var(--mono); color: var(--text); line-height: 1.2; }
+  .visit-total { margin-top: 8px; font-size: 0.62rem; color: var(--text3); font-family: var(--mono); }
+  .chart-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 18px; margin-bottom: 28px; }
+  .chart-wrap canvas { max-height: 220px; }
 </style>
 </head>
 <body>
@@ -171,6 +183,16 @@
     <div class="data-card-title" style="margin-bottom:4px;">Última linha do log</div>
     <div id="migUltimaLinha" style="font-family:var(--mono);font-size:0.72rem;color:var(--text2);word-break:break-all;">—</div>
   </div>
+</div>
+
+<!-- Acessos por Página -->
+<div class="section-label">Acessos por Página</div>
+<div class="visits-summary" id="visitsSummary">
+  <div class="visit-card" style="opacity:.4;grid-column:span 3">Carregando...</div>
+</div>
+<div class="chart-wrap">
+  <div class="section-label" style="margin-bottom:14px;">Visitas diárias — últimos 30 dias</div>
+  <canvas id="visitChart"></canvas>
 </div>
 
 <!-- Logs -->
@@ -353,7 +375,106 @@ async function clearCache(product) {
   btn.textContent = '⟳ Forçar atualização';
 }
 
+// ── VISITAS ──────────────────────────────────────────────────────────────
+const VISITAS_URL = 'https://api.laygoleada.com.br/adm/api/visitas';
+
+const PAGE_LABELS = {
+  freefire:    'FreeFire',
+  trinity:     'Trinity',
+  overtriplex: 'Over Triplex',
+};
+
+const PAGE_COLORS = {
+  freefire:    '#2ECC8A',
+  trinity:     '#3B82F6',
+  overtriplex: '#F59E0B',
+};
+
+let visitChart = null;
+
+function renderVisitsSummary(resumo, paginas) {
+  const el = document.getElementById('visitsSummary');
+  if (!paginas.length) {
+    el.innerHTML = '<div class="visit-card" style="opacity:.5">Nenhum dado ainda.</div>';
+    return;
+  }
+  el.innerHTML = paginas.map(p => {
+    const r = resumo[p] || {hoje:0,'7dias':0,'30dias':0,total:0};
+    return `<div class="visit-card">
+      <div class="visit-card-title" style="color:${PAGE_COLORS[p]||'var(--green)'}">${PAGE_LABELS[p]||p}</div>
+      <div class="visit-stats">
+        <div>
+          <div class="visit-stat-label">Hoje</div>
+          <div class="visit-stat-val">${r.hoje}</div>
+        </div>
+        <div>
+          <div class="visit-stat-label">7 dias</div>
+          <div class="visit-stat-val">${r['7dias']}</div>
+        </div>
+        <div>
+          <div class="visit-stat-label">30 dias</div>
+          <div class="visit-stat-val">${r['30dias']}</div>
+        </div>
+      </div>
+      <div class="visit-total">Total: ${r.total.toLocaleString('pt-BR')}</div>
+    </div>`;
+  }).join('');
+}
+
+function renderVisitChart(serie, paginas) {
+  const labels   = serie.map(d => d.data.slice(0,5)); // DD/MM
+  const datasets = paginas.map(p => ({
+    label:           PAGE_LABELS[p] || p,
+    data:            serie.map(d => d[p] || 0),
+    backgroundColor: (PAGE_COLORS[p] || '#8b949e') + 'CC',
+    borderColor:     PAGE_COLORS[p] || '#8b949e',
+    borderWidth:     1,
+    borderRadius:    3,
+  }));
+
+  if (visitChart) { visitChart.destroy(); visitChart = null; }
+
+  const ctx = document.getElementById('visitChart').getContext('2d');
+  visitChart = new Chart(ctx, {
+    type: 'bar',
+    data: { labels, datasets },
+    options: {
+      responsive: true,
+      maintainAspectRatio: true,
+      plugins: {
+        legend: { labels: { color: '#c9d1d9', font: { size: 11 } } },
+        tooltip: { mode: 'index', intersect: false },
+      },
+      scales: {
+        x: {
+          stacked: false,
+          ticks: { color: '#8b949e', font: { size: 9 }, maxRotation: 45 },
+          grid:  { color: 'rgba(255,255,255,.04)' },
+        },
+        y: {
+          beginAtZero: true,
+          ticks: { color: '#8b949e', font: { size: 10 }, stepSize: 1 },
+          grid:  { color: 'rgba(255,255,255,.06)' },
+        },
+      },
+    },
+  });
+}
+
+async function loadVisitas() {
+  try {
+    const resp = await fetch(VISITAS_URL);
+    const d    = await resp.json();
+    renderVisitsSummary(d.resumo || {}, d.paginas || []);
+    renderVisitChart(d.diario  || [], d.paginas || []);
+  } catch(e) {
+    document.getElementById('visitsSummary').innerHTML =
+      `<div class="visit-card" style="opacity:.5;color:var(--red)">Erro ao carregar visitas: ${e.message}</div>`;
+  }
+}
+
 load();
+loadVisitas();
 </script>
 </body>
 </html>

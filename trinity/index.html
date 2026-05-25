@@ -673,6 +673,7 @@ async function init(){
   }catch(e){setStatus('err','OFFLINE');showErr('N\xe3o foi poss\xedvel conectar ao backend em '+API+' \u2014 '+e.message);hideLoading();}
 }
 init();
+fetch('https://api.laygoleada.com.br/trinity/api/ping-visit?page=trinity',{method:'POST'}).catch(()=>{});
 </script>
 </body>
 </html>
