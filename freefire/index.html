@@ -830,7 +830,7 @@ footer{position:relative;z-index:1;margin-top:48px;padding:24px 32px;
         <div class="chart-wrap"><canvas id="cTop10Zero" height="300"></canvas></div>
       </div>
       <div class="card">
-        <div class="card-title">Top 10 — campeonatos com maior % de jogos com gol pós alerta</div>
+        <div class="card-title">Top 10 — campeonatos com maior % de jogos com 2+ gols pós alerta</div>
         <div class="chart-wrap"><canvas id="cTop10Gols" height="300"></canvas></div>
       </div>
     </div>
@@ -2624,13 +2624,13 @@ function renderGolsPosAlerta() {
     true
   );
 
-  // Top 10 mais gols — % de jogos com gol sobre o total do campeonato
+  // Top 10 mais gols — % de jogos com 2+ gols pós alerta
   const g = rawGolsPosAlerta.top10_mais_gols || [];
   rankingChart('cTop10Gols',
     g.map(r => r.campeonato),
-    g.map(r => r.pct_com_gol),
+    g.map(r => r.pct_over2),
     'rgba(46,204,138,.75)',
-    'com gol',
+    'com 2+ gols',
     true
   );
 
