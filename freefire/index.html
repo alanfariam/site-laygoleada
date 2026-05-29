@@ -1365,7 +1365,7 @@ async function renderKpis() {
 
   setV('k-lucro',   fmt(data.lucro_total),        data.lucro_total  >= 0 ? 'g' : 'r', `ROI ${data.roi.toFixed(2)}%`);
   setV('k-ent',     data.total_entradas.toLocaleString('pt-BR'), '', `${data.greens} greens · ${data.reds} reds`);
-  setV('k-wr',      data.win_rate.toFixed(1) + '%', 'g', data.win_rate >= 60 ? 'Acima da meta (60%)' : 'Abaixo da meta (60%)');
+  setV('k-wr',      data.win_rate.toFixed(1) + '%', data.win_rate >= 59 ? 'g' : 'r', data.win_rate >= 59 ? 'Acima da meta (59%)' : 'Abaixo da meta (59%)');
   setV('k-roi',     data.roi.toFixed(2) + '%',      data.roi >= 0 ? 'g' : 'r', 'por entrada');
   setV('k-dd',      fmt(data.max_drawdown),          'r', `Banca mín. sugerida: ${fmt(data.max_drawdown * 1.5)}`);
   setV('k-badrun',  data.maior_bad_run,              'r', 'reds consecutivos');
@@ -1633,7 +1633,7 @@ function filterTabela() {
       <td style="font-weight:500">${r.campeonato}</td>
       <td style="font-family:var(--mono)">${r.total}</td>
       <td style="font-family:var(--mono);color:var(--green)">${r.greens}</td>
-      <td><span class="pill ${r.win_rate>=62?'pg':r.win_rate>=55?'pa':'pr'}">${r.win_rate}%</span></td>
+      <td><span class="pill ${r.win_rate>=59?'pg':r.win_rate>=58?'pa':'pr'}">${r.win_rate}%</span></td>
       <td style="font-family:var(--mono);color:${r.lucro>=0?'var(--green)':'var(--red)'}">
         ${r.lucro>=0?'':'-'}R$${Math.abs(r.lucro).toLocaleString('pt-BR',{minimumFractionDigits:2})}
       </td>
@@ -1661,7 +1661,7 @@ function renderOdds() {
       data: { labels, datasets: [
         {
           data: wrs,
-          backgroundColor: wrs.map(v => v === 0 ? 'rgba(255,255,255,.06)' : v >= 60 ? 'rgba(46,204,138,.75)' : 'rgba(240,90,90,.65)'),
+          backgroundColor: wrs.map(wrColor),
           borderRadius: 4, barPercentage: .6, yAxisID: 'y'
         },
         {
@@ -1710,7 +1710,7 @@ function renderOdds() {
       data: { labels: euLabels, datasets: [
         {
           data: euWrs,
-          backgroundColor: euWrs.map(v => v === 0 ? 'rgba(255,255,255,.06)' : v >= 60 ? 'rgba(46,204,138,.75)' : 'rgba(240,90,90,.65)'),
+          backgroundColor: euWrs.map(wrColor),
           borderRadius: 4, barPercentage: .6, yAxisID: 'y'
         },
         {
@@ -1749,7 +1749,7 @@ function renderOdds() {
       data: { labels: combLabels, datasets: [
         {
           data: combWrs,
-          backgroundColor: combWrs.map(v => v === 0 ? 'rgba(255,255,255,.06)' : v >= 60 ? 'rgba(46,204,138,.75)' : 'rgba(240,90,90,.65)'),
+          backgroundColor: combWrs.map(wrColor),
           borderRadius: 4, barPercentage: .6, yAxisID: 'y'
         },
         {
@@ -1788,7 +1788,7 @@ function renderGolsAlerta() {
     charts[id] = new Chart(document.getElementById(id), {
       type: 'bar',
       data: { labels, datasets: [
-        { data: wrs, backgroundColor: wrs.map(v => v >= 60 ? 'rgba(46,204,138,.75)' : 'rgba(240,90,90,.65)'), borderRadius: 4, barPercentage: .6, yAxisID: 'y' },
+        { data: wrs, backgroundColor: wrs.map(wrColor), borderRadius: 4, barPercentage: .6, yAxisID: 'y' },
         { data: vols, type: 'line', borderColor: 'rgba(255,255,255,.2)', backgroundColor: 'transparent', pointBackgroundColor: 'rgba(255,255,255,.3)', pointRadius: 4, tension: .3, yAxisID: 'y2', borderDash: [3,3] }
       ]},
       options: { ...cd(),
@@ -1979,7 +1979,7 @@ function renderWRMinAlerta() {
   charts['cWRMinAlerta'] = new Chart(document.getElementById('cWRMinAlerta'), {
     type: 'bar',
     data: { labels, datasets: [{ data: wrs,
-      backgroundColor: wrs.map(v => v >= 60 ? 'rgba(46,204,138,.75)' : v >= 45 ? 'rgba(240,160,48,.75)' : 'rgba(240,90,90,.65)'),
+      backgroundColor: wrs.map(wrColor),
       borderRadius: 3, barPercentage: .8
     }]},
     options: { ...cd(),
@@ -2014,6 +2014,13 @@ function cd() {
   };
 }
 function destroyChart(id) { if (charts[id]) { charts[id].destroy(); delete charts[id]; } }
+// Cor padrão para barras de Win Rate: < 58% vermelho · 58–59% amarelo · ≥ 59% verde
+function wrColor(v) {
+  if (v === 0) return 'rgba(255,255,255,.06)';
+  if (v < 58)  return 'rgba(240,90,90,.65)';
+  if (v < 59)  return 'rgba(240,200,48,.80)';
+  return 'rgba(46,204,138,.75)';
+}
 function fmt(v) { return (v < 0 ? '-' : '') + 'R$ ' + Math.abs(v).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}); }
 function setStatus(type, text) { const el=document.getElementById('statusPill'); el.textContent=text; el.className='status-pill '+type; }
 function setLoadingText(t) { document.getElementById('loadingText').textContent = t; }
@@ -2074,7 +2081,7 @@ async function buscaTime() {
   try {
     const d = await api('/api/times/busca?time=' + encodeURIComponent(nome));
 
-    const wr  = v => `<span style="color:${v >= 60 ? 'var(--green)' : v >= 45 ? 'var(--gold)' : 'var(--red)'};font-weight:700">${v}%</span>`;
+    const wr  = v => `<span style="color:${v >= 59 ? 'var(--green)' : v >= 58 ? 'var(--gold)' : 'var(--red)'};font-weight:700">${v}%</span>`;
     const luc = v => `<span style="color:${v >= 0 ? 'var(--green)' : 'var(--red)'};font-weight:700">${v >= 0 ? '+' : ''}R$${Math.abs(v).toLocaleString('pt-BR',{minimumFractionDigits:2})}</span>`;
 
     const statCard = (titulo, s, cor) => s.total === 0 ? '' : `
@@ -2294,7 +2301,7 @@ function renderCalendario() {
     ['Lucro do Mês',  fmtLucro(lucroMes),  lucroPos ? 'var(--green)' : 'var(--red)'],
     ['Entradas',      totalMes,             'var(--text)'],
     ['Greens / Reds', `${greensMes} / ${redsMes}`, 'var(--text)'],
-    ['Win Rate',      totalMes ? wrMes + '%' : '—', parseFloat(wrMes) >= 60 ? 'var(--green)' : 'var(--red)'],
+    ['Win Rate',      totalMes ? wrMes + '%' : '—', parseFloat(wrMes) >= 59 ? 'var(--green)' : parseFloat(wrMes) >= 58 ? 'var(--gold)' : 'var(--red)'],
   ].map(([lbl, val, cor]) => `
     <div style="background:var(--bg3);border-radius:8px;padding:12px 14px;border:1px solid var(--border);">
       <div style="font-size:9px;color:var(--text3);font-family:var(--mono);letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px;">${lbl}</div>
@@ -2396,7 +2403,7 @@ function renderMesDetalhe() {
       type: 'bar',
       data: { labels: pLabels, datasets: [{
         data: pWrs,
-        backgroundColor: pWrs.map(v => v >= 60 ? 'rgba(46,204,138,.75)' : 'rgba(240,90,90,.65)'),
+        backgroundColor: pWrs.map(wrColor),
         borderRadius: 4, barPercentage: .75
       }]},
       options: { ...cd(),
