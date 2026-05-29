@@ -708,6 +708,25 @@ footer{position:relative;z-index:1;margin-top:48px;padding:24px 32px;
       <div class="card-title">Win Rate % — Confronto combinado com U25</div>
       <div class="chart-wrap"><canvas id="cCombinado" height="300"></canvas></div>
     </div>
+    <div class="section-label">Faixas de odd do empate (3 grupos)</div>
+    <div class="card">
+      <div class="card-title">Win Rate % — Odd Empate por faixa</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;">
+        <span style="font-size:10px;font-family:var(--mono);background:rgba(255,255,255,.06);border-radius:4px;padding:3px 8px;color:var(--text2);">🔵 <b>Baixo</b> — Odd Empate &lt; 3.6</span>
+        <span style="font-size:10px;font-family:var(--mono);background:rgba(255,255,255,.06);border-radius:4px;padding:3px 8px;color:var(--text2);">🟡 <b>Médio</b> — Odd Empate 3.6 a 4.0</span>
+        <span style="font-size:10px;font-family:var(--mono);background:rgba(255,255,255,.06);border-radius:4px;padding:3px 8px;color:var(--text2);">🔴 <b>Alto</b> — Odd Empate &gt; 4.0</span>
+      </div>
+      <div class="chart-wrap"><canvas id="cEmpate3F" height="260"></canvas></div>
+    </div>
+    <div class="section-label">Faixas do empate × Under/Over 2.5</div>
+    <div class="card">
+      <div class="card-title">Win Rate % — Odd Empate (3 grupos) × U25</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;">
+        <span style="font-size:10px;font-family:var(--mono);background:rgba(255,255,255,.06);border-radius:4px;padding:3px 8px;color:var(--text2);">📉 <b>Under</b> — Odd U25 ≤ 2.00</span>
+        <span style="font-size:10px;font-family:var(--mono);background:rgba(255,255,255,.06);border-radius:4px;padding:3px 8px;color:var(--text2);">📈 <b>Over</b> — Odd U25 &gt; 2.00</span>
+      </div>
+      <div class="chart-wrap"><canvas id="cEmpateXU25" height="300"></canvas></div>
+    </div>
   </div>
 
   <!-- ══════════════════════════════════════
@@ -807,16 +826,16 @@ footer{position:relative;z-index:1;margin-top:48px;padding:24px 32px;
     <div class="section-label">Gols após o alerta — coluna N da planilha</div>
     <div class="grid2">
       <div class="card">
-        <div class="card-title">Top 10 — campeonatos com mais jogos sem gol pós alerta</div>
+        <div class="card-title">Top 10 — campeonatos com maior % de jogos sem gol pós alerta</div>
         <div class="chart-wrap"><canvas id="cTop10Zero" height="300"></canvas></div>
       </div>
       <div class="card">
-        <div class="card-title">Top 10 — campeonatos com mais gols pós alerta</div>
+        <div class="card-title">Top 10 — campeonatos com maior % de jogos com gol pós alerta</div>
         <div class="chart-wrap"><canvas id="cTop10Gols" height="300"></canvas></div>
       </div>
     </div>
     <div class="card">
-      <div class="card-title">Jogos com 0 gols pós alerta — por placar no momento do alerta</div>
+      <div class="card-title">% de jogos sem gol pós alerta — por placar no momento do alerta</div>
       <div class="chart-wrap"><canvas id="cPlacarZero" height="260"></canvas></div>
     </div>
 
@@ -1677,6 +1696,47 @@ function renderOdds() {
   buildOddsChart('cClassificacao', rawOdds.por_classificacao);
   buildOddsChart('cU25Class',     rawOdds.por_u25_class);
 
+  buildOddsChart('cEmpate3F', rawOdds.por_empate_3faixas);
+
+  // Empate 3 faixas × U25 — rótulos de duas linhas (split em " + ")
+  const empU25 = (rawOdds.por_empate_x_u25 || []).filter(o => o.total > 0);
+  if (empU25.length) {
+    const euLabels = empU25.map(o => o.faixa.split(' + '));
+    const euWrs    = empU25.map(o => o.win_rate);
+    const euVols   = empU25.map(o => o.total);
+    destroyChart('cEmpateXU25');
+    charts['cEmpateXU25'] = new Chart(document.getElementById('cEmpateXU25'), {
+      type: 'bar',
+      data: { labels: euLabels, datasets: [
+        {
+          data: euWrs,
+          backgroundColor: euWrs.map(v => v === 0 ? 'rgba(255,255,255,.06)' : v >= 60 ? 'rgba(46,204,138,.75)' : 'rgba(240,90,90,.65)'),
+          borderRadius: 4, barPercentage: .6, yAxisID: 'y'
+        },
+        {
+          data: euVols, type: 'line',
+          borderColor: 'rgba(255,255,255,.2)', backgroundColor: 'transparent',
+          pointBackgroundColor: 'rgba(255,255,255,.3)', pointRadius: 4,
+          tension: .3, yAxisID: 'y2', borderDash: [3,3]
+        }
+      ]},
+      options: { ...cd(),
+        plugins: { ...cd().plugins, tooltip: { ...cd().plugins.tooltip, callbacks: {
+          label: ctx => {
+            const r = empU25[ctx.dataIndex];
+            if (ctx.datasetIndex === 0) return [` WR: ${ctx.raw}%`, ` Entradas: ${r.total}`, ` ROI: ${r.roi}%`];
+            return ` Volume: ${ctx.raw}`;
+          }
+        }}},
+        scales: {
+          y:  { min: 0, max: 100, ticks: { callback: v => v+'%', color:'#556070', font:{size:10} }, grid: { color:'rgba(255,255,255,.04)' } },
+          y2: { position: 'right', ticks: { color:'rgba(255,255,255,.2)', font:{size:10} }, grid: { display:false } },
+          x:  { ticks: { color:'#8A96A3', font:{size:9}, maxRotation: 0 }, grid: { display:false } }
+        }
+      }
+    });
+  }
+
   // Gráfico combinado — rótulos de duas linhas (split em " + ")
   const comb = (rawOdds.por_combinado || []).filter(o => o.total > 0);
   if (comb.length) {
@@ -2525,7 +2585,7 @@ function renderSilencio() {
 function renderGolsPosAlerta() {
   if (!rawGolsPosAlerta) return;
 
-  function rankingChart(id, labels, values, color, tooltipSuffix) {
+  function rankingChart(id, labels, values, color, tooltipSuffix, isPct) {
     destroyChart(id);
     charts[id] = new Chart(document.getElementById(id), {
       type: 'bar',
@@ -2537,52 +2597,57 @@ function renderGolsPosAlerta() {
       options: { ...cd(),
         indexAxis: 'y',
         plugins: { ...cd().plugins, tooltip: { ...cd().plugins.tooltip, callbacks: {
-          label: ctx => ` ${ctx.raw} ${tooltipSuffix}`
+          label: ctx => ` ${ctx.raw}${isPct ? '%' : ''} ${tooltipSuffix}`
         }}},
         scales: {
-          x: { ticks: { color: '#556070', font: {size:10} }, grid: { color: 'rgba(255,255,255,.04)' } },
+          x: { ticks: { color: '#556070', font: {size:10}, callback: isPct ? v => v+'%' : undefined }, grid: { color: 'rgba(255,255,255,.04)' } },
           y: { ticks: { color: '#8A96A3', font: {size:10} }, grid: { display: false } }
         }
       }
     });
   }
 
-  // Top 10 zero gols
+  // Top 10 zero gols — % de jogos sem gol sobre o total do campeonato
   const z = rawGolsPosAlerta.top10_zero_gols || [];
   rankingChart('cTop10Zero',
     z.map(r => r.campeonato),
-    z.map(r => r.zero),
-    'rgba(46,204,138,.75)',
-    'jogos sem gol'
+    z.map(r => r.pct_zero),
+    'rgba(240,90,90,.7)',
+    'sem gol',
+    true
   );
 
-  // Top 10 mais gols
+  // Top 10 mais gols — % de jogos com gol sobre o total do campeonato
   const g = rawGolsPosAlerta.top10_mais_gols || [];
   rankingChart('cTop10Gols',
     g.map(r => r.campeonato),
-    g.map(r => r.gols),
+    g.map(r => r.pct_com_gol),
     'rgba(46,204,138,.75)',
-    'gols pós alerta'
+    'com gol',
+    true
   );
 
-  // Por placar — 0 gols pós alerta
+  // Por placar — % de jogos sem gol sobre total de entradas com aquele placar
   const p = rawGolsPosAlerta.por_placar_zero || [];
   const pLabels = p.map(x => x.placar);
-  const pVals   = p.map(x => x.total);
+  const pVals   = p.map(x => x.pct_zero);
   destroyChart('cPlacarZero');
   charts['cPlacarZero'] = new Chart(document.getElementById('cPlacarZero'), {
     type: 'bar',
     data: { labels: pLabels, datasets: [{
       data: pVals,
-      backgroundColor: 'rgba(46,204,138,.7)',
+      backgroundColor: 'rgba(240,90,90,.65)',
       borderRadius: 4, barPercentage: .6
     }]},
     options: { ...cd(),
       plugins: { ...cd().plugins, tooltip: { ...cd().plugins.tooltip, callbacks: {
-        label: ctx => ` ${ctx.raw} jogos`
+        label: ctx => {
+          const r = p[ctx.dataIndex];
+          return [` ${ctx.raw}% sem gol`, ` (${r.total} de ${Math.round(r.total * 100 / (ctx.raw || 1))} jogos)`];
+        }
       }}},
       scales: {
-        y: { ticks: { color: '#556070', font: {size:10} }, grid: { color: 'rgba(255,255,255,.04)' } },
+        y: { ticks: { color: '#556070', font: {size:10}, callback: v => v+'%' }, grid: { color: 'rgba(255,255,255,.04)' } },
         x: { ticks: { color: '#8A96A3', font: {size:10}, maxRotation: 45 }, grid: { display: false } }
       }
     }
