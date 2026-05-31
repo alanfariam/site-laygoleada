@@ -2428,8 +2428,8 @@ function renderMesDetalhe() {
       return;
     }
     el.innerHTML = lista.map((r, i) => {
-      const cor = r.win_rate >= 60 ? 'var(--green)' : 'var(--red)';
-      const bg  = r.win_rate >= 60 ? 'rgba(46,204,138,.03)' : 'rgba(240,90,90,.03)';
+      const cor = r.win_rate >= 59 ? 'var(--green)' : r.win_rate >= 58 ? 'var(--gold)' : 'var(--red)';
+      const bg  = r.win_rate >= 59 ? 'rgba(46,204,138,.03)' : r.win_rate >= 58 ? 'rgba(240,200,48,.03)' : 'rgba(240,90,90,.03)';
       return `<div class="top10-item" style="background:${bg};">
         <span class="top10-rank">${i+1}</span>
         <span class="top10-name" title="${r.campeonato}">${r.campeonato}</span>
@@ -2456,7 +2456,7 @@ function renderMesDetalhe() {
     data: { labels: dLabels, datasets: [
       {
         data: dWrs,
-        backgroundColor: dWrs.map((v, i) => dVols[i] === 0 ? 'rgba(255,255,255,.05)' : v >= 60 ? 'rgba(46,204,138,.75)' : 'rgba(240,90,90,.65)'),
+        backgroundColor: dWrs.map((v, i) => dVols[i] === 0 ? 'rgba(255,255,255,.05)' : wrColor(v)),
         borderRadius: 4, barPercentage: .6, yAxisID: 'y'
       },
       {
@@ -2556,7 +2556,7 @@ function renderSilencio() {
     data: { labels, datasets: [
       {
         data: wrs,
-        backgroundColor: wrs.map(v => v >= 60 ? 'rgba(46,204,138,.75)' : 'rgba(240,90,90,.65)'),
+        backgroundColor: wrs.map(wrColor),
         borderRadius: 5, barPercentage: .6, yAxisID: 'y'
       },
       {
