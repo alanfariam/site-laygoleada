@@ -1571,7 +1571,7 @@ function renderDias() {
   charts['cDiasWR'] = new Chart(document.getElementById('cDiasWR'), {
     type: 'bar',
     data: { labels, datasets: [
-      { data: wrs, backgroundColor: wrs.map((v,i) => vols[i]===0 ? 'rgba(255,255,255,.05)' : v>=media ? 'rgba(46,204,138,.75)' : 'rgba(240,90,90,.65)'), borderRadius: 4, barPercentage: .6, yAxisID: 'y' },
+      { data: wrs, backgroundColor: wrs.map((v,i) => vols[i]===0 ? 'rgba(255,255,255,.05)' : wrColor(v)), borderRadius: 4, barPercentage: .6, yAxisID: 'y' },
       { data: vols, type: 'line', borderColor: 'rgba(255,255,255,.2)', backgroundColor: 'transparent', pointBackgroundColor: 'rgba(255,255,255,.3)', pointRadius: 4, tension: .3, yAxisID: 'y2', borderDash: [3,3] }
     ]},
     options: { ...cd(), scales: {
