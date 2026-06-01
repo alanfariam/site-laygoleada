@@ -581,11 +581,12 @@ function buildMonthCard(mesN, anoN, diasDoMes, triaMap, otMap) {
     d => d.reds   || 0
   );
 
+  // Card mensal — sempre dourado para destacar na grade
+  const GOLD       = '#F0C040';
+  const GOLD_RGB   = '240,192,64';
+  const mesId      = `${String(mesN+1).padStart(2,'0')}-${anoN}`;
   const lucroTotal = ff.lucro + tria.lucro + ot.lucro;
-  const borderColor = lucroTotal > 0 ? '#00e676' : lucroTotal < 0 ? '#ff1744' : '#FFD700';
-  const glowRgb     = lucroTotal > 0 ? '0,230,118' : lucroTotal < 0 ? '255,23,68' : '255,215,0';
-  const mesLabel    = MESES_PT[mesN] + ' · ' + anoN;
-  const mesId       = `${String(mesN+1).padStart(2,'0')}-${anoN}`;
+  const lucroColor = lucroTotal >= 0 ? '#00e676' : '#ff1744';
 
   const wrapper = document.createElement('div');
   wrapper.className = 'card-wrapper';
@@ -593,9 +594,10 @@ function buildMonthCard(mesN, anoN, diasDoMes, triaMap, otMap) {
   const cardEl = document.createElement('div');
   cardEl.className = 'card';
   cardEl.id = 'card-mes-' + mesId;
-  cardEl.style.borderColor = borderColor;
-  cardEl.style.boxShadow   = `0 0 30px rgba(${glowRgb},0.15), 0 0 80px rgba(${glowRgb},0.06), inset 0 0 40px rgba(${glowRgb},0.03)`;
-  cardEl.style.setProperty('--glow-rgb', glowRgb);
+  cardEl.style.borderColor     = GOLD;
+  cardEl.style.boxShadow       = `0 0 30px rgba(${GOLD_RGB},0.20), 0 0 80px rgba(${GOLD_RGB},0.08), inset 0 0 60px rgba(${GOLD_RGB},0.04)`;
+  cardEl.style.background      = `linear-gradient(160deg, rgba(${GOLD_RGB},0.06) 0%, #0a0c10 40%)`;
+  cardEl.style.setProperty('--glow-rgb', GOLD_RGB);
 
   const pBlock = (nome, dot, linkHref, linkTxt, d, show) => {
     const wrP = Math.min(d.wr, 100);
@@ -625,12 +627,12 @@ function buildMonthCard(mesN, anoN, diasDoMes, triaMap, otMap) {
   cardEl.innerHTML = `
     <div class="card-header">
       <img class="card-logo" src="${LOGO_B64}" alt="Lay Goleada">
-      <div class="card-badge">✦ PORTAL LAYGOLEADA · FECHAMENTO MENSAL</div>
+      <div class="card-badge" style="color:${GOLD};border-color:rgba(${GOLD_RGB},.4);background:rgba(${GOLD_RGB},.08);">✦ PORTAL LAYGOLEADA · FECHAMENTO MENSAL</div>
     </div>
     <div class="card-date">
-      <div class="weekday">FECHAMENTO</div>
-      <div class="day" style="font-size:28px;letter-spacing:.02em;">${MESES_PT[mesN].toUpperCase()}</div>
-      <div class="month-year">${anoN}</div>
+      <div class="weekday" style="color:${GOLD};letter-spacing:.18em;">FECHAMENTO</div>
+      <div class="day" style="font-size:46px;letter-spacing:.03em;line-height:1;color:${GOLD};text-shadow:0 0 30px rgba(${GOLD_RGB},.4);">${MESES_PT[mesN].toUpperCase()}</div>
+      <div class="month-year" style="color:rgba(${GOLD_RGB},.7);">${anoN} · <span style="color:${lucroColor};font-weight:700;">${fmtReais(lucroTotal)}</span></div>
     </div>
     <div class="divider"></div>
     <div class="p-block">
@@ -654,8 +656,58 @@ function buildMonthCard(mesN, anoN, diasDoMes, triaMap, otMap) {
   btnSave.textContent = '⬇ SALVAR COMO PNG';
   btnSave.onclick = () => salvarCard(cardEl, mesId);
 
+  // Legenda para o fechamento mensal
+  const mesNome = MESES_PT[mesN];
+  const lucroStr = fmtReais(lucroTotal);
+  const ffEnt  = ff.greens + ff.reds;
+  const triaEnt = tria.greens + tria.reds;
+  const otEnt   = ot.greens + ot.reds;
+
+  let legendaTexto = `🗓️📊 FECHAMENTO ${mesNome.toUpperCase()} ${anoN}\n\n`;
+
+  if (ffEnt > 0) {
+    legendaTexto += `🟢 OVER FREEFIRE\n`;
+    legendaTexto += `💰 Lucro: ${fmtReais(ff.lucro)}\n`;
+    legendaTexto += `📊 Win Rate: ${fmtPct(ff.wr)}\n`;
+    legendaTexto += `🎯 Entradas: ${ffEnt} | ✅ Greens: ${ff.greens} | ❌ Reds: ${ff.reds}\n\n`;
+  }
+  if (triaEnt > 0) {
+    legendaTexto += `🟣 LAY GOLEADA TRINITY\n`;
+    legendaTexto += `💰 Lucro: ${fmtReais(tria.lucro)}\n`;
+    legendaTexto += `📊 Win Rate: ${fmtPct(tria.wr)}\n`;
+    legendaTexto += `🎯 Entradas: ${triaEnt} | ✅ Greens: ${tria.greens} | ❌ Reds: ${tria.reds}\n\n`;
+  }
+  if (otEnt > 0) {
+    legendaTexto += `🟠 OVER TRIPLEX\n`;
+    legendaTexto += `💰 Lucro: ${fmtReais(ot.lucro)}\n`;
+    legendaTexto += `📊 Win Rate: ${fmtPct(ot.wr)}\n`;
+    legendaTexto += `🎯 Entradas: ${otEnt} | ✅ Greens: ${ot.greens} | ❌ Reds: ${ot.reds}\n\n`;
+  }
+
+  legendaTexto += `📈 Lucro Total do Mês: ${lucroStr}\n\n`;
+  legendaTexto += `Portal LayGoleada 🏆 | Três métodos. Uma plataforma.\n`;
+  legendaTexto += `🔔 Acompanhe os resultados e entre para o grupo VIP!\n`;
+  legendaTexto += `👉 www.laygoleada.com.br\n\n`;
+  legendaTexto += `#LayGoleada #OverFreeFire #LGTrinity #OverTriplex\n#ApostasEsportivas #FechamentoMensal #BetBrasil #ResultadoDoMes\n#ApostasInteligentes #TipsGratuitas #WinRate #TradeEsportivo`;
+
+  const caption = document.createElement('div');
+  caption.className = 'caption-box';
+  caption.innerHTML = `<strong>📋 Legenda para o Reels</strong>${legendaTexto.replace(/\n/g,'<br>')}`;
+
+  const btnCopy = document.createElement('button');
+  btnCopy.className = 'btn-copy';
+  btnCopy.textContent = '📋 COPIAR LEGENDA';
+  btnCopy.onclick = () => {
+    navigator.clipboard.writeText(legendaTexto).then(() => {
+      btnCopy.textContent = '✅ COPIADO!';
+      setTimeout(() => { btnCopy.textContent = '📋 COPIAR LEGENDA'; }, 2000);
+    });
+  };
+  caption.appendChild(btnCopy);
+
   wrapper.appendChild(cardEl);
   wrapper.appendChild(btnSave);
+  wrapper.appendChild(caption);
   return wrapper;
 }
 
