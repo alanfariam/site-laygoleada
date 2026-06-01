@@ -553,6 +553,112 @@ function buildPBalls(g, r, cls, sequencia) {
   return seq.map(s => `<div class="p-ball ${s==='G'?cls:'r'}">${s}</div>`).join('');
 }
 
+function buildMonthCard(mesN, anoN, diasDoMes, triaMap, otMap) {
+  // Agrega totais do mês
+  const agg = (dias, getL, getG, getR) => {
+    let lucro = 0, greens = 0, reds = 0;
+    dias.forEach(d => { lucro += getL(d); greens += getG(d); reds += getR(d); });
+    return { lucro, greens, reds, wr: (greens + reds) > 0 ? greens / (greens + reds) * 100 : 0 };
+  };
+
+  const ff = agg(diasDoMes,
+    d => parseFloat(d.lucro) || 0,
+    d => d.greens || 0,
+    d => d.reds   || 0
+  );
+
+  const triaDias = diasDoMes.map(d => triaMap[d.data]).filter(Boolean);
+  const tria = agg(triaDias,
+    d => parseFloat(d.lucro) || 0,
+    d => d.greens || 0,
+    d => d.reds   || 0
+  );
+
+  const otDias = diasDoMes.map(d => otMap[d.data]).filter(Boolean);
+  const ot = agg(otDias,
+    d => parseFloat(d.lucro) || 0,
+    d => d.greens || 0,
+    d => d.reds   || 0
+  );
+
+  const lucroTotal = ff.lucro + tria.lucro + ot.lucro;
+  const borderColor = lucroTotal > 0 ? '#00e676' : lucroTotal < 0 ? '#ff1744' : '#FFD700';
+  const glowRgb     = lucroTotal > 0 ? '0,230,118' : lucroTotal < 0 ? '255,23,68' : '255,215,0';
+  const mesLabel    = MESES_PT[mesN] + ' · ' + anoN;
+  const mesId       = `${String(mesN+1).padStart(2,'0')}-${anoN}`;
+
+  const wrapper = document.createElement('div');
+  wrapper.className = 'card-wrapper';
+
+  const cardEl = document.createElement('div');
+  cardEl.className = 'card';
+  cardEl.id = 'card-mes-' + mesId;
+  cardEl.style.borderColor = borderColor;
+  cardEl.style.boxShadow   = `0 0 30px rgba(${glowRgb},0.15), 0 0 80px rgba(${glowRgb},0.06), inset 0 0 40px rgba(${glowRgb},0.03)`;
+  cardEl.style.setProperty('--glow-rgb', glowRgb);
+
+  const pBlock = (nome, dot, linkHref, linkTxt, d, show) => {
+    const wrP = Math.min(d.wr, 100);
+    const ent = d.greens + d.reds;
+    if (!show) return `
+      <div class="p-header">
+        <div class="p-pill"><div class="p-dot ${dot}"></div><div class="p-name ${dot}">${nome}</div></div>
+        ${linkHref ? `<a href="${linkHref}" target="_blank" class="p-em-breve ${dot}" style="text-decoration:none;">${linkTxt}</a>` : ''}
+      </div>
+      <div class="p-sem-dados">Sem entradas no mês</div>`;
+    return `
+      <div class="p-header">
+        <div class="p-pill"><div class="p-dot ${dot}"></div><div class="p-name ${dot}">${nome}</div></div>
+        ${linkHref ? `<a href="${linkHref}" target="_blank" class="p-em-breve ${dot}" style="text-decoration:none;">${linkTxt}</a>` : ''}
+      </div>
+      <div class="p-stats">
+        <div class="p-stat ${dot}"><div class="p-sv ${d.lucro >= 0 ? 'g' : 'r'}">${fmtReais(d.lucro)}</div><div class="p-sl">Lucro Mês</div></div>
+        <div class="p-stat ${dot}"><div class="p-sv wht">${ent}</div><div class="p-sl">Entradas</div></div>
+        <div class="p-stat ${dot}"><div class="p-sv wht"><span style="color:#00e676">${d.greens}G</span> · <span style="color:#ff1744">${d.reds}R</span></div><div class="p-sl">Resultado</div></div>
+      </div>
+      <div class="p-wr">
+        <div class="p-wr-top"><span class="p-wr-lbl">Win Rate</span><span class="p-wr-val ${d.wr >= 59 ? 'g' : d.wr >= 58 ? '' : 'r'}">${fmtPct(d.wr)}</span></div>
+        <div class="p-wr-bar"><div class="p-wr-fill ${d.wr >= 59 ? 'g' : 'r'}" style="width:${wrP}%"></div></div>
+      </div>`;
+  };
+
+  cardEl.innerHTML = `
+    <div class="card-header">
+      <img class="card-logo" src="${LOGO_B64}" alt="Lay Goleada">
+      <div class="card-badge">✦ PORTAL LAYGOLEADA · FECHAMENTO MENSAL</div>
+    </div>
+    <div class="card-date">
+      <div class="weekday">FECHAMENTO</div>
+      <div class="day" style="font-size:28px;letter-spacing:.02em;">${MESES_PT[mesN].toUpperCase()}</div>
+      <div class="month-year">${anoN}</div>
+    </div>
+    <div class="divider"></div>
+    <div class="p-block">
+      ${pBlock('Over FREEFIRE', 'g', null, null, ff, ff.greens + ff.reds > 0)}
+    </div>
+    <div class="p-divider"></div>
+    <div class="p-block">
+      ${pBlock('Lay Goleada TRINITY', 'p', 'https://www.laygoleada.com.br/trinity', 'Ver TRINITY →', tria, tria.greens + tria.reds > 0)}
+    </div>
+    <div class="p-divider"></div>
+    <div class="p-block">
+      ${pBlock('OVER TRIPLEX', 'o', 'https://www.laygoleada.com.br/triplex', 'Ver TRIPLEX →', ot, ot.greens + ot.reds > 0)}
+    </div>
+    <div class="card-footer">
+      <div class="disclaimer">Dados completos em</div>
+      <div class="site">laygoleada.com.br</div>
+    </div>`;
+
+  const btnSave = document.createElement('button');
+  btnSave.className = 'btn-save';
+  btnSave.textContent = '⬇ SALVAR COMO PNG';
+  btnSave.onclick = () => salvarCard(cardEl, mesId);
+
+  wrapper.appendChild(cardEl);
+  wrapper.appendChild(btnSave);
+  return wrapper;
+}
+
 function buildCard(dia, acumuladoMes, triaDia, otDia) {
   const wrapper   = document.createElement('div');
   wrapper.className = 'card-wrapper';
@@ -791,14 +897,32 @@ async function init() {
       acumPorData[d.data] = soma;
     });
 
-    // Últimos 5 dias
-    const dias = todosDesc.slice(0, 5);
+    // ── 3 cards diários mais recentes ──
+    const dias = todosDesc.slice(0, 3);
 
-    setStatus(`✅ Últimos ${dias.length} dias carregados`);
+    // ── Cards mensais: mês anterior e mês corrente ──
+    const now    = new Date();
+    const mesAtual  = now.getMonth();      // 0-based
+    const anoAtual  = now.getFullYear();
+    const mesAntM   = mesAtual === 0 ? 11 : mesAtual - 1;
+    const anoAntM   = mesAtual === 0 ? anoAtual - 1 : anoAtual;
+
+    const diasMesAtual = todosDesc.filter(d => {
+      const dt = parseD(d.data);
+      return dt.getMonth() === mesAtual && dt.getFullYear() === anoAtual;
+    });
+    const diasMesAnt = todosDesc.filter(d => {
+      const dt = parseD(d.data);
+      return dt.getMonth() === mesAntM && dt.getFullYear() === anoAntM;
+    });
+
+    setStatus(`✅ ${dias.length} dias + 2 fechamentos mensais carregados`);
 
     const grid = document.getElementById('cardsGrid');
     grid.innerHTML = '';
     dias.forEach(d => grid.appendChild(buildCard(d, acumPorData[d.data], triaMap[d.data] || null, otMap[d.data] || null)));
+    if (diasMesAnt.length)   grid.appendChild(buildMonthCard(mesAntM,  anoAntM,  diasMesAnt,  triaMap, otMap));
+    if (diasMesAtual.length) grid.appendChild(buildMonthCard(mesAtual, anoAtual, diasMesAtual, triaMap, otMap));
 
   } catch(e) {
     setStatus('❌ Erro: ' + e.message);
