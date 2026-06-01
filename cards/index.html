@@ -767,54 +767,38 @@ async function init() {
     const otMap = {};
     (Array.isArray(otData) ? otData : []).forEach(d => { otMap[d.data] = d; });
 
-    // Filtrar pelo mês corrente
-    const dias = (Array.isArray(data) ? data : data.dias || [])
-      .filter(d => {
-        if (!d.data) return false;
-        let dt;
-        if (d.data.includes('/')) {
-          const [dd, mm, yyyy] = d.data.split('/');
-          dt = new Date(`${yyyy}-${mm}-${dd}T12:00:00`);
-        } else {
-          dt = new Date(d.data + 'T12:00:00');
-        }
-        return dt.getMonth() + 1 === mes && dt.getFullYear() === ano;
-      })
-      .sort((a,b) => {
-        const parseD = s => {
-          if (s && s.includes('/')) { const [d,m,y] = s.split('/'); return new Date(`${y}-${m}-${d}T12:00:00`); }
-          return new Date(s + 'T12:00:00');
-        };
-        return parseD(b.data) - parseD(a.data);
-      });
+    const parseD = s => {
+      if (s && s.includes('/')) { const [d,m,y] = s.split('/'); return new Date(`${y}-${m}-${d}T12:00:00`); }
+      return new Date(s + 'T12:00:00');
+    };
 
-    if (!dias.length) {
-      setStatus('⚠️ Nenhum dado encontrado para o mês atual');
+    // Todos os dias disponíveis, ordenados do mais recente
+    const todosDesc = (Array.isArray(data) ? data : data.dias || [])
+      .filter(d => d.data)
+      .sort((a, b) => parseD(b.data) - parseD(a.data));
+
+    if (!todosDesc.length) {
+      setStatus('⚠️ Nenhum dado encontrado');
       return;
     }
 
-    // Ordenar crescente para calcular acumulado progressivo
-    const diasAsc = [...dias].sort((a, b) => {
-      const parseD = s => {
-        if (s && s.includes('/')) { const [d,m,y] = s.split('/'); return new Date(`${y}-${m}-${d}T12:00:00`); }
-        return new Date(s + 'T12:00:00');
-      };
-      return parseD(a.data) - parseD(b.data);
-    });
-
-    // Calcular acumulado até cada dia
+    // Calcular acumulado sobre todos os dados (ordem crescente)
+    const todosAsc = [...todosDesc].sort((a, b) => parseD(a.data) - parseD(b.data));
     let soma = 0;
     const acumPorData = {};
-    diasAsc.forEach(d => {
+    todosAsc.forEach(d => {
       soma += parseFloat(d.lucro) || 0;
       acumPorData[d.data] = soma;
     });
 
-    setStatus(`✅ ${dias.length} dias carregados · Mês ${mes}/${ano}`);
+    // Últimos 5 dias
+    const dias = todosDesc.slice(0, 5);
+
+    setStatus(`✅ Últimos ${dias.length} dias carregados`);
 
     const grid = document.getElementById('cardsGrid');
     grid.innerHTML = '';
-    dias.slice(0, 3).forEach(d => grid.appendChild(buildCard(d, acumPorData[d.data], triaMap[d.data] || null, otMap[d.data] || null)));
+    dias.forEach(d => grid.appendChild(buildCard(d, acumPorData[d.data], triaMap[d.data] || null, otMap[d.data] || null)));
 
   } catch(e) {
     setStatus('❌ Erro: ' + e.message);
