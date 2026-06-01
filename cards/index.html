@@ -858,10 +858,6 @@ async function init() {
   try {
     setStatus('🔄 Carregando dados da API...');
 
-    const now   = new Date();
-    const mes   = now.getMonth() + 1;
-    const ano   = now.getFullYear();
-
     const [data, triaData, otData] = await Promise.all([
       fetchApi(`/api/lucro-diario`),
       fetch(TR_API + '/api/lucro-diario').then(r => r.json()).catch(() => []),
