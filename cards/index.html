@@ -310,6 +310,23 @@ h1 {
 .lucro-value.zero { color: #888; }
 .lucro-value.gold { color: #FFD700; }
 
+/* CTA strip — cabeçalho */
+.cta-strip {
+  width: 100%;
+  background: transparent;
+  border-top: 1px solid rgba(0,230,118,0.3);
+  border-bottom: 1px solid rgba(0,230,118,0.3);
+  padding: 6px 0;
+  text-align: center;
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  color: #00e676;
+  white-space: nowrap;
+  z-index: 2;
+  position: relative;
+}
+
 /* FOOTER do card — CTA */
 .card-footer {
   z-index: 1;
@@ -629,6 +646,7 @@ function buildMonthCard(mesN, anoN, diasDoMes, triaMap, otMap) {
       <img class="card-logo" src="${LOGO_B64}" alt="Lay Goleada">
       <div class="card-badge" style="color:${GOLD};border-color:rgba(${GOLD_RGB},.4);background:rgba(${GOLD_RGB},.08);">✦ PORTAL LAYGOLEADA · FECHAMENTO MENSAL</div>
     </div>
+    <div class="cta-strip">www.laygoleada.com.br · Resultados e assinatura</div>
     <div class="card-date">
       <div class="weekday" style="color:${GOLD};letter-spacing:.18em;">FECHAMENTO</div>
       <div class="day" style="font-size:46px;letter-spacing:.03em;line-height:1;color:${GOLD};text-shadow:0 0 30px rgba(${GOLD_RGB},.4);">${MESES_PT[mesN].toUpperCase()}</div>
@@ -647,8 +665,8 @@ function buildMonthCard(mesN, anoN, diasDoMes, triaMap, otMap) {
       ${pBlock('OVER TRIPLEX', 'o', 'https://www.laygoleada.com.br/triplex', 'Ver TRIPLEX →', ot, ot.greens + ot.reds > 0)}
     </div>
     <div class="card-footer">
-      <div class="disclaimer">Dados completos em</div>
-      <div class="site">laygoleada.com.br</div>
+      <div class="disclaimer">Confira os números completos em</div>
+      <div class="site">www.laygoleada.com.br</div>
     </div>`;
 
   const btnSave = document.createElement('button');
@@ -757,6 +775,7 @@ function buildCard(dia, acumuladoMes, triaDia, otDia) {
       <img class="card-logo" src="${LOGO_B64}" alt="Lay Goleada">
       <div class="card-badge">✦ PORTAL LAYGOLEADA · RESULTADO DIÁRIO</div>
     </div>
+    <div class="cta-strip">www.laygoleada.com.br · Resultados e assinatura</div>
 
     <!-- DATA -->
     <div class="card-date">
@@ -854,8 +873,8 @@ function buildCard(dia, acumuladoMes, triaDia, otDia) {
 
     <!-- FOOTER CTA -->
     <div class="card-footer">
-      <div class="disclaimer">Dados completos em</div>
-      <div class="site">laygoleada.com.br</div>
+      <div class="disclaimer">Confira os números completos em</div>
+      <div class="site">www.laygoleada.com.br</div>
     </div>
   `;
 
