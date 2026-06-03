@@ -926,8 +926,22 @@ async function init() {
       return new Date(s + 'T12:00:00');
     };
 
-    // Todos os dias disponíveis, ordenados do mais recente
-    const todosDesc = (Array.isArray(data) ? data : data.dias || [])
+    // Índice dos dias do FreeFire
+    const ffMap = {};
+    (Array.isArray(data) ? data : data.dias || [])
+      .filter(d => d.data)
+      .forEach(d => { ffMap[d.data] = d; });
+
+    // Unifica todos os dias de todos os produtos
+    const todasDatas = new Set([
+      ...Object.keys(ffMap),
+      ...Object.keys(triaMap),
+      ...Object.keys(otMap),
+    ]);
+
+    // Para dias sem entrada no FreeFire, cria objeto zerado
+    const todosDesc = Array.from(todasDatas)
+      .map(data => ffMap[data] || { data, lucro: 0, greens: 0, reds: 0, total: 0, sequencia: [] })
       .filter(d => d.data)
       .sort((a, b) => parseD(b.data) - parseD(a.data));
 
