@@ -997,13 +997,12 @@ async function init() {
       return dt.getMonth() === mesAntM && dt.getFullYear() === anoAntM;
     });
 
-    setStatus(`✅ ${dias.length} dias + 2 fechamentos mensais carregados`);
+    setStatus(`✅ ${dias.length} dias + fechamento de ${MESES_PT[mesAntM]} carregados`);
 
     const grid = document.getElementById('cardsGrid');
     grid.innerHTML = '';
     dias.forEach(d => grid.appendChild(buildCard(d, acumPorData[d.data], triaMap[d.data] || null, otMap[d.data] || null)));
     if (diasMesAnt.length)   grid.appendChild(buildMonthCard(mesAntM,  anoAntM,  diasMesAnt,  triaMap, otMap));
-    if (diasMesAtual.length) grid.appendChild(buildMonthCard(mesAtual, anoAtual, diasMesAtual, triaMap, otMap));
 
   } catch(e) {
     setStatus('❌ Erro: ' + e.message);
@@ -1012,6 +1011,585 @@ async function init() {
 }
 
 init();
+</script>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     SEÇÃO: CARDS POR PRODUTO (mensal + calendário)
+════════════════════════════════════════════════════════════════ -->
+<div style="margin:60px auto 0;max-width:1400px;text-align:center;">
+  <div style="display:inline-block;width:80%;height:1px;background:linear-gradient(to right,transparent,rgba(255,215,0,0.3),transparent);margin-bottom:32px;"></div>
+  <h2 style="font-family:'Space Mono',monospace;color:#FFD700;font-size:1.1rem;letter-spacing:3px;margin-bottom:6px;">🎯 CARDS POR PRODUTO</h2>
+  <p style="color:#555;font-size:0.8rem;margin-bottom:20px;letter-spacing:1px;">RESULTADO MENSAL COM CALENDÁRIO · UM CARD POR MÉTODO</p>
+  <div style="display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:30px;">
+    <label style="color:#888;font-size:0.8rem;letter-spacing:1px;">MÊS:</label>
+    <select id="prodMesSelect" style="background:#111318;color:#FFD700;border:1px solid rgba(255,215,0,0.3);border-radius:8px;padding:8px 16px;font-family:'Space Mono',monospace;font-size:0.8rem;cursor:pointer;outline:none;">
+      <option value="">Carregando...</option>
+    </select>
+  </div>
+  <div id="statusProd" style="color:#FFD700;font-size:0.9rem;min-height:24px;margin-bottom:20px;letter-spacing:1px;">🔄 Aguardando seleção...</div>
+</div>
+<div class="cards-grid" id="cardsGridProd" style="padding-bottom:60px;"></div>
+
+<style>
+/* ── CALENDÁRIO ── */
+.cal-grid {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 3px;
+  z-index: 1;
+}
+.cal-header {
+  font-family: 'Space Mono', monospace;
+  font-size: 7px;
+  color: #555;
+  text-align: center;
+  padding: 3px 0;
+  letter-spacing: .08em;
+}
+.cal-cell {
+  border-radius: 5px;
+  padding: 4px 2px;
+  text-align: center;
+  min-height: 38px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  position: relative;
+}
+.cal-cell.empty {
+  background: transparent;
+}
+.cal-cell.no-entry {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.05);
+}
+.cal-cell.positive {
+  background: rgba(0,230,118,0.15);
+  border: 1px solid rgba(0,230,118,0.3);
+}
+.cal-cell.negative {
+  background: rgba(255,23,68,0.15);
+  border: 1px solid rgba(255,23,68,0.3);
+}
+.cal-cell.positive.prod-p {
+  background: rgba(168,85,247,0.15);
+  border: 1px solid rgba(168,85,247,0.3);
+}
+.cal-cell.positive.prod-o {
+  background: rgba(249,115,22,0.15);
+  border: 1px solid rgba(249,115,22,0.3);
+}
+.cal-day-num {
+  font-family: 'Space Mono', monospace;
+  font-size: 8px;
+  font-weight: 700;
+  color: #666;
+  line-height: 1;
+}
+.cal-cell.positive .cal-day-num { color: #aaa; }
+.cal-cell.negative .cal-day-num { color: #aaa; }
+.cal-lucro {
+  font-family: 'Space Mono', monospace;
+  font-size: 7px;
+  font-weight: 700;
+  line-height: 1;
+}
+.cal-cell.positive .cal-lucro { color: #00e676; }
+.cal-cell.positive.prod-p .cal-lucro { color: #A855F7; }
+.cal-cell.positive.prod-o .cal-lucro { color: #F97316; }
+.cal-cell.negative .cal-lucro { color: #ff1744; }
+.cal-cell.no-entry .cal-day-num { color: #333; }
+
+/* ── CARD PRODUTO ── */
+.prod-card-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+  z-index: 1;
+  width: 100%;
+}
+.prod-kpis {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  width: 100%;
+  z-index: 1;
+}
+.prod-kpi {
+  border-radius: 8px;
+  padding: 8px 10px;
+  text-align: center;
+}
+.prod-kpi-val {
+  font-family: 'Space Mono', monospace;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.1;
+}
+.prod-kpi-lbl {
+  font-size: 7px;
+  color: #555;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  margin-top: 2px;
+}
+.prod-wr-wrap {
+  width: 100%;
+  z-index: 1;
+}
+.prod-wr-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+.prod-wr-lbl {
+  font-size: 8px;
+  color: #555;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+.prod-wr-num {
+  font-family: 'Space Mono', monospace;
+  font-size: 18px;
+  font-weight: 700;
+}
+.prod-wr-bar-bg {
+  width: 100%;
+  height: 6px;
+  background: rgba(255,255,255,.08);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.prod-wr-bar-fill {
+  height: 100%;
+  border-radius: 3px;
+}
+.prod-cal-title {
+  font-size: 8px;
+  color: #444;
+  letter-spacing: .15em;
+  text-transform: uppercase;
+  text-align: center;
+  z-index: 1;
+  width: 100%;
+}
+.prod-lucro-box {
+  width: 100%;
+  border-radius: 12px;
+  padding: 10px 14px;
+  text-align: center;
+  z-index: 1;
+  position: relative;
+  overflow: hidden;
+}
+.prod-lucro-lbl {
+  font-size: 7px;
+  color: #666;
+  letter-spacing: .15em;
+  text-transform: uppercase;
+  margin-bottom: 2px;
+}
+.prod-lucro-val {
+  font-family: 'Space Mono', monospace;
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 1.1;
+  text-shadow: 0 0 14px currentColor;
+}
+</style>
+
+<script>
+(function() {
+  const API_FF = 'https://api.laygoleada.com.br';
+  const API_TR = 'https://api.laygoleada.com.br/trinity';
+  const API_OT = 'https://api.laygoleada.com.br/overtriplex';
+
+  const MESES_PT2 = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho',
+                     'Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+  const DIAS_SEMANA = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+
+  const PRODUTOS = [
+    { key:'ff',   nome:'Over FreeFire',      dot:'g',  api: API_FF, r:'0,230,118',   cor:'#00e676', cls:'',      slug:'freefire' },
+    { key:'tria', nome:'Lay Goleada Trinity', dot:'p',  api: API_TR, r:'168,85,247',  cor:'#A855F7', cls:'prod-p', slug:'trinity'  },
+    { key:'ot',   nome:'Over Triplex',        dot:'o',  api: API_OT, r:'249,115,22',  cor:'#F97316', cls:'prod-o', slug:'triplex'  },
+  ];
+
+  function parseDate(str) {
+    const [d,m,y] = str.split('/');
+    return new Date(+y, +m-1, +d);
+  }
+  function fmtR(v) {
+    const n = parseFloat(v)||0;
+    return (n>=0?'+':'') + 'R$' + Math.abs(n).toFixed(2).replace('.',',');
+  }
+  function fmtPct(v) { return (parseFloat(v)||0).toFixed(1)+'%'; }
+  function setStatusProd(msg) { document.getElementById('statusProd').textContent = msg; }
+
+  // ── Popula o seletor de meses ──
+  async function populateMeses() {
+    try {
+      const data = await fetch(API_FF + '/api/kpis').then(r=>r.json());
+      const meses = (data.meses_disponiveis || []).sort((a,b) => {
+        const [ma,ya] = a.split('/'); const [mb,yb] = b.split('/');
+        return (+yb - +ya) || (+mb - +ma);
+      });
+      const sel = document.getElementById('prodMesSelect');
+      sel.innerHTML = meses.map(m => `<option value="${m}">${m.replace('/',' / ')}</option>`).join('');
+      // Seleciona mês atual (primeiro da lista após reverse = mais recente)
+      sel.value = meses[0] || '';
+      sel.addEventListener('change', () => renderProdCards(sel.value));
+      renderProdCards(sel.value);
+    } catch(e) {
+      setStatusProd('❌ Erro ao carregar meses: ' + e.message);
+    }
+  }
+
+  // ── Constrói o calendário ──
+  function buildCalendar(mes0, ano, diasMap, corCls) {
+    const primeiroDia = new Date(ano, mes0, 1).getDay(); // 0=Dom
+    const totalDias   = new Date(ano, mes0+1, 0).getDate();
+
+    let html = '<div class="cal-grid">';
+    // Cabeçalho
+    DIAS_SEMANA.forEach(d => { html += `<div class="cal-header">${d}</div>`; });
+    // Células vazias antes do 1º dia
+    for (let i=0; i<primeiroDia; i++) html += '<div class="cal-cell empty"></div>';
+    // Dias do mês
+    for (let d=1; d<=totalDias; d++) {
+      const key = String(d).padStart(2,'0') + '/' + String(mes0+1).padStart(2,'0') + '/' + ano;
+      const entry = diasMap[key];
+      let cls = 'no-entry';
+      let lucroTxt = '';
+      if (entry) {
+        const l = parseFloat(entry.lucro)||0;
+        cls = l > 0 ? 'positive' : l < 0 ? 'negative' : 'no-entry';
+        lucroTxt = `<div class="cal-lucro">${l>=0?'+':''}${Math.abs(l).toFixed(0)}</div>`;
+      }
+      html += `<div class="cal-cell ${cls}"><div class="cal-day-num">${d}</div>${lucroTxt}</div>`;
+    }
+    html += '</div>';
+    return html;
+  }
+
+  // ── Constrói um card de produto ──
+  function buildProdCard(prod, kpis, diasMap, mes0, ano) {
+    const mesNome  = MESES_PT2[mes0];
+    const lucroTotal = parseFloat(kpis.lucro_total)||0;
+    const lucroColor = lucroTotal >= 0 ? prod.cor : '#ff1744';
+    const wr         = parseFloat(kpis.win_rate)||0;
+    const wrCls      = wr >= 58 ? 'positive' : 'negative';
+    const wrColor    = wr >= 58 ? prod.cor : '#ff1744';
+    const greens     = kpis.greens || 0;
+    const reds       = kpis.reds   || 0;
+    const entradas   = kpis.total_entradas || (greens+reds);
+
+    const wrapper = document.createElement('div');
+    wrapper.className = 'card-wrapper';
+
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.id = `card-prod-${prod.key}-${String(mes0+1).padStart(2,'0')}-${ano}`;
+    card.style.borderColor = prod.cor;
+    card.style.boxShadow   = `0 0 30px rgba(${prod.r},0.20), 0 0 80px rgba(${prod.r},0.08), inset 0 0 60px rgba(${prod.r},0.04)`;
+    card.style.background  = `linear-gradient(160deg, rgba(${prod.r},0.06) 0%, #0a0c10 40%)`;
+    card.style.setProperty('--glow-rgb', prod.r);
+
+    const calHtml = buildCalendar(mes0, ano, diasMap, prod.cls);
+
+    card.innerHTML = `
+      <div class="card-header">
+        <img class="card-logo" src="/favicon.png" alt="Lay Goleada">
+        <div class="card-badge" style="color:${prod.cor};border-color:rgba(${prod.r},.4);background:rgba(${prod.r},.08);">PORTAL LAYGOLEADA · RESULTADO DO MÊS</div>
+      </div>
+      <div class="cta-strip">www.laygoleada.com.br · Resultados e assinatura</div>
+      <div style="z-index:1;width:100%;text-align:center;">
+        <div style="display:inline-block;background:rgba(${prod.r},.12);border:1.5px solid rgba(${prod.r},.5);border-radius:10px;padding:8px 18px;margin-bottom:6px;">
+          <div style="font-size:7px;color:rgba(${prod.r},.6);letter-spacing:.2em;text-transform:uppercase;margin-bottom:3px;">MÉTODO</div>
+          <div style="font-family:'Space Mono',monospace;font-size:17px;font-weight:700;color:${prod.cor};letter-spacing:.06em;text-shadow:0 0 18px rgba(${prod.r},.7);line-height:1.1;">${prod.nome.toUpperCase()}</div>
+        </div>
+        <div style="font-family:'Space Mono',monospace;font-size:38px;font-weight:700;color:#fff;line-height:1;letter-spacing:.02em;">${mesNome.toUpperCase()}</div>
+        <div style="font-size:13px;color:#555;letter-spacing:.15em;">${ano}</div>
+      </div>
+      <div class="divider"></div>
+
+      <div class="prod-lucro-box" style="background:rgba(${prod.r},.07);border:1.5px solid rgba(${prod.r},.25);">
+        <div class="prod-lucro-lbl">LUCRO DO MÊS</div>
+        <div class="prod-lucro-val" style="color:${lucroColor};">${fmtR(lucroTotal)}</div>
+      </div>
+
+      <div class="prod-kpis">
+        <div class="prod-kpi" style="background:rgba(${prod.r},.06);border:1px solid rgba(${prod.r},.15);">
+          <div class="prod-kpi-val" style="color:#fff;">${entradas}</div>
+          <div class="prod-kpi-lbl">Entradas</div>
+        </div>
+        <div class="prod-kpi" style="background:rgba(${prod.r},.06);border:1px solid rgba(${prod.r},.15);">
+          <div class="prod-kpi-val"><span style="color:#00e676">${greens}G</span> · <span style="color:#ff1744">${reds}R</span></div>
+          <div class="prod-kpi-lbl">Resultado</div>
+        </div>
+      </div>
+
+      <div class="prod-wr-wrap">
+        <div class="prod-wr-top">
+          <span class="prod-wr-lbl">WIN RATE</span>
+          <span class="prod-wr-num" style="color:${wrColor};text-shadow:0 0 8px ${wrColor};">${fmtPct(wr)}</span>
+        </div>
+        <div class="prod-wr-bar-bg">
+          <div class="prod-wr-bar-fill" style="width:${Math.min(wr,100)}%;background:linear-gradient(to right,${prod.cor},${prod.cor}99);box-shadow:0 0 6px rgba(${prod.r},.5);"></div>
+        </div>
+      </div>
+
+      <div class="prod-cal-title">CALENDÁRIO DE RESULTADOS — ${mesNome.toUpperCase()} ${ano}</div>
+      ${calHtml}
+
+      <div class="card-footer">
+        <div class="disclaimer">Confira os números completos em</div>
+        <div class="site">www.laygoleada.com.br/${prod.slug}</div>
+      </div>`;
+
+    // Legenda
+    const legenda = [
+      `📊 ${prod.nome.toUpperCase()} — ${mesNome.toUpperCase()} ${ano}`,
+      ``,
+      `💰 Lucro do Mês: ${fmtR(lucroTotal)}`,
+      `📈 Win Rate: ${fmtPct(wr)}`,
+      `🎯 Entradas: ${entradas} | ✅ ${greens}G | ❌ ${reds}R`,
+      ``,
+      `Portal LayGoleada 🏆 | Método comprovado com dados reais`,
+      `🔔 Acompanhe os resultados no nosso portal!`,
+      `👉 www.laygoleada.com.br`,
+      ``,
+      `#LayGoleada #${prod.nome.replace(/\s+/g,'')} #ApostasEsportivas #TradeEsportivo`,
+      `#WinRate #ResultadoDoMes #TipsGratuitas #BetBrasil`,
+    ].join('\n');
+
+    const btnSave = document.createElement('button');
+    btnSave.className = 'btn-save';
+    btnSave.textContent = '⬇ SALVAR COMO PNG';
+    btnSave.onclick = () => {
+      html2canvas(card, { scale:2, backgroundColor:'#080a0f', useCORS:true, logging:false }).then(canvas => {
+        const a = document.createElement('a');
+        a.download = `card-${prod.key}-${String(mes0+1).padStart(2,'0')}-${ano}.png`;
+        a.href = canvas.toDataURL('image/png');
+        a.click();
+      });
+    };
+
+    const caption = document.createElement('div');
+    caption.className = 'caption-box';
+    caption.innerHTML = `<strong>📋 Legenda para o Reels</strong>${legenda.replace(/\n/g,'<br>')}`;
+
+    const btnCopy = document.createElement('button');
+    btnCopy.className = 'btn-copy';
+    btnCopy.textContent = '📋 COPIAR LEGENDA';
+    btnCopy.onclick = () => {
+      navigator.clipboard.writeText(legenda).then(() => {
+        btnCopy.textContent = '✅ COPIADO!';
+        setTimeout(() => { btnCopy.textContent = '📋 COPIAR LEGENDA'; }, 2000);
+      });
+    };
+    caption.appendChild(btnCopy);
+
+    wrapper.appendChild(card);
+    wrapper.appendChild(btnSave);
+    return wrapper;
+  }
+
+  // ── Card CAPA do Reels ──
+  function buildCapaCard(ffKpis, trKpis, otKpis, mes0, ano) {
+    const GOLD = '#FFD700'; const GOLD_R = '255,215,0';
+    const mesNome = MESES_PT2[mes0];
+    const ffL  = parseFloat(ffKpis.lucro_total)||0;
+    const trL  = parseFloat(trKpis.lucro_total)||0;
+    const otL  = parseFloat(otKpis.lucro_total)||0;
+    const total = ffL + trL + otL;
+    const totalColor = total >= 0 ? '#00e676' : '#ff1744';
+
+    const wrapper = document.createElement('div');
+    wrapper.className = 'card-wrapper';
+
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.id = `card-capa-${String(mes0+1).padStart(2,'0')}-${ano}`;
+    card.style.borderColor = GOLD;
+    card.style.boxShadow   = `0 0 30px rgba(${GOLD_R},.25), 0 0 80px rgba(${GOLD_R},.10), inset 0 0 60px rgba(${GOLD_R},.04)`;
+    card.style.background  = `linear-gradient(160deg, rgba(${GOLD_R},.07) 0%, #0a0c10 40%)`;
+
+    const linha = (prod, lucro, greens, reds, wr, cor, r) => {
+      const lc = lucro >= 0 ? '#00e676' : '#ff1744';
+      return `
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:rgba(${r},.06);border:1px solid rgba(${r},.2);border-radius:10px;width:100%;z-index:1;">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <div style="width:8px;height:8px;border-radius:50%;background:${cor};box-shadow:0 0 6px ${cor};flex-shrink:0;"></div>
+            <div style="font-family:'Space Mono',monospace;font-size:9px;font-weight:700;color:${cor};letter-spacing:.06em;">${prod}</div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-family:'Space Mono',monospace;font-size:13px;font-weight:700;color:${lc};">${fmtR(lucro)}</div>
+            <div style="font-size:7px;color:#555;letter-spacing:.08em;"><span style="color:#00e676">${greens}G</span> · <span style="color:#ff1744">${reds}R</span> · <span style="color:${cor}">${fmtPct(wr)}</span></div>
+          </div>
+        </div>`;
+    };
+
+    card.innerHTML = `
+      <div class="card-header">
+        <img class="card-logo" src="/favicon.png" alt="Lay Goleada">
+        <div class="card-badge" style="color:${GOLD};border-color:rgba(${GOLD_R},.4);background:rgba(${GOLD_R},.08);">PORTAL LAYGOLEADA · RESULTADO DO MÊS</div>
+      </div>
+      <div class="cta-strip">www.laygoleada.com.br · Resultados e assinatura</div>
+
+      <div style="z-index:1;text-align:center;width:100%;">
+        <div style="font-size:8px;color:rgba(${GOLD_R},.5);letter-spacing:.2em;text-transform:uppercase;margin-bottom:4px;">CONSOLIDADO · TODOS OS MÉTODOS</div>
+        <div style="font-family:'Space Mono',monospace;font-size:38px;font-weight:700;color:${GOLD};line-height:1;letter-spacing:.02em;text-shadow:0 0 30px rgba(${GOLD_R},.4);">${mesNome.toUpperCase()}</div>
+        <div style="font-size:13px;color:rgba(${GOLD_R},.5);letter-spacing:.15em;">${ano}</div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div style="z-index:1;width:100%;text-align:center;background:rgba(${totalColor === '#00e676' ? '0,230,118' : '255,23,68'},.07);border:1.5px solid rgba(${totalColor === '#00e676' ? '0,230,118' : '255,23,68'},.25);border-radius:14px;padding:12px 16px;">
+        <div style="font-size:7px;color:#555;letter-spacing:.2em;text-transform:uppercase;margin-bottom:4px;">LUCRO TOTAL DO MÊS</div>
+        <div style="font-family:'Space Mono',monospace;font-size:30px;font-weight:700;color:${totalColor};text-shadow:0 0 16px ${totalColor};">${fmtR(total)}</div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:7px;width:100%;z-index:1;">
+        ${linha('OVER FREEFIRE',      ffL, ffKpis.greens||0, ffKpis.reds||0, ffKpis.win_rate||0, '#00e676','0,230,118')}
+        ${linha('LAY GOLEADA TRINITY',trL, trKpis.greens||0, trKpis.reds||0, trKpis.win_rate||0, '#A855F7','168,85,247')}
+        ${linha('OVER TRIPLEX',       otL, otKpis.greens||0, otKpis.reds||0, otKpis.win_rate||0, '#F97316','249,115,22')}
+      </div>
+
+
+      <div class="card-footer">
+        <div class="disclaimer">Confira os números completos em</div>
+        <div class="site">www.laygoleada.com.br</div>
+      </div>`;
+
+    const btnSave = document.createElement('button');
+    btnSave.className = 'btn-save';
+    btnSave.textContent = '⬇ SALVAR CAPA';
+    btnSave.onclick = () => {
+      html2canvas(card, { scale:2, backgroundColor:'#080a0f', useCORS:true, logging:false }).then(canvas => {
+        const a = document.createElement('a');
+        a.download = `card-capa-${String(mes0+1).padStart(2,'0')}-${ano}.png`;
+        a.href = canvas.toDataURL('image/png');
+        a.click();
+      });
+    };
+
+    wrapper.appendChild(card);
+    wrapper.appendChild(btnSave);
+    return wrapper;
+  }
+
+  // ── Legenda única para o Reels ──
+  function buildLegendaReels(ffKpis, trKpis, otKpis, mes0, ano) {
+    const mesNome = MESES_PT2[mes0];
+    const ffL  = parseFloat(ffKpis.lucro_total)||0;
+    const trL  = parseFloat(trKpis.lucro_total)||0;
+    const otL  = parseFloat(otKpis.lucro_total)||0;
+    const total = ffL + trL + otL;
+    return [
+      `📊 RESULTADO ${mesNome.toUpperCase()} ${ano} — TODOS OS MÉTODOS`,
+      ``,
+      `💰 Lucro Total: ${fmtR(total)}`,
+      ``,
+      `🟢 OVER FREEFIRE`,
+      `   Lucro: ${fmtR(ffL)} | WR: ${fmtPct(ffKpis.win_rate||0)} | ${ffKpis.greens||0}G · ${ffKpis.reds||0}R`,
+      ``,
+      `🟣 LAY GOLEADA TRINITY`,
+      `   Lucro: ${fmtR(trL)} | WR: ${fmtPct(trKpis.win_rate||0)} | ${trKpis.greens||0}G · ${trKpis.reds||0}R`,
+      ``,
+      `🟠 OVER TRIPLEX`,
+      `   Lucro: ${fmtR(otL)} | WR: ${fmtPct(otKpis.win_rate||0)} | ${otKpis.greens||0}G · ${otKpis.reds||0}R`,
+      ``,
+      `📈 Dados reais, sem edição — auditáveis no portal`,
+      `👉 www.laygoleada.com.br`,
+      ``,
+      `#LayGoleada #OverFreeFire #LGTrinity #OverTriplex`,
+      `#ApostasEsportivas #TradeEsportivo #ResultadoDoMes`,
+      `#WinRate #TipsGratuitas #BetBrasil #FechamentoMensal`,
+    ].join('\n');
+  }
+
+  // ── Renderiza os 3 cards para o mês selecionado ──
+  async function renderProdCards(mesStr) {
+    if (!mesStr) return;
+    const [mm, yyyy] = mesStr.split('/');
+    const mes0 = parseInt(mm,10)-1;
+    const ano  = parseInt(yyyy,10);
+    const grid = document.getElementById('cardsGridProd');
+    grid.innerHTML = '';
+    // Remove legenda anterior se existir
+    const oldLegenda = grid.parentElement.querySelector('.reels-legenda-wrap');
+    if (oldLegenda) oldLegenda.remove();
+    setStatusProd('🔄 Carregando dados...');
+
+    try {
+      const [ffKpis, trKpis, otKpis,
+             ffDiario, trDiario, otDiario] = await Promise.all([
+        fetch(`${API_FF}/api/kpis?mes=${mm}/${yyyy}`).then(r=>r.json()),
+        fetch(`${API_TR}/api/kpis?mes=${mm}/${yyyy}`).then(r=>r.json()),
+        fetch(`${API_OT}/api/kpis?mes=${mm}/${yyyy}`).then(r=>r.json()),
+        fetch(`${API_FF}/api/lucro-diario`).then(r=>r.json()),
+        fetch(`${API_TR}/api/lucro-diario`).then(r=>r.json()),
+        fetch(`${API_OT}/api/lucro-diario`).then(r=>r.json()),
+      ]);
+
+      // Monta mapas { "DD/MM/YYYY": entry } filtrados pelo mês/ano
+      function buildMap(arr) {
+        const m = {};
+        arr.forEach(e => {
+          const [d, mo, y] = e.data.split('/');
+          if (parseInt(mo,10)-1 === mes0 && parseInt(y,10) === ano)
+            m[e.data] = e;
+        });
+        return m;
+      }
+
+      const ffMap = buildMap(ffDiario);
+      const trMap = buildMap(trDiario);
+      const otMap = buildMap(otDiario);
+
+      const kpisArr  = [ffKpis,  trKpis,  otKpis];
+      const mapsArr  = [ffMap,   trMap,   otMap];
+
+      // Capa (slide 1)
+      grid.appendChild(buildCapaCard(ffKpis, trKpis, otKpis, mes0, ano));
+
+      // 3 cards por produto (slides 2-4)
+      PRODUTOS.forEach((prod, i) => {
+        grid.appendChild(buildProdCard(prod, kpisArr[i], mapsArr[i], mes0, ano));
+      });
+
+      // Legenda única para o reels completo
+      const legenda = buildLegendaReels(ffKpis, trKpis, otKpis, mes0, ano);
+      const legendaWrap = document.createElement('div');
+      legendaWrap.className = 'reels-legenda-wrap';
+      legendaWrap.style.cssText = 'width:100%;max-width:1400px;margin:10px auto 0;padding:0 20px;';
+      legendaWrap.innerHTML = `
+        <div class="caption-box" style="max-width:800px;margin:0 auto;">
+          <strong>📋 Legenda do Reels (4 slides)</strong>${legenda.replace(/\n/g,'<br>')}
+          <button class="btn-copy" id="btnCopyReels">📋 COPIAR LEGENDA</button>
+        </div>`;
+      legendaWrap.querySelector('#btnCopyReels').onclick = function() {
+        navigator.clipboard.writeText(legenda).then(() => {
+          this.textContent = '✅ COPIADO!';
+          setTimeout(() => { this.textContent = '📋 COPIAR LEGENDA'; }, 2000);
+        });
+      };
+      grid.parentElement.appendChild(legendaWrap);
+
+      setStatusProd(`✅ 4 cards gerados (capa + 3 métodos) — ${MESES_PT2[mes0]} ${ano}`);
+    } catch(e) {
+      setStatusProd('❌ Erro: ' + e.message);
+      console.error(e);
+    }
+  }
+
+  populateMeses();
+})();
 </script>
 </body>
 </html>
