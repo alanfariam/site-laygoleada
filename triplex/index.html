@@ -173,6 +173,26 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 .gr-seg{height:18px;border-radius:3px;display:inline-block;cursor:default;transition:opacity .1s;}
 .gr-seg:hover{opacity:.75;}
 
+/* ── GRID 2 ── */
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-bottom:16px;}
+@media(max-width:600px){.grid2{grid-template-columns:1fr;}}
+
+/* ── CAMP SEARCH ── */
+#campSearch{width:100%;font-family:var(--mono);font-size:12px;padding:10px 14px;
+  background:var(--bg3);border:1px solid var(--border);border-radius:8px;
+  color:var(--text);outline:none;margin-bottom:14px;}
+#campSearch:focus{border-color:var(--accent);}
+#campSearch::placeholder{color:var(--text3);}
+
+/* ── TOP 10 ── */
+.top10-item{display:flex;align-items:center;gap:10px;padding:9px 12px;
+  border-radius:8px;border:1px solid var(--border);margin-bottom:6px;transition:border-color .15s;}
+.top10-item:hover{border-color:rgba(249,115,22,.3);}
+.top10-rank{font-family:var(--mono);font-size:11px;color:var(--text3);min-width:20px;}
+.top10-name{font-size:12px;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.top10-meta{font-family:var(--mono);font-size:11px;color:var(--text3);white-space:nowrap;}
+.top10-roi{font-family:var(--mono);font-size:12px;font-weight:700;min-width:52px;text-align:right;}
+
 /* ── FOOTER ── */
 footer{border-top:1px solid var(--border);padding:16px 24px;display:flex;justify-content:space-between;font-family:var(--mono);font-size:11px;color:var(--text3);}
 </style>
@@ -228,6 +248,7 @@ footer{border-top:1px solid var(--border);padding:16px 24px;display:flex;justify
   <div class="tab active" onclick="showTab('inicio')">Início</div>
   <div class="tab" onclick="showTab('kpis')">KPIs Gerais</div>
   <div class="tab" onclick="showTab('lucro')">Lucro Mensal</div>
+  <div class="tab" onclick="showTab('camp')">Campeonatos</div>
 </div>
 
 <div class="container">
@@ -511,6 +532,35 @@ footer{border-top:1px solid var(--border);padding:16px 24px;display:flex;justify
   </div>
 
 
+  <!-- ══════════════════════════════════════════ CAMPEONATOS ══ -->
+  <div id="page-camp" class="page">
+    <div class="section-label">Top 10 melhores × piores — por ROI (mín. 5 entradas)</div>
+    <div class="grid2">
+      <div class="card">
+        <div class="card-title g">🏆 Top 10 melhores — ROI</div>
+        <div id="top10Best"></div>
+      </div>
+      <div class="card">
+        <div class="card-title r">⚠ Top 10 piores — ROI</div>
+        <div id="top10Worst"></div>
+      </div>
+    </div>
+    <div class="section-label">Ranking geral</div>
+    <div class="card">
+      <div class="card-title">Todos os campeonatos (mín. 5 entradas)</div>
+      <input id="campSearch" type="text" placeholder="🔍  Buscar campeonato..." oninput="filterTabela()">
+      <div class="tbl-wrap">
+        <table class="tbl">
+          <thead><tr>
+            <th>#</th><th>Campeonato</th><th>Entradas</th>
+            <th>Greens</th><th>Win Rate</th><th>Lucro</th><th>ROI</th>
+          </tr></thead>
+          <tbody id="tblCampBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
 </div>
 
 <footer>
@@ -522,7 +572,8 @@ footer{border-top:1px solid var(--border);padding:16px 24px;display:flex;justify
 const API = window.location.hostname === 'localhost' || window.location.protocol === 'file:'
   ? 'http://localhost:5001/overtriplex' : 'https://api.laygoleada.com.br/overtriplex';
 
-let rawKpis=null, rawMensal=null, rawDiario=null, rawMesDetalhe=null;
+let rawKpis=null, rawMensal=null, rawDiario=null, rawMesDetalhe=null, rawCamp=null;
+let campData=[];
 let kpiMode='geral', metodoKpi='todos', metodoLucro='todos';
 let calYear=null, calMonth=null, charts={};
 let metodosCarregados=false;
@@ -539,7 +590,7 @@ function showTab(id){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
   document.getElementById('page-'+id).classList.add('active');
-  ['inicio','kpis','lucro'].forEach((n,i)=>{if(n===id)document.querySelectorAll('.tab')[i].classList.add('active');});
+  ['inicio','kpis','lucro','camp'].forEach((n,i)=>{if(n===id)document.querySelectorAll('.tab')[i].classList.add('active');});
 }
 
 async function apiFetch(path){const r=await fetch(API+path);if(r.status===404)return null;if(!r.ok)throw new Error('HTTP '+r.status);return r.json();}
@@ -792,16 +843,57 @@ function renderCalAcum(){
   charts['cCalAcum']=new Chart(canvas,{type:'line',data:{labels,datasets:[{data:vals,borderColor:pos?'#2ECC8A':'#F05A5A',borderWidth:2,pointRadius:3,pointBackgroundColor:pos?'#2ECC8A':'#F05A5A',tension:.3,fill:true,backgroundColor:pos?'rgba(46,204,138,.1)':'rgba(240,90,90,.1)'}]},options:{...cd(),scales:{x:{ticks:{color:'#8A96A3',font:{size:10}},grid:{display:false}},y:{ticks:{callback:v=>'R$'+v.toLocaleString('pt-BR',{minimumFractionDigits:0}),color:'#556070',font:{size:10}},grid:{color:'rgba(255,255,255,.04)'}}}}});
 }
 
+// ── CAMPEONATOS ──
+function renderCampeonatos(){
+  if(!rawCamp)return;
+  campData=rawCamp.filter(c=>c.total>=5);
+  const best=[...campData].sort((a,b)=>b.roi-a.roi).slice(0,10);
+  const worst=[...campData].sort((a,b)=>a.roi-b.roi).slice(0,10);
+  document.getElementById('top10Best').innerHTML=best.map((r,i)=>`
+    <div class="top10-item" style="background:rgba(46,204,138,.03);">
+      <span class="top10-rank">${i+1}</span>
+      <span class="top10-name">${r.campeonato}</span>
+      <span class="top10-meta">${r.total}e · ${r.win_rate}%</span>
+      <span class="top10-roi" style="color:var(--green)">+${r.roi}%</span>
+    </div>`).join('');
+  document.getElementById('top10Worst').innerHTML=worst.map((r,i)=>`
+    <div class="top10-item" style="background:rgba(240,90,90,.03);">
+      <span class="top10-rank">${i+1}</span>
+      <span class="top10-name">${r.campeonato}</span>
+      <span class="top10-meta">${r.total}e · ${r.win_rate}%</span>
+      <span class="top10-roi" style="color:var(--red)">${r.roi}%</span>
+    </div>`).join('');
+  filterTabela();
+}
+
+function filterTabela(){
+  const q=(document.getElementById('campSearch')?.value||'').toLowerCase();
+  const sorted=[...campData].filter(r=>r.campeonato.toLowerCase().includes(q)).sort((a,b)=>b.lucro-a.lucro);
+  document.getElementById('tblCampBody').innerHTML=sorted.map((r,i)=>`
+    <tr>
+      <td style="color:var(--text3);font-family:var(--mono)">${i+1}</td>
+      <td style="font-weight:500">${r.campeonato}</td>
+      <td style="font-family:var(--mono)">${r.total}</td>
+      <td style="font-family:var(--mono);color:var(--green)">${r.greens}</td>
+      <td><span class="pill ${r.win_rate>=60?'pg':'pr'}">${r.win_rate}%</span></td>
+      <td style="font-family:var(--mono);color:${r.lucro>=0?'var(--green)':'var(--red)'}">
+        ${r.lucro>=0?'+':''}R$${Math.abs(r.lucro).toLocaleString('pt-BR',{minimumFractionDigits:2})}
+      </td>
+      <td><span class="pill ${r.roi>=0?'pg':'pr'}">${r.roi>0?'+':''}${r.roi}%</span></td>
+    </tr>`).join('');
+}
+
 // ── INICIALIZAÇÃO ──
 async function init(){
   setLoadingText('Buscando KPIs...');
   try{
-    const[kpiRes,mensalRes,diarioRes]=await Promise.all([
+    const[kpiRes,mensalRes,diarioRes,campRes]=await Promise.all([
       apiFetch('/api/kpis'),
       apiFetch('/api/lucro-mensal'),
       apiFetch('/api/lucro-diario'),
+      apiFetch('/api/campeonatos'),
     ]);
-    rawKpis=kpiRes; rawMensal=mensalRes||[]; rawDiario=diarioRes||[];
+    rawKpis=kpiRes; rawMensal=mensalRes||[]; rawDiario=diarioRes||[]; rawCamp=campRes||[];
     if(!rawKpis){
       setStatus('ok','SEM DADOS');
       hideLoading();
@@ -817,6 +909,7 @@ async function init(){
     renderBanner(rawKpis, rawMensal);
     renderKpis();
     renderLucro();
+    renderCampeonatos();
   }catch(err){
     setStatus('error','ERRO');
     showErr('Não foi possível conectar à API: '+err.message);
