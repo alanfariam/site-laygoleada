@@ -519,50 +519,93 @@ function buildBalls(greens, reds, sequencia) {
   return seq.map(r => `<div class="ball ${r === 'G' ? 'g' : 'r'}">${r}</div>`).join('');
 }
 
-function buildCaption(d, lucro, wr, greens, reds, entradas, dataStr, triaDia, otDia) {
-  const lucroSign = lucro >= 0 ? '+R$ ' + lucro.toFixed(2).replace('.',',') : '-R$ ' + Math.abs(lucro).toFixed(2).replace('.',',');
-  const emojis = lucro >= 0 ? '🟢✅📈' : '🔴❌📉';
-  let triaLine = '';
-  if (triaDia) {
-    const tLucro = parseFloat(triaDia.lucro) || 0;
-    const tSign  = tLucro >= 0 ? '+R$ ' + tLucro.toFixed(2).replace('.',',') : '-R$ ' + Math.abs(tLucro).toFixed(2).replace('.',',');
-    const tEnt   = triaDia.total || (triaDia.greens + triaDia.reds) || 0;
-    const tWr    = tEnt > 0 ? ((triaDia.greens / tEnt) * 100) : 0;
-    triaLine = `
-🟣 LAY GOLEADA TRINITY
-💰 Lucro: ${tSign}
-📊 Win Rate: ${fmtPct(tWr)}
-⚽ Entradas: ${tEnt} | ✅ Greens: ${triaDia.greens} | ❌ Reds: ${triaDia.reds}
-`;
+// ── GERADOR DE LEGENDA ─────────────────────────────────────────────────
+
+const FRASES_ABERTURA = [
+  'Dias de muitas entradas, dias de poucas, dias em que um método segura os outros. O que não muda: seguir o método. Consistência é o que transforma dias em resultado de mês.',
+  'Dia após dia, o plano é o mesmo: seguir o método. Red faz parte, dia parado faz parte. Quem persiste no processo colhe no mês.',
+  'Qualquer um segue o método em dia de green. A diferença aparece nos dias difíceis. Aqui a regra é uma só: confiar no processo, todos os dias.',
+  'Quando o filtro valida, o bot entra. Quando não valida, a banca fica protegida. Seguir o método também é saber ficar de fora.',
+  'O resultado de um dia não diz nada. O resultado de quem segue o método todos os dias diz tudo. Persistência é a estratégia por trás da estratégia.',
+  'Tem dia que um método carrega o resultado sozinho. Tem dia que todos entregam. Tem dia que nenhum opera. O portfólio existe pra isso: disciplina no conjunto, não emoção no dia.',
+  'Método não é promessa de green diário. É processo com estatística a favor no longo prazo. Quem entende isso opera tranquilo, dia após dia.',
+];
+
+const CTAS_LEGENDA = [
+  'Você teria seguido o método até o fim? Comenta aí',
+  'Você opera no automático ou no manual? Comenta aí',
+  'Green ou red na sua banca ontem? Comenta aí',
+  'Quem tá no longo prazo comenta "FOCO"',
+  'Qual dos métodos você quer conhecer melhor? Comenta o nome',
+];
+
+const METODOS_CFG = [
+  { nome: 'OVER FREEFIRE',       emoji: '🟢', hashtag: '#overfreefire' },
+  { nome: 'LAY GOLEADA TRINITY', emoji: '🟣', hashtag: '#lgtrinity'   },
+  { nome: 'OVER TRIPLEX',        emoji: '🟠', hashtag: '#overtriplex' },
+];
+
+const HTAGS_BASE = ['#tradingesportivo', '#betfair', '#traderesportivo', '#laygoleada'];
+const HTAGS_COMP = ['#gestaodebanca', '#mercadodegols', '#puntertrader'];
+const HTAGS_MAX  = 10;
+
+function _brl(val) {
+  const s = Math.abs(val).toFixed(2).replace('.', ',');
+  const [int, dec] = s.split(',');
+  return 'R$ ' + int.replace(/\B(?=(\d{3})+(?!\d))/g, '.') + ',' + dec;
+}
+function _sinal(val) { return val >= 0 ? '+' : '-'; }
+
+function buildCaptionNew(dataStr, ffDia, triaDia, otDia, parcialMes) {
+  const diaDoMes  = parseInt(dataStr.split('/')[0], 10);
+  const dataCurta = dataStr.slice(0, 5); // DD/MM
+
+  const frase = FRASES_ABERTURA[(diaDoMes - 1) % 7];
+  const cta   = CTAS_LEGENDA[(diaDoMes - 1) % 5];
+
+  const diasDados = [
+    { cfg: METODOS_CFG[0], dia: ffDia   },
+    { cfg: METODOS_CFG[1], dia: triaDia },
+    { cfg: METODOS_CFG[2], dia: otDia   },
+  ];
+
+  const linhas       = [];
+  const hashDinamicas = [];
+  let totalDia = 0;
+
+  for (const { cfg, dia } of diasDados) {
+    const luc = parseFloat(dia?.lucro) || 0;
+    totalDia += luc;
+    const ent = parseInt(dia?.total) || ((parseInt(dia?.greens) || 0) + (parseInt(dia?.reds) || 0));
+    if (!ent) continue;
+    const g = parseInt(dia?.greens) || 0;
+    const r = parseInt(dia?.reds)   || 0;
+    linhas.push(`${cfg.emoji} ${cfg.nome} · ${_sinal(luc)}${_brl(luc)} · ${ent} entrada(s) · ${g}G ${r}R`);
+    hashDinamicas.push(cfg.hashtag);
   }
-  let otLine = '';
-  if (otDia) {
-    const oLucro = parseFloat(otDia.lucro) || 0;
-    const oSign  = oLucro >= 0 ? '+R$ ' + oLucro.toFixed(2).replace('.',',') : '-R$ ' + Math.abs(oLucro).toFixed(2).replace('.',',');
-    const oEnt   = otDia.total || (otDia.greens + otDia.reds) || 0;
-    const oWr    = oEnt > 0 ? ((otDia.greens / oEnt) * 100) : 0;
-    otLine = `
-🟠 OVER TRIPLEX
-💰 Lucro: ${oSign}
-📊 Win Rate: ${fmtPct(oWr)}
-⚽ Entradas: ${oEnt} | ✅ Greens: ${otDia.greens} | ❌ Reds: ${otDia.reds}
-`;
-  }
-  return `${emojis} RESULTADO DO DIA — ${dataStr.toUpperCase()}
 
-🟢 OVER FREEFIRE
-💰 Lucro: ${lucroSign}
-📊 Win Rate: ${fmtPct(wr)}
-⚽ Entradas: ${entradas} | ✅ Greens: ${greens} | ❌ Reds: ${reds}
-${triaLine}${otLine}
-Portal LayGoleada 🏆 | Três métodos. Uma plataforma.
+  const linhasMetodos = linhas.length ? linhas.join('\n') : '⚪ Sem entradas validadas neste dia';
 
-🔔 Acompanhe os resultados diários e entre para o grupo VIP!
-👉 www.laygoleada.com.br
+  const parcialVal = (parcialMes !== null && parcialMes !== undefined) ? parseFloat(parcialMes) : null;
+  const parcialStr = parcialVal !== null ? `${_sinal(parcialVal)}${_brl(parcialVal)}` : '---';
 
-⚠️ +18 · Em apostas não existe lucro garantido, jogue com responsabilidade.
+  const remaining  = HTAGS_MAX - HTAGS_BASE.length - hashDinamicas.length;
+  const comp       = HTAGS_COMP.slice(0, Math.max(0, remaining));
+  const hashtags   = [...HTAGS_BASE, ...hashDinamicas, ...comp].join(' ');
 
-#LayGoleada #OverFreeFire #LGTrinity #OverTriplex #ApostasEsportivas #GreenDay #BetBrasil #ResultadoDoDia #ApostasInteligentes #TipsGratuitas #WinRate #TradeEsportivo`;
+  return `${frase}
+
+📊 RESULTADO DO DIA · ${dataCurta}
+${linhasMetodos}
+💰 Total do dia: ${_sinal(totalDia)}${_brl(totalDia)}
+📈 Parcial do mês: ${parcialStr}
+
+${cta} 👇
+
+🏆 Resultados diários + grupo VIP → @laygoleada · link na bio
+⚠️ +18 · Não existe lucro garantido, jogue com responsabilidade.
+
+${hashtags}`;
 }
 
 function buildPBalls(g, r, cls, sequencia) {
@@ -733,7 +776,7 @@ function buildMonthCard(mesN, anoN, diasDoMes, triaMap, otMap) {
   return wrapper;
 }
 
-function buildCard(dia, acumuladoMes, triaDia, otDia) {
+function buildCard(dia, acumuladoMes, triaDia, otDia, parcialMes) {
   const wrapper   = document.createElement('div');
   wrapper.className = 'card-wrapper';
 
@@ -890,7 +933,7 @@ function buildCard(dia, acumuladoMes, triaDia, otDia) {
   btnSave.onclick = () => salvarCard(cardEl, dataStr);
 
   // Legenda
-  const captionText = buildCaption(dia, lucro, wr, greens, reds, entradas, dataStr, triaDia, otDia);
+  const captionText = buildCaptionNew(dataStr, dia, triaDia, otDia, parcialMes);
   const caption = document.createElement('div');
   caption.className = 'caption-box';
   caption.innerHTML = `<strong>📋 Legenda para o Reels</strong>${captionText.replace(/\n/g,'<br>')}`;
@@ -983,6 +1026,19 @@ async function init() {
       acumPorData[d.data] = soma;
     });
 
+    // Parcial do mês combinado (FF + Trinity + OT) por data
+    const parcialMesPorData = {};
+    const _acumMes = {};
+    todosAsc.forEach(entry => {
+      const dt  = parseD(entry.data);
+      const key = `${dt.getFullYear()}-${dt.getMonth()}`;
+      const diaTotal = (parseFloat(ffMap[entry.data]?.lucro)   || 0)
+                     + (parseFloat(triaMap[entry.data]?.lucro) || 0)
+                     + (parseFloat(otMap[entry.data]?.lucro)   || 0);
+      _acumMes[key] = (_acumMes[key] || 0) + diaTotal;
+      parcialMesPorData[entry.data] = _acumMes[key];
+    });
+
     // ── 3 cards diários mais recentes ──
     const dias = todosDesc.slice(0, 3);
 
@@ -1006,7 +1062,7 @@ async function init() {
 
     const grid = document.getElementById('cardsGrid');
     grid.innerHTML = '';
-    dias.forEach(d => grid.appendChild(buildCard(d, acumPorData[d.data], triaMap[d.data] || null, otMap[d.data] || null)));
+    dias.forEach(d => grid.appendChild(buildCard(d, acumPorData[d.data], triaMap[d.data] || null, otMap[d.data] || null, parcialMesPorData[d.data] ?? 0)));
     if (diasMesAnt.length)   grid.appendChild(buildMonthCard(mesAntM,  anoAntM,  diasMesAnt,  triaMap, otMap));
 
   } catch(e) {
