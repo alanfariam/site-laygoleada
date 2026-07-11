@@ -43,17 +43,10 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 .btn-ig:hover{color:var(--text);border-color:rgba(255,255,255,.2);}
 
 /* ── HERO ── */
-.hero{background:linear-gradient(135deg,rgba(200,255,26,.06) 0%,transparent 60%);border-bottom:1px solid var(--border);padding:48px 24px 40px;}
-.hero-inner{max-width:860px;margin:0 auto;text-align:center;}
-.hero-badge{display:inline-flex;align-items:center;gap:6px;background:var(--accent-dim);border:1px solid var(--accent-border);border-radius:99px;padding:4px 14px;font-family:var(--mono);font-size:10px;letter-spacing:.1em;color:var(--accent);text-transform:uppercase;margin-bottom:20px;}
-.hero-title{font-size:32px;font-weight:800;letter-spacing:.02em;color:var(--text);line-height:1.15;margin-bottom:16px;}
-.hero-desc{font-size:15px;color:var(--text2);max-width:600px;margin:0 auto 28px;}
-.hero-actions{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;}
+.hero{border-bottom:1px solid var(--border);}
+.hero-banner{width:100%;display:block;max-height:420px;object-fit:cover;object-position:center top;}
+.hero-actions{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;padding:20px 24px;}
 .btn-hero{padding:12px 28px;font-size:14px;border-radius:var(--r2);}
-.hero-meta{margin-top:28px;display:flex;align-items:center;justify-content:center;gap:24px;flex-wrap:wrap;}
-.hero-stat{text-align:center;}
-.hero-stat-val{font-family:var(--mono);font-size:20px;font-weight:700;color:var(--accent);}
-.hero-stat-label{font-size:11px;color:var(--text3);margin-top:2px;}
 
 /* ── CONTAINER ── */
 .container{max-width:1100px;margin:0 auto;padding:36px 20px 80px;}
@@ -129,28 +122,10 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 
 <!-- HERO -->
 <section class="hero">
-  <div class="hero-inner">
-    <div class="hero-badge">🤖 Treinamento</div>
-    <h1 class="hero-title">PROJETO LAYBACK 26</h1>
-    <p class="hero-desc">Nesse projeto vou te ensinar e inspirar a criar bots na plataforma layback bot.</p>
-    <div class="hero-actions">
-      <a class="btn btn-member btn-hero" id="btnHeroMember" href="https://www.youtube.com/@laygoleada/join" target="_blank">🔑 Torne-se membro do canal</a>
-      <a class="btn btn-ig btn-hero" href="https://instagram.com/laygoleada" target="_blank">Seguir no Instagram</a>
-    </div>
-    <div class="hero-meta">
-      <div class="hero-stat">
-        <div class="hero-stat-val" id="totalAulas">—</div>
-        <div class="hero-stat-label">Aulas publicadas</div>
-      </div>
-      <div class="hero-stat">
-        <div class="hero-stat-val">🔒</div>
-        <div class="hero-stat-label">Conteúdo exclusivo</div>
-      </div>
-      <div class="hero-stat">
-        <div class="hero-stat-val">▶️</div>
-        <div class="hero-stat-label">YouTube</div>
-      </div>
-    </div>
+  <img class="hero-banner" src="/img/projeto-lb-banner.png" alt="Projeto Layback 26">
+  <div class="hero-actions">
+    <a class="btn btn-member btn-hero" id="btnHeroMember" href="https://www.youtube.com/@laygoleada/join" target="_blank">🔑 Torne-se membro do canal</a>
+    <a class="btn btn-ig btn-hero" href="https://instagram.com/laygoleada" target="_blank">Seguir no Instagram</a>
   </div>
 </section>
 
@@ -229,9 +204,6 @@ async function init() {
       allItems   = allItems.concat(data.items || []);
       pageToken  = data.nextPageToken || '';
     } while (pageToken);
-
-    // Atualiza counter do hero
-    document.getElementById('totalAulas').textContent = allItems.length || '0';
 
     // Atualiza link de membro com channelId real se disponível
     if (allItems.length > 0) {
