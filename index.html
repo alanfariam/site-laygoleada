@@ -161,6 +161,46 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
   font-family:var(--mono);font-size:11px;color:var(--text3);
 }
 
+/* TREINAMENTOS BANNER */
+.training-banner{
+  background:var(--bg2);border:1px solid rgba(200,255,26,.2);border-radius:var(--r2);
+  overflow:hidden;position:relative;display:flex;align-items:stretch;
+  transition:border-color .2s,transform .2s;text-decoration:none;color:inherit;
+}
+.training-banner::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,transparent,#C8FF1A,transparent);
+}
+.training-banner:hover{border-color:rgba(200,255,26,.5);transform:translateY(-2px);}
+.tb-body{padding:28px 32px;flex:1;}
+.tb-tag{
+  font-family:var(--mono);font-size:9px;letter-spacing:.12em;text-transform:uppercase;
+  color:#C8FF1A;background:rgba(200,255,26,.1);border:1px solid rgba(200,255,26,.25);
+  padding:3px 9px;border-radius:99px;display:inline-block;margin-bottom:14px;
+}
+.tb-title{font-size:22px;font-weight:800;margin-bottom:8px;color:var(--text);}
+.tb-desc{font-size:13px;color:var(--text2);line-height:1.65;margin-bottom:22px;max-width:500px;}
+.btn-lb26{
+  display:inline-flex;align-items:center;gap:8px;
+  background:#C8FF1A;color:#0A0A0A;font-weight:700;font-size:14px;
+  padding:11px 22px;border-radius:var(--r);text-decoration:none;
+  transition:opacity .2s;box-shadow:0 4px 20px rgba(200,255,26,.3);letter-spacing:.02em;
+}
+.btn-lb26:hover{opacity:.88;}
+.tb-side{
+  padding:28px 48px;display:flex;align-items:center;justify-content:center;
+  border-left:1px solid rgba(200,255,26,.08);background:rgba(200,255,26,.03);min-width:200px;
+}
+.tb-monogram{
+  font-family:var(--mono);font-size:56px;font-weight:900;line-height:1;
+  color:rgba(200,255,26,.18);letter-spacing:-.02em;text-align:center;user-select:none;
+}
+.tb-monogram span{display:block;font-size:12px;font-weight:700;letter-spacing:.25em;color:rgba(200,255,26,.35);margin-top:6px;}
+@media(max-width:700px){
+  .tb-side{display:none;}
+  .tb-body{padding:22px 20px;}
+}
+
 /* PARCEIROS */
 .partners-section{
   background:var(--bg2);border-top:1px solid var(--border);border-bottom:1px solid var(--border);
@@ -324,6 +364,24 @@ footer a{color:var(--red);text-decoration:none;}
     </div>
 
   </div>
+</div>
+
+<!-- TREINAMENTOS -->
+<div class="section" style="padding-top:0;padding-bottom:56px;">
+  <div class="section-eyebrow" style="color:#C8FF1A;">Treinamentos</div>
+  <h2 class="section-title">Aprenda a operar e automatizar.</h2>
+  <p class="section-sub">Conteúdo exclusivo para membros do canal — do zero à automação.</p>
+  <a class="training-banner" href="/projetolb26">
+    <div class="tb-body">
+      <div class="tb-tag">🤖 Novo projeto</div>
+      <div class="tb-title">PROJETO LAYBACK 26</div>
+      <div class="tb-desc">Aprenda do zero a criar bots na plataforma Layback Bot — estratégia, automação e resultado na prática. Aulas disponíveis para membros do canal no YouTube.</div>
+      <span class="btn-lb26">Ver aulas →</span>
+    </div>
+    <div class="tb-side">
+      <div class="tb-monogram">LB<span>26</span></div>
+    </div>
+  </a>
 </div>
 
 <div class="divider"><hr></div>
