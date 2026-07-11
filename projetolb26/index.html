@@ -185,17 +185,13 @@ async function fetchPlaylist(pageToken = '') {
   return r.json();
 }
 
-function buildCard(item, index, statusMap) {
+function buildCard(item, index) {
   const s     = item.snippet;
   const vid   = s.resourceId.videoId;
   const url   = `https://www.youtube.com/watch?v=${vid}`;
   const thumb = s.thumbnails?.high?.url || s.thumbnails?.medium?.url || s.thumbnails?.default?.url || '';
   const num   = (s.position !== undefined ? s.position + 1 : index + 1);
   const title = s.title || 'Sem título';
-  const embeddable = statusMap[vid] !== false; // default true se não encontrado
-  const badgeHtml  = embeddable
-    ? `<div class="video-badge badge-free">🌐 Público</div>`
-    : `<div class="video-badge badge-member">🔒 Exclusivo membros</div>`;
 
   return `
     <a class="video-card" href="${url}" target="_blank" rel="noopener">
@@ -213,7 +209,6 @@ function buildCard(item, index, statusMap) {
       <div class="video-body">
         <div class="video-title">${title}</div>
         <div class="video-meta">YouTube · Projeto Layback 26</div>
-        ${badgeHtml}
       </div>
     </a>`;
 }
@@ -251,18 +246,7 @@ async function init() {
       state.style.display = 'block';
       stateMsg.textContent = 'Nenhuma aula publicada ainda. Volte em breve!';
     } else {
-      // Busca status (embeddable) em lotes de 50
-      const statusMap = {};
-      const ids = allItems.map(i => i.snippet.resourceId.videoId);
-      for (let i = 0; i < ids.length; i += 50) {
-        const chunk = ids.slice(i, i + 50).join(',');
-        const r = await fetch(`https://www.googleapis.com/youtube/v3/videos?part=status&id=${chunk}&key=${API_KEY}`);
-        if (r.ok) {
-          const d = await r.json();
-          (d.items || []).forEach(v => { statusMap[v.id] = v.status?.embeddable ?? true; });
-        }
-      }
-      grid.innerHTML = allItems.map((item, i) => buildCard(item, i, statusMap)).join('');
+      grid.innerHTML = allItems.map((item, i) => buildCard(item, i)).join('');
     }
   } catch (err) {
     console.error(err);
