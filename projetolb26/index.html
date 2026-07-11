@@ -12,7 +12,8 @@
   --text:#E8ECF0;--text2:#8A96A3;--text3:#556070;
   --green:#2ECC8A;
   --red:#F05A5A;
-  --accent:#8B5CF6;--accent-dim:rgba(139,92,246,.15);--accent-border:rgba(139,92,246,.3);
+  --accent:#C8FF1A;--accent-dim:rgba(200,255,26,.12);--accent-border:rgba(200,255,26,.3);
+  --accent2:#B8F000;--accent-dark:#7FA600;
   --r1:8px;--r2:12px;--r3:16px;
   --mono:'JetBrains Mono','Fira Mono','Courier New',monospace;
 }
@@ -36,13 +37,13 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 .logo-sub{font-family:var(--mono);font-size:9px;color:var(--accent);letter-spacing:.1em;text-transform:uppercase;}
 .header-cta{display:flex;gap:10px;align-items:center;}
 .btn{display:inline-flex;align-items:center;gap:6px;padding:8px 18px;border-radius:var(--r1);font-size:13px;font-weight:600;text-decoration:none;cursor:pointer;border:none;transition:opacity .15s;}
-.btn-member{background:var(--accent);color:#fff;}
+.btn-member{background:var(--accent);color:#0A0A0A;font-weight:700;}
 .btn-member:hover{opacity:.85;}
 .btn-ig{background:transparent;border:1px solid var(--border);color:var(--text2);}
 .btn-ig:hover{color:var(--text);border-color:rgba(255,255,255,.2);}
 
 /* ── HERO ── */
-.hero{background:linear-gradient(135deg,rgba(139,92,246,.08) 0%,transparent 60%);border-bottom:1px solid var(--border);padding:48px 24px 40px;}
+.hero{background:linear-gradient(135deg,rgba(200,255,26,.06) 0%,transparent 60%);border-bottom:1px solid var(--border);padding:48px 24px 40px;}
 .hero-inner{max-width:860px;margin:0 auto;text-align:center;}
 .hero-badge{display:inline-flex;align-items:center;gap:6px;background:var(--accent-dim);border:1px solid var(--accent-border);border-radius:99px;padding:4px 14px;font-family:var(--mono);font-size:10px;letter-spacing:.1em;color:var(--accent);text-transform:uppercase;margin-bottom:20px;}
 .hero-title{font-size:32px;font-weight:800;letter-spacing:.02em;color:var(--text);line-height:1.15;margin-bottom:16px;}
