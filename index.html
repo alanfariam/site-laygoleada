@@ -188,14 +188,10 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
 }
 .btn-lb26:hover{opacity:.88;}
 .tb-side{
-  padding:28px 48px;display:flex;align-items:center;justify-content:center;
-  border-left:1px solid rgba(200,255,26,.08);background:rgba(200,255,26,.03);min-width:200px;
+  display:flex;align-items:stretch;justify-content:center;
+  border-left:1px solid rgba(200,255,26,.08);min-width:240px;overflow:hidden;
 }
-.tb-monogram{
-  font-family:var(--mono);font-size:56px;font-weight:900;line-height:1;
-  color:rgba(200,255,26,.18);letter-spacing:-.02em;text-align:center;user-select:none;
-}
-.tb-monogram span{display:block;font-size:12px;font-weight:700;letter-spacing:.25em;color:rgba(200,255,26,.35);margin-top:6px;}
+.tb-side img{width:100%;height:100%;object-fit:cover;object-position:center top;display:block;}
 @media(max-width:700px){
   .tb-side{display:none;}
   .tb-body{padding:22px 20px;}
@@ -379,7 +375,7 @@ footer a{color:var(--red);text-decoration:none;}
       <span class="btn-lb26">Ver aulas →</span>
     </div>
     <div class="tb-side">
-      <div class="tb-monogram">LB<span>26</span></div>
+      <img src="/img/projeto-lb-icone.png" alt="Projeto Layback 26">
     </div>
   </a>
 </div>
