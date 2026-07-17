@@ -507,7 +507,7 @@ async function renderKpis(){
   if(params.length){ids.forEach(id=>{const el=document.getElementById(id);el.textContent='...';el.style.opacity='.3';});setStatus('loading','BUSCANDO');
     try{const fetches=[apiFetch('/api/kpis?'+params.join('&'))];if(metodoKpi!=='todos')fetches.push(apiFetch('/api/lucro-diario?metodo='+encodeURIComponent(metodoKpi)).catch(()=>rawDiario));const[kpiRes,...rest]=await Promise.all(fetches);data=kpiRes;if(metodoKpi!=='todos'&&rest[0])diario=rest[0];}catch{data=null;}
     ids.forEach(id=>{document.getElementById(id).style.opacity='1';});setStatus('ok','AO VIVO');}
-  if(!data||data.erro){ids.forEach(id=>{document.getElementById(id).textContent='\u2014';});document.getElementById('k-lucro-s').textContent='Sem dados';renderUltimas(null);renderLucroDiario([]);return;}
+  if(!data||data.erro){ids.forEach(id=>{document.getElementById(id).textContent='\u2014';});document.getElementById('k-lucro-s').textContent='Sem dados';document.getElementById('k-ent-s').textContent='';document.getElementById('k-good-run').textContent='\u2014';document.getElementById('k-bad-run').textContent='\u2014';document.getElementById('k-drawdown').textContent='\u2014';renderUltimas(null);renderLucroDiario([]);return;}
   const sv=(id,val,cls,sub,sid)=>{const el=document.getElementById(id);el.textContent=val;el.className='kpi-value'+(cls?' '+cls:'');if(sid)document.getElementById(sid).textContent=sub||'';};
   sv('k-lucro',fmtBRL(data.lucro_total),data.lucro_total>=0?'g':'r','Responsabilidade R$1.000','k-lucro-s');
   sv('k-ent',data.total_entradas.toLocaleString('pt-BR'),'',data.periodo||'','k-ent-s');
