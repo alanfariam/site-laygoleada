@@ -1377,7 +1377,7 @@ async function renderKpis() {
 
   setV('k-lucro',   fmt(data.lucro_total),        data.lucro_total  >= 0 ? 'g' : 'r', `ROI ${data.roi.toFixed(2)}%`);
   setV('k-ent',     data.total_entradas.toLocaleString('pt-BR'), '', `${data.greens} greens · ${data.reds} reds`);
-  setV('k-wr',      data.win_rate.toFixed(1) + '%', data.win_rate >= 59 ? 'g' : 'r', data.win_rate >= 59 ? 'Acima da meta (59%)' : 'Abaixo da meta (59%)');
+  setV('k-wr',      data.win_rate.toFixed(1) + '%', data.win_rate >= 51 ? 'g' : data.win_rate >= 49 ? 'a' : 'r', data.win_rate >= 51 ? 'Acima da meta (51%)' : data.win_rate >= 49 ? 'Na zona neutra' : 'Abaixo da meta (51%)');
   setV('k-roi',     data.roi.toFixed(2) + '%',      data.roi >= 0 ? 'g' : 'r', 'por entrada');
   setV('k-dd',      fmt(data.max_drawdown),          'r', `Banca mín. sugerida: ${fmt(data.max_drawdown * 1.5)}`);
   setV('k-badrun',  data.maior_bad_run,              'r', 'reds consecutivos');
@@ -1645,7 +1645,7 @@ function filterTabela() {
       <td style="font-weight:500">${r.campeonato}</td>
       <td style="font-family:var(--mono)">${r.total}</td>
       <td style="font-family:var(--mono);color:var(--green)">${r.greens}</td>
-      <td><span class="pill ${r.win_rate>=59?'pg':r.win_rate>=58?'pa':'pr'}">${r.win_rate}%</span></td>
+      <td><span class="pill ${r.win_rate>=51?'pg':r.win_rate>=49?'pa':'pr'}">${r.win_rate}%</span></td>
       <td style="font-family:var(--mono);color:${r.lucro>=0?'var(--green)':'var(--red)'}">
         ${r.lucro>=0?'':'-'}R$${Math.abs(r.lucro).toLocaleString('pt-BR',{minimumFractionDigits:2})}
       </td>
@@ -2026,11 +2026,11 @@ function cd() {
   };
 }
 function destroyChart(id) { if (charts[id]) { charts[id].destroy(); delete charts[id]; } }
-// Cor padrão para barras de Win Rate: < 58% vermelho · 58–59% amarelo · ≥ 59% verde
+// Cor padrão para barras de Win Rate: < 49% vermelho · 49–50% amarelo · ≥ 51% verde
 function wrColor(v) {
   if (v === 0) return 'rgba(255,255,255,.06)';
-  if (v < 58)  return 'rgba(240,90,90,.65)';
-  if (v < 59)  return 'rgba(240,200,48,.80)';
+  if (v < 49)  return 'rgba(240,90,90,.65)';
+  if (v < 51)  return 'rgba(240,200,48,.80)';
   return 'rgba(46,204,138,.75)';
 }
 function fmt(v) { return (v < 0 ? '-' : '') + 'R$ ' + Math.abs(v).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}); }
