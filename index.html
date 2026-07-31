@@ -251,6 +251,10 @@ footer a{color:var(--red);text-decoration:none;}
   .hero-title{font-size:26px;}
   .pc-stats{grid-template-columns:repeat(3,1fr);}
 }
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: .4; transform: scale(1.4); }
+}
 </style>
 </head>
 <body>
@@ -285,6 +289,37 @@ footer a{color:var(--red);text-decoration:none;}
     </a>
   </div>
 </section>
+
+<!-- PROMO ARENASTREAM -->
+<div style="max-width:860px;margin:0 auto 16px;padding:0 16px;">
+  <a href="https://arenastream.com.br/a/alan-lay-goleada" target="_blank" rel="noopener noreferrer" style="display:block;text-decoration:none;">
+    <div style="position:relative;overflow:hidden;border-radius:16px;border:1.5px solid rgba(252,211,77,.35);background:linear-gradient(120deg,rgba(217,119,6,.18) 0%,rgba(15,12,5,.7) 50%,rgba(217,119,6,.10) 100%);padding:28px 32px;display:flex;align-items:center;gap:24px;flex-wrap:wrap;">
+      <!-- glow de fundo -->
+      <div style="position:absolute;top:-40px;left:-40px;width:200px;height:200px;background:rgba(217,119,6,.2);border-radius:50%;filter:blur(60px);pointer-events:none;"></div>
+      <!-- ícone -->
+      <div style="flex-shrink:0;width:52px;height:52px;border-radius:12px;background:rgba(217,119,6,.2);border:1px solid rgba(252,211,77,.3);display:flex;align-items:center;justify-content:center;">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#FCD34D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/>
+        </svg>
+      </div>
+      <!-- texto -->
+      <div style="flex:1;min-width:180px;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap;">
+          <span style="font-size:16px;font-weight:700;color:#FCD34D;letter-spacing:.3px;">ArenaStream</span>
+          <span style="font-size:11px;font-weight:600;color:#D97706;border:1px solid rgba(252,211,77,.4);background:rgba(217,119,6,.2);border-radius:99px;padding:2px 8px;letter-spacing:.5px;">OFERTA ESPECIAL</span>
+          <span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:#ef4444;border:1px solid rgba(239,68,68,.35);background:rgba(239,68,68,.1);border-radius:99px;padding:2px 8px;letter-spacing:.5px;">
+            <span style="width:6px;height:6px;border-radius:50%;background:#ef4444;display:inline-block;animation:pulse-dot 1.4s ease-in-out infinite;"></span>
+            TEMPO LIMITADO
+          </span>
+        </div>
+        <div style="font-size:15px;color:var(--text);font-weight:600;margin-bottom:2px;">Streaming ao vivo com baixo delay — 1º mês por <span style="color:#FCD34D;">R$&nbsp;49,90</span></div>
+        <div style="font-size:12px;color:var(--text2);">Assista os jogos sem lag enquanto opera. Use meu link e garanta a promoção.</div>
+      </div>
+      <!-- cta -->
+      <div style="flex-shrink:0;background:linear-gradient(135deg,#D97706,#FCD34D);color:#1a0f00;font-size:13px;font-weight:700;padding:12px 22px;border-radius:10px;white-space:nowrap;box-shadow:0 4px 18px rgba(217,119,6,.4);">Assinar por R$&nbsp;49,90 →</div>
+    </div>
+  </a>
+</div>
 
 <!-- PRODUTOS -->
 <div class="section">
