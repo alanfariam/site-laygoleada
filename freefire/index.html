@@ -506,8 +506,8 @@ footer{position:relative;z-index:1;margin-top:48px;padding:24px 32px;
       <div class="chart-wrap"><canvas id="cLucroDiarioKpi" height="200"></canvas></div>
     </div>
 
-    <!-- Últimas 20 operações -->
-    <div class="section-label">Últimas 20 operações</div>
+    <!-- Últimas 50 operações -->
+    <div class="section-label">Últimas 50 operações</div>
     <div class="card">
       <div class="card-title">Operações recentes</div>
       <div class="tbl-wrap">
@@ -518,6 +518,7 @@ footer{position:relative;z-index:1;margin-top:48px;padding:24px 32px;
             <th>Placar alerta</th>
             <th>Min. alerta</th>
             <th>Campeonato</th>
+            <th>Min. gol</th>
             <th>Placar final</th>
             <th>Resultado</th>
             <th>Lucro</th>
@@ -1489,7 +1490,7 @@ function renderSeq() {
   });
 }
 
-// ÚLTIMAS 20 OPERAÇÕES
+// ÚLTIMAS 50 OPERAÇÕES
 // ══════════════════════════════════════════════
 function renderUltimas(data) {
   if (!data?.ultimas_operacoes?.length) return;
@@ -1500,6 +1501,7 @@ function renderUltimas(data) {
       <td style="font-family:var(--mono);">${op.placar}</td>
       <td style="font-family:var(--mono);text-align:center;">${op.min_alerta}'</td>
       <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;color:var(--text2);">${op.campeonato}</td>
+      <td style="font-family:var(--mono);text-align:center;">${op.min_gol != null ? op.min_gol + "'" : '—'}</td>
       <td style="font-family:var(--mono);">${op.final || '—'}</td>
       <td><span class="pill ${op.resultado === 'GREEN' ? 'pg' : 'pr'}">${op.resultado}</span></td>
       <td style="font-family:var(--mono);font-weight:600;color:${op.lucro > 0 ? 'var(--green)' : 'var(--red)'};">
