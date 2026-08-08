@@ -387,33 +387,6 @@ footer a:hover{color:var(--green);}
 </div>
 
 <!-- CHARTS -->
-<div class="section" style="padding-top:8px;">
-  <div class="section-title" id="sectionTitle">Análise de eficiência · carregando...</div>
-  <div class="charts">
-
-    <!-- Donut -->
-    <div class="card">
-      <div class="card-title">Distribuição — gols após o alerta</div>
-      <div class="donut-layout">
-        <canvas id="donutCanvas" width="148" height="148" style="flex-shrink:0"></canvas>
-        <div class="legend">
-          <div class="leg-row"><div class="leg-pip" style="background:var(--s1)"></div><span class="leg-name">1 gol após alerta</span><span class="leg-pct" id="p1">—</span></div>
-          <div class="leg-row"><div class="leg-pip" style="background:var(--s2)"></div><span class="leg-name">2 gols após alerta</span><span class="leg-pct" id="p2">—</span></div>
-          <div class="leg-row"><div class="leg-pip" style="background:var(--s3)"></div><span class="leg-name">3+ gols após alerta</span><span class="leg-pct" id="p3">—</span></div>
-          <div class="leg-row"><div class="leg-pip" style="background:var(--s4);border:1px solid rgba(255,255,255,.1)"></div><span class="leg-name">Sem gol</span><span class="leg-pct" id="p4">—</span></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Monthly bars -->
-    <div class="card">
-      <div class="card-title">% de jogos com gol por mês (Over 1+)</div>
-      <div class="bars" id="barChart"></div>
-    </div>
-
-  </div>
-</div>
-
 <!-- CTA -->
 <div class="section" style="padding-top:8px;">
   <div class="section-title">Plano de acesso</div>
@@ -476,7 +449,35 @@ footer a:hover{color:var(--green);}
     </div>
   </div>
 
-  <div class="section" style="padding-top:32px;">
+  <!-- GRÁFICOS -->
+  <div class="section" style="padding-top:24px;">
+    <div class="section-title" id="sectionTitle">Análise de eficiência · carregando...</div>
+    <div class="charts">
+
+      <!-- Donut -->
+      <div class="card">
+        <div class="card-title">Distribuição — gols após o alerta</div>
+        <div class="donut-layout">
+          <canvas id="donutCanvas" width="148" height="148" style="flex-shrink:0"></canvas>
+          <div class="legend">
+            <div class="leg-row"><div class="leg-pip" style="background:var(--s1)"></div><span class="leg-name">1 gol após alerta</span><span class="leg-pct" id="p1">—</span></div>
+            <div class="leg-row"><div class="leg-pip" style="background:var(--s2)"></div><span class="leg-name">2 gols após alerta</span><span class="leg-pct" id="p2">—</span></div>
+            <div class="leg-row"><div class="leg-pip" style="background:var(--s3)"></div><span class="leg-name">3+ gols após alerta</span><span class="leg-pct" id="p3">—</span></div>
+            <div class="leg-row"><div class="leg-pip" style="background:var(--s4);border:1px solid rgba(255,255,255,.1)"></div><span class="leg-name">Sem gol</span><span class="leg-pct" id="p4">—</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Monthly bars -->
+      <div class="card">
+        <div class="card-title">% de jogos com gol por mês (Over 1+)</div>
+        <div class="bars" id="barChart"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="section" style="padding-top:8px;">
     <div class="section-title">Últimas 50 operações</div>
     <div class="tbl-wrap">
       <table class="tbl">
