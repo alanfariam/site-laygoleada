@@ -1021,7 +1021,10 @@ function renderCampTable() {
   const q = (document.getElementById('campSearch')?.value || '').toLowerCase();
   const rows = campData
     .filter(r => r.campeonato.toLowerCase().includes(q))
-    .sort((a, b) => campSortDir * (b[campSortKey] - a[campSortKey]));
+    .sort((a, b) => {
+      const diff = campSortDir * (b[campSortKey] - a[campSortKey]);
+      return diff !== 0 ? diff : b.total - a.total;
+    });
   document.getElementById('campTblBody').innerHTML = rows.length
     ? rows.map((r, i) => `<tr>
         <td class="mono" style="color:var(--text3)">${i+1}</td>
@@ -1093,8 +1096,8 @@ function renderTimeCharts(raw) {
 
 // ── times: renderiza top10 campeonatos ───────────────────────
 function renderTop10Camp(campData) {
-  const sorted = [...campData].sort((a,b) => b.pct_over1 - a.pct_over1).slice(0,10);
-  const worst  = [...campData].sort((a,b) => b.pct_zero  - a.pct_zero ).slice(0,10);
+  const sorted = [...campData].sort((a,b) => (b.pct_over1 - a.pct_over1) || (b.total - a.total)).slice(0,10);
+  const worst  = [...campData].sort((a,b) => (b.pct_zero  - a.pct_zero)  || (b.total - a.total)).slice(0,10);
   const el1 = document.getElementById('top10CampBest');
   const el2 = document.getElementById('top10CampWorst');
   if (el1) el1.innerHTML = sorted.map((r,i) => {
