@@ -7,6 +7,7 @@
 <link rel="icon" href="../favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@400;500;600;700&display=swap">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 
@@ -165,6 +166,7 @@ nav{
 
 /* ── CHARTS GRID ── */
 .charts{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;}
+.card-full{grid-column:1/-1;}
 .card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:28px;}
 .card-title{font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--text3);margin-bottom:24px;}
 
@@ -468,10 +470,16 @@ footer a:hover{color:var(--green);}
         </div>
       </div>
 
-      <!-- Monthly bars -->
-      <div class="card">
-        <div class="card-title">% de jogos com gol por mês (Over 1+)</div>
-        <div class="bars" id="barChart"></div>
+      <!-- Monthly chart -->
+      <div class="card card-full">
+        <div class="card-title">
+          % de jogos com gol por mês (Over 1+)
+          <span style="float:right;display:flex;gap:14px;font-size:9px;letter-spacing:.06em;font-weight:400;">
+            <span><span style="display:inline-block;width:10px;height:10px;background:rgba(46,204,138,.75);border-radius:2px;margin-right:4px;vertical-align:middle;"></span>% Over 1+</span>
+            <span><span style="display:inline-block;width:10px;height:2px;background:#4A9EF0;margin-right:4px;vertical-align:middle;border-radius:2px;"></span>Volume</span>
+          </span>
+        </div>
+        <canvas id="cMensalGols" height="90"></canvas>
       </div>
 
     </div>
@@ -577,22 +585,73 @@ function animateDonut() {
   })(t0);
 }
 
-// ── bars ─────────────────────────────────────────────────────
+// ── chart mensal ─────────────────────────────────────────────
+let chartMensal = null;
 function buildBars(months) {
-  const c = document.getElementById('barChart');
-  c.innerHTML = '';
-  const last12 = months.slice(-12);
-  const maxPct = Math.max(...last12.map(d => d.pct), 1);
-  last12.forEach((d, i) => {
-    const isCur = i === last12.length - 1;
-    const alpha = d.pct >= 85 ? 1 : d.pct >= 75 ? 0.65 : 0.4;
-    const row = document.createElement('div');
-    row.className = 'bar-row';
-    row.innerHTML = `
-      <span class="bar-mo">${d.label}</span>
-      <div class="bar-track"><div class="bar-fill" data-w="${(d.pct / maxPct * 100).toFixed(1)}" style="opacity:${alpha}"></div></div>
-      <span class="bar-val${isCur ? ' hi' : ''}">${d.pct}%</span>`;
-    c.appendChild(row);
+  const data = months.slice(-14);
+  const labels = data.map(d => d.label);
+  const pcts   = data.map(d => d.pct);
+  const vols   = data.map(d => d.total);
+  if (chartMensal) chartMensal.destroy();
+  chartMensal = new Chart(document.getElementById('cMensalGols'), {
+    type: 'bar',
+    data: { labels, datasets: [
+      {
+        label: '% Over 1+',
+        data: pcts,
+        backgroundColor: 'rgba(46,204,138,.7)',
+        borderRadius: 4,
+        barPercentage: .7,
+        yAxisID: 'y'
+      },
+      {
+        label: 'Volume',
+        data: vols,
+        type: 'line',
+        borderColor: '#4A9EF0',
+        backgroundColor: 'rgba(74,158,240,.12)',
+        fill: true,
+        tension: .35,
+        pointRadius: 3,
+        pointBackgroundColor: '#4A9EF0',
+        yAxisID: 'y2'
+      }
+    ]},
+    options: {
+      responsive: true,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: '#0F1218',
+          borderColor: 'rgba(255,255,255,.08)',
+          borderWidth: 1,
+          titleColor: '#9BAABB',
+          bodyColor: '#E8ECF4',
+          callbacks: {
+            label: ctx => ctx.datasetIndex === 0
+              ? ` Over 1+: ${ctx.raw}%`
+              : ` Volume: ${ctx.raw} jogos`
+          }
+        }
+      },
+      scales: {
+        y: {
+          min: 70, max: 100,
+          ticks: { callback: v => v + '%', color: '#556070', font: { size: 10 } },
+          grid: { color: 'rgba(255,255,255,.04)' }
+        },
+        y2: {
+          position: 'right',
+          ticks: { color: '#4A9EF0', font: { size: 10 } },
+          grid: { display: false }
+        },
+        x: {
+          ticks: { color: '#8A96A3', font: { size: 10 }, maxRotation: 45, autoSkip: false },
+          grid: { display: false }
+        }
+      }
+    }
   });
 }
 
@@ -709,11 +768,6 @@ window.addEventListener('DOMContentLoaded', async () => {
 
     animateDonut();
     buildBars(mensalGols);
-    setTimeout(() => {
-      document.querySelectorAll('.bar-fill').forEach((el, i) => {
-        setTimeout(() => { el.style.width = el.dataset.w + '%'; }, i * 80);
-      });
-    }, 400);
 
     // Tabela de jogos
     if (kpis?.ultimas_operacoes?.length) {
