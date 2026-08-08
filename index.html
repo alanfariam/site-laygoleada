@@ -129,6 +129,17 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
 .card-orange::before{background:linear-gradient(90deg,transparent,#F97316,transparent);}
 .card-orange .pc-tag{color:#F97316;background:rgba(249,115,22,.1);border-color:rgba(249,115,22,.3);}
 .card-orange .btn-produto{background:#F97316;color:#fff;box-shadow:0 4px 20px rgba(249,115,22,.35);}
+/* Alertas Gol = azul */
+.card-blue{border-color:rgba(74,158,240,.2);}
+.card-blue:hover{border-color:rgba(74,158,240,.5);}
+.card-blue::before{background:linear-gradient(90deg,transparent,#4A9EF0,transparent);}
+.card-blue .pc-tag{color:#4A9EF0;background:rgba(74,158,240,.1);border-color:rgba(74,158,240,.3);}
+.card-blue .btn-produto{background:#4A9EF0;color:#0A0A0A;font-weight:800;box-shadow:0 4px 20px rgba(74,158,240,.35);}
+.ag-board{padding:28px 22px 20px;border-bottom:1px solid var(--border);text-align:center;background:radial-gradient(ellipse at 50% 0%,rgba(74,158,240,.06) 0%,transparent 70%);}
+.ag-eyebrow{font-family:var(--mono);font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--text3);margin-bottom:14px;}
+.ag-num{font-size:76px;font-weight:900;line-height:1;color:#E8EDF2;display:inline;}
+.ag-sym{font-size:38px;font-weight:700;color:#4A9EF0;vertical-align:top;margin-top:12px;display:inline-block;}
+.ag-sub{font-size:12px;color:var(--text2);line-height:1.6;margin-top:12px;}
 .btn-soon{display:block;text-align:center;background:var(--bg3);color:var(--text3);font-weight:700;font-size:14px;padding:13px;border-radius:var(--r);border:1px solid var(--border);letter-spacing:.02em;cursor:default;}
 
 .pc-header{padding:22px 22px 16px;border-bottom:1px solid var(--border);}
@@ -331,6 +342,23 @@ footer a{color:var(--red);text-decoration:none;}
       </div>
       <div class="pc-footer" style="text-align:center;padding:12px 0;">
         <span style="font-family:var(--mono);font-size:11px;letter-spacing:.08em;color:#F0A030;">Produto suspenso</span>
+      </div>
+    </div>
+
+    <!-- ALERTAS GOL -->
+    <div class="product-card card-blue">
+      <div class="pc-header">
+        <div class="pc-tag">Mercado Over Gols</div>
+        <div class="pc-name">Alertas Gol</div>
+        <div class="pc-desc">Alertas em tempo real com análise pré-live e de odds — identificando partidas com alta probabilidade de sair gol após o alerta.</div>
+      </div>
+      <div class="ag-board">
+        <div class="ag-eyebrow">— Eficiência de Alertas —</div>
+        <div><span class="ag-num" id="ag-pct">—</span><span class="ag-sym">%</span></div>
+        <div class="ag-sub">dos alertas emitidos resultaram em <strong>pelo menos 1 gol</strong><br>após a chegada do alerta</div>
+      </div>
+      <div class="pc-footer">
+        <a class="btn-produto" href="/alertasgol">Ver dados completos →</a>
       </div>
     </div>
 
@@ -593,9 +621,18 @@ async function loadOT() {
   }
 }
 
+async function loadAG() {
+  try {
+    const d = await fetch(FF_API + '/api/qtd-gols').then(r => r.json());
+    const over1 = d.grupos?.find(g => g.label === 'Over Limite (1+)');
+    if (over1) document.getElementById('ag-pct').textContent = Math.round(over1.pct * 10) / 10;
+  } catch(e) {}
+}
+
 loadFF();
 loadTR();
 loadOT();
+loadAG();
 </script>
 </body>
 </html>
