@@ -316,7 +316,7 @@ footer{position:relative;z-index:1;margin-top:48px;padding:24px 32px;
   <button class="tab active" onclick="showTab('inicio')">Início</button>
   <button class="tab" onclick="showTab('kpis')">KPIs Gerais</button>
   <button class="tab" onclick="showTab('lucro')">Lucro Mensal</button>
-  <button class="tab" onclick="showTab('dias')">Lucro Semanal</button>
+  <button class="tab" onclick="showTab('dias')" style="display:none">Lucro Semanal</button>
   <button class="tab" onclick="showTab('times')" style="display:none">Times</button>
   <button class="tab" onclick="showTab('camp')" style="display:none">Campeonatos</button>
   <button class="tab" onclick="showTab('odds')" style="display:none">Análise Odds</button>
@@ -1147,10 +1147,9 @@ async function init() {
     await api('/api/ping');
     setLoadingText('Carregando dados...');
 
-    [rawKpisGeral, rawMensal, rawDias, rawQtdGols, rawLucroDiario] = await Promise.all([
+    [rawKpisGeral, rawMensal, rawQtdGols, rawLucroDiario] = await Promise.all([
       api('/api/kpis'),
       api('/api/lucro-mensal'),
-      api('/api/winrate-dias'),
       api('/api/qtd-gols').catch(() => null),
       api('/api/lucro-diario').catch(() => null),
     ]);
@@ -1161,7 +1160,6 @@ async function init() {
     renderAcumulado(rawKpisGeral);
     renderUltimas(rawKpisGeral);
     renderLucro();
-    renderDias();
     if (rawQtdGols)     renderQtdGols();
     if (rawLucroDiario) initCalendario();
 
