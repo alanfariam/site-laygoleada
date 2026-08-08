@@ -185,6 +185,7 @@ nav{
 .top10-name{font-size:12px;color:var(--text);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .top10-meta{font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap;}
 .top10-val{font-family:var(--mono);font-size:13px;font-weight:700;white-space:nowrap;}
+.top10-total{font-family:var(--mono);font-size:13px;font-weight:700;color:var(--text2);white-space:nowrap;}
 .section-label{font-family:var(--mono);font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--text3);padding:24px 32px 8px;}
 
 /* Donut */
@@ -1072,7 +1073,7 @@ function renderTop10(elId, lista, metricaGood, metricaBad) {
     <div class="top10-item" style="background:${bg};">
       <span class="top10-rank">${i+1}</span>
       <span class="top10-name" title="${r.time}">${r.time}</span>
-      <span class="top10-meta">${r.total} jogos · ${r.pct_over1}% Over1</span>
+      <span class="top10-total">${r.total} <span style="font-size:9px;font-weight:400;">jogos</span></span>
       <span class="top10-val" style="color:${color}">${r[metric]}%</span>
     </div>`).join('');
 }
@@ -1096,14 +1097,14 @@ function renderTop10Camp(campData) {
     <div class="top10-item" style="background:rgba(46,204,138,.03);">
       <span class="top10-rank">${i+1}</span>
       <span class="top10-name" title="${r.campeonato}">${r.campeonato}</span>
-      <span class="top10-meta">${r.total} jogos</span>
+      <span class="top10-total">${r.total} <span style="font-size:9px;font-weight:400;">jogos</span></span>
       <span class="top10-val" style="color:var(--green)">${r.pct_over1}%</span>
     </div>`).join('');
   if (el2) el2.innerHTML = worst.map((r,i) => `
     <div class="top10-item" style="background:rgba(240,90,90,.03);">
       <span class="top10-rank">${i+1}</span>
       <span class="top10-name" title="${r.campeonato}">${r.campeonato}</span>
-      <span class="top10-meta">${r.total} jogos</span>
+      <span class="top10-total">${r.total} <span style="font-size:9px;font-weight:400;">jogos</span></span>
       <span class="top10-val" style="color:var(--red)">${r.pct_zero}%</span>
     </div>`).join('');
 }
