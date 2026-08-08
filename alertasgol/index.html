@@ -1293,6 +1293,9 @@ function showTab(id) {
   document.getElementById('page-' + id).classList.add('active');
   const idx = ['inicio','jogos','analise','camp','times'].indexOf(id);
   document.querySelectorAll('.tab')[idx].classList.add('active');
+  if (id === 'analise') lazyAnalise();
+  if (id === 'camp')    lazyCamp();
+  if (id === 'times')   lazyTimes();
 }
 
 // ── api ──────────────────────────────────────────────────────
@@ -1318,97 +1321,64 @@ function renderJogos(ops) {
     </tr>`).join('');
 }
 
-// ── init ─────────────────────────────────────────────────────
+// ── lazy load flags ──────────────────────────────────────────
+const _loaded = { analise: false, camp: false, times: false };
+
+// ── init fase 1: dados críticos (Início + Dashboard) ─────────
 window.addEventListener('DOMContentLoaded', async () => {
   try {
-    const [qtdGols, kpis, mensalGols, diaSemana, golsPosAlerta, distPrimGol, intervaloGols, campGols, timesGols] = await Promise.all([
+    const [qtdGols, kpis, mensalGols, diaSemana] = await Promise.all([
       fetchJson('/api/qtd-gols'),
       fetchJson('/api/kpis'),
       fetchJson('/api/mensal-gols'),
       fetchJson('/api/gols-dia-semana'),
-      fetchJson('/api/gols-pos-alerta').catch(() => null),
-      fetchJson('/api/dist-primeiro-gol').catch(() => null),
-      fetchJson('/api/intervalo-gols').catch(() => null),
-      fetchJson('/api/campeonatos-gols').catch(() => null),
-      fetchJson('/api/times-gols').catch(() => null),
     ]);
 
-    // Hero e tiles com dados reais
     const overLimite = qtdGols.grupos.find(g => g.label === 'Over Limite (1+)');
     if (overLimite) {
       const pctVal = Math.round(overLimite.pct * 10) / 10;
       counter(document.getElementById('heroN'), pctVal, 2000);
       counter(document.getElementById('tileAlerts'), qtdGols.total, 1600);
       document.getElementById('heroN2').textContent = pctVal;
-    }
 
-    // Banner stats
-    if (overLimite) {
-      const pctGeral = Math.round(overLimite.pct * 10) / 10;
+      const pctGeral = pctVal;
       document.getElementById('bannerGolGeral').textContent = pctGeral + '%';
       document.getElementById('bannerTotal').textContent = qtdGols.total.toLocaleString('pt-BR');
 
-      // Mês atual do mensal-gols
       if (mensalGols?.length) {
         const agora = new Date();
-        const mesPad = String(agora.getMonth() + 1).padStart(2, '0');
-        const mesKey = `${agora.getFullYear()}-${mesPad}`;
+        const mesKey = `${agora.getFullYear()}-${String(agora.getMonth()+1).padStart(2,'0')}`;
         const mesAtual = mensalGols.find(m => m.mes === mesKey);
-        if (mesAtual && mesAtual.total > 0) {
+        if (mesAtual?.total > 0) {
           const pctMes = Math.round(mesAtual.pct * 10) / 10;
           document.getElementById('bannerGolMes').textContent = pctMes + '%';
           const diff = pctMes - pctGeral;
           const el = document.getElementById('bannerGolIndicador');
-          if (diff > 1) {
-            el.textContent = '▲'; el.style.color = 'var(--green)';
-            document.getElementById('bannerGolMes').style.color = 'var(--green)';
-          } else if (diff < -1) {
-            el.textContent = '▼'; el.style.color = 'var(--red)';
-            document.getElementById('bannerGolMes').style.color = 'var(--red)';
-          } else {
-            el.textContent = '▬'; el.style.color = 'var(--amber)';
-            document.getElementById('bannerGolMes').style.color = 'var(--amber)';
-          }
+          if (diff > 1)       { el.textContent='▲'; el.style.color='var(--green)'; document.getElementById('bannerGolMes').style.color='var(--green)'; }
+          else if (diff < -1) { el.textContent='▼'; el.style.color='var(--red)';   document.getElementById('bannerGolMes').style.color='var(--red)'; }
+          else                { el.textContent='▬'; el.style.color='var(--amber)'; document.getElementById('bannerGolMes').style.color='var(--amber)'; }
         }
       }
     }
 
-    // Cards de análise e resumo da aba jogos
     renderAnaliseCards(qtdGols.grupos, qtdGols.total);
     renderJogosSummary(qtdGols);
 
-    // Donut com dados reais de distribuição
     const dist = qtdGols.distribuicao;
     const total = qtdGols.total;
     const q = gols => dist.find(d => d.gols === gols)?.quantidade || 0;
     const pct = n => Math.round(n / total * 100);
-    const semGol = q('0');
-    const um     = q('1');
-    const dois   = q('2');
-    const tresP  = total - semGol - um - dois; // 3, 4, 5, 6+
-    slices[0].pct = pct(um);
-    slices[1].pct = pct(dois);
+    const semGol = q('0'), um = q('1'), dois = q('2');
+    const tresP = total - semGol - um - dois;
+    slices[0].pct = pct(um); slices[1].pct = pct(dois);
     slices[2].pct = pct(tresP);
     slices[3].pct = 100 - slices[0].pct - slices[1].pct - slices[2].pct;
-
-    document.getElementById('sectionTitle').textContent =
-      `Análise de eficiência · ${total.toLocaleString('pt-BR')} jogos`;
-
+    document.getElementById('sectionTitle').textContent = `Análise de eficiência · ${total.toLocaleString('pt-BR')} jogos`;
     animateDonut();
     buildDiaSemana(diaSemana);
     buildBars(mensalGols);
-    if (golsPosAlerta) { renderPlacarZero(golsPosAlerta); }
-    if (distPrimGol)   renderDistPrimGol(distPrimGol);
-    if (intervaloGols) renderMinutoGols(intervaloGols);
-    if (campGols)  { campData = campGols; renderCampTable(); renderTop10Camp(campGols); }
-    if (timesGols) renderTimeCharts(timesGols);
 
-    document.getElementById('inputBuscaTime')?.addEventListener('keydown', e => { if (e.key === 'Enter') buscaTimeGol(); });
-
-    // Tabela de jogos
-    if (kpis?.ultimas_operacoes?.length) {
-      renderJogos(kpis.ultimas_operacoes);
-    }
+    if (kpis?.ultimas_operacoes?.length) renderJogos(kpis.ultimas_operacoes);
 
   } catch(e) {
     counter(document.getElementById('heroN'), 89, 2000);
@@ -1417,7 +1387,45 @@ window.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('sectionTitle').textContent = 'Análise de eficiência · 4.028 jogos';
     animateDonut();
   }
+
+  document.getElementById('inputBuscaTime')?.addEventListener('keydown', e => { if (e.key === 'Enter') buscaTimeGol(); });
 });
+
+// ── lazy loaders por aba ─────────────────────────────────────
+async function lazyAnalise() {
+  if (_loaded.analise) return;
+  _loaded.analise = true;
+  try {
+    const [golsPosAlerta, distPrimGol, intervaloGols] = await Promise.all([
+      fetchJson('/api/gols-pos-alerta').catch(() => null),
+      fetchJson('/api/dist-primeiro-gol').catch(() => null),
+      fetchJson('/api/intervalo-gols').catch(() => null),
+    ]);
+    if (golsPosAlerta) renderPlacarZero(golsPosAlerta);
+    if (distPrimGol)   renderDistPrimGol(distPrimGol);
+    if (intervaloGols) renderMinutoGols(intervaloGols);
+  } catch(e) {}
+}
+
+async function lazyCamp() {
+  if (_loaded.camp) return;
+  _loaded.camp = true;
+  try {
+    const campGols = await fetchJson('/api/campeonatos-gols');
+    campData = campGols;
+    renderCampTable();
+    renderTop10Camp(campGols);
+  } catch(e) {}
+}
+
+async function lazyTimes() {
+  if (_loaded.times) return;
+  _loaded.times = true;
+  try {
+    const timesGols = await fetchJson('/api/times-gols');
+    renderTimeCharts(timesGols);
+  } catch(e) {}
+}
 </script>
 </body>
 </html>
