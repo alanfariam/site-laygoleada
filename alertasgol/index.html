@@ -1301,6 +1301,8 @@ function showTab(id) {
 // ── api ──────────────────────────────────────────────────────
 const API = 'https://api.laygoleada.com.br';
 
+fetch(API + '/api/ping-visit?page=alertasgol', { method: 'POST' }).catch(() => {});
+
 async function fetchJson(path) {
   const r = await fetch(API + path);
   if (!r.ok) throw new Error(r.status);
