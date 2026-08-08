@@ -313,9 +313,9 @@ footer a{color:var(--red);text-decoration:none;}
   <div class="products-grid">
 
     <!-- FREEFIRE -->
-    <div class="product-card card-green">
+    <div class="product-card card-green" style="opacity:.5;pointer-events:none;filter:grayscale(.6);">
       <div class="pc-header">
-        <div class="pc-tag">Mercado Over Gols</div>
+        <div class="pc-tag" style="background:rgba(240,160,48,.12);color:#F0A030;border-color:rgba(240,160,48,.3);">⚠ SUSPENSO</div>
         <div class="pc-name">Over FREEFIRE</div>
         <div class="pc-desc">Over limite para pegar um gol no meio da partida na proporção 1 red para 2 greens — sinais automáticos via bot Telegram.</div>
       </div>
@@ -329,8 +329,8 @@ footer a{color:var(--red);text-decoration:none;}
         <canvas id="cFF" height="120"></canvas>
         <div class="pc-loading" id="ff-loading">Carregando dados...</div>
       </div>
-      <div class="pc-footer">
-        <a class="btn-produto" href="freefire/">Ver resultados completos →</a>
+      <div class="pc-footer" style="text-align:center;padding:12px 0;">
+        <span style="font-family:var(--mono);font-size:11px;letter-spacing:.08em;color:#F0A030;">Produto temporariamente suspenso</span>
       </div>
     </div>
 
