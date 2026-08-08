@@ -470,6 +470,18 @@ footer a:hover{color:var(--green);}
         </div>
       </div>
 
+      <!-- Dia da semana -->
+      <div class="card">
+        <div class="card-title">
+          % de jogos com gol por dia (Over 1+)
+          <span style="float:right;display:flex;gap:14px;font-size:9px;letter-spacing:.06em;font-weight:400;">
+            <span><span style="display:inline-block;width:10px;height:10px;background:rgba(46,204,138,.75);border-radius:2px;margin-right:4px;vertical-align:middle;"></span>% Over 1+</span>
+            <span><span style="display:inline-block;width:10px;height:2px;background:#4A9EF0;margin-right:4px;vertical-align:middle;border-radius:2px;"></span>Volume</span>
+          </span>
+        </div>
+        <canvas id="cDiaSemana" height="160"></canvas>
+      </div>
+
       <!-- Monthly chart -->
       <div class="card card-full">
         <div class="card-title">
@@ -583,6 +595,75 @@ function animateDonut() {
     if (p < 1) requestAnimationFrame(tick);
     else slices.forEach((s, i) => setTimeout(() => { document.getElementById(s.id).textContent = s.pct + '%'; }, i * 120));
   })(t0);
+}
+
+// ── chart dia da semana ──────────────────────────────────────
+let chartDia = null;
+function buildDiaSemana(data) {
+  const labels = data.map(d => d.label);
+  const pcts   = data.map(d => d.pct);
+  const vols   = data.map(d => d.total);
+  if (chartDia) chartDia.destroy();
+  chartDia = new Chart(document.getElementById('cDiaSemana'), {
+    type: 'bar',
+    data: { labels, datasets: [
+      {
+        label: '% Over 1+',
+        data: pcts,
+        backgroundColor: 'rgba(46,204,138,.7)',
+        borderRadius: 4,
+        barPercentage: .65,
+        yAxisID: 'y'
+      },
+      {
+        label: 'Volume',
+        data: vols,
+        type: 'line',
+        borderColor: '#4A9EF0',
+        backgroundColor: 'rgba(74,158,240,.12)',
+        fill: true,
+        tension: .35,
+        pointRadius: 3,
+        pointBackgroundColor: '#4A9EF0',
+        yAxisID: 'y2'
+      }
+    ]},
+    options: {
+      responsive: true,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: '#0F1218',
+          borderColor: 'rgba(255,255,255,.08)',
+          borderWidth: 1,
+          titleColor: '#9BAABB',
+          bodyColor: '#E8ECF4',
+          callbacks: {
+            label: ctx => ctx.datasetIndex === 0
+              ? ` Over 1+: ${ctx.raw}%`
+              : ` Volume: ${ctx.raw} jogos`
+          }
+        }
+      },
+      scales: {
+        y: {
+          min: 70, max: 100,
+          ticks: { callback: v => v + '%', color: '#556070', font: { size: 10 } },
+          grid: { color: 'rgba(255,255,255,.04)' }
+        },
+        y2: {
+          position: 'right',
+          ticks: { color: '#4A9EF0', font: { size: 10 } },
+          grid: { display: false }
+        },
+        x: {
+          ticks: { color: '#8A96A3', font: { size: 11 } },
+          grid: { display: false }
+        }
+      }
+    }
+  });
 }
 
 // ── chart mensal ─────────────────────────────────────────────
@@ -730,10 +811,11 @@ function renderJogos(ops) {
 // ── init ─────────────────────────────────────────────────────
 window.addEventListener('DOMContentLoaded', async () => {
   try {
-    const [qtdGols, kpis, mensalGols] = await Promise.all([
+    const [qtdGols, kpis, mensalGols, diaSemana] = await Promise.all([
       fetchJson('/api/qtd-gols'),
       fetchJson('/api/kpis'),
       fetchJson('/api/mensal-gols'),
+      fetchJson('/api/gols-dia-semana'),
     ]);
 
     // Hero e tiles com dados reais
@@ -767,6 +849,7 @@ window.addEventListener('DOMContentLoaded', async () => {
       `Análise de eficiência · ${total.toLocaleString('pt-BR')} jogos`;
 
     animateDonut();
+    buildDiaSemana(diaSemana);
     buildBars(mensalGols);
 
     // Tabela de jogos
