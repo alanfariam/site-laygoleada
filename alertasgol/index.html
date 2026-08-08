@@ -176,7 +176,16 @@ nav{
 .charts{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;}
 .card-full{grid-column:1/-1;}
 .card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:28px;}
-.card-title{font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--text3);margin-bottom:24px;}
+.card-title{font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--text3);margin-bottom:16px;}
+.card-title.g{color:var(--green);}
+.card-title.r{color:var(--red);}
+.top10-item{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:6px;margin-bottom:4px;background:rgba(255,255,255,.02);transition:background .12s;}
+.top10-item:hover{background:rgba(255,255,255,.05);}
+.top10-rank{font-family:var(--mono);font-size:11px;color:var(--text3);width:18px;flex-shrink:0;}
+.top10-name{font-size:12px;color:var(--text);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.top10-meta{font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap;}
+.top10-val{font-family:var(--mono);font-size:13px;font-weight:700;white-space:nowrap;}
+.section-label{font-family:var(--mono);font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--text3);padding:24px 32px 8px;}
 
 /* Donut */
 .donut-layout{display:flex;align-items:center;gap:24px;}
@@ -353,6 +362,8 @@ footer a:hover{color:var(--green);}
   <button class="tab active" onclick="showTab('inicio')">Início</button>
   <button class="tab" onclick="showTab('jogos')">Dashboard</button>
   <button class="tab" onclick="showTab('analise')">Análise</button>
+  <button class="tab" onclick="showTab('camp')">Campeonatos</button>
+  <button class="tab" onclick="showTab('times')">Times</button>
 </div>
 
 <!-- PAGE: INÍCIO -->
@@ -582,23 +593,8 @@ footer a:hover{color:var(--green);}
 <!-- PAGE: ANÁLISE -->
 <div class="page" id="page-analise">
 
-  <!-- CAMPEONATOS -->
-  <div class="section" style="padding-top:48px;">
-    <div class="section-title">Campeonatos</div>
-    <div class="charts">
-      <div class="card" style="height:340px;">
-        <div class="card-title">Top 10 — campeonatos com maior % de jogos sem gol pós alerta</div>
-        <canvas id="cTop10Zero"></canvas>
-      </div>
-      <div class="card" style="height:340px;">
-        <div class="card-title">Top 10 — campeonatos com maior % de jogos com 2+ gols pós alerta</div>
-        <canvas id="cTop10Gols"></canvas>
-      </div>
-    </div>
-  </div>
-
   <!-- PLACAR NO ALERTA -->
-  <div class="section" style="padding-top:8px;">
+  <div class="section" style="padding-top:48px;">
     <div class="section-title">% de jogos sem gol pós alerta — por placar no momento do alerta</div>
     <div class="card card-full" style="height:280px;">
       <canvas id="cPlacarZero"></canvas>
@@ -628,89 +624,115 @@ footer a:hover{color:var(--green);}
     </div>
   </div>
 
-  <!-- TABELA CAMPEONATOS -->
-  <div class="section" style="padding-top:8px;">
-    <div class="section-title">Tabela de campeonatos (mín. 10 jogos)</div>
-    <div style="margin-bottom:12px;">
-      <input id="campSearch" class="search-input" type="text" placeholder="Buscar campeonato..." oninput="filterCamp()">
-    </div>
-    <div class="tbl-wrap">
-      <table class="tbl">
-        <thead><tr>
-          <th>#</th><th>Campeonato</th><th>Jogos</th>
-          <th style="cursor:pointer" onclick="sortCamp('pct_over1')">Over 1+ ↕</th>
-          <th style="cursor:pointer" onclick="sortCamp('pct_over2')">Over 2+ ↕</th>
-          <th style="cursor:pointer" onclick="sortCamp('pct_zero')">Sem Gol ↕</th>
-          <th style="cursor:pointer" onclick="sortCamp('media_gols')">Média Gols ↕</th>
-        </tr></thead>
-        <tbody id="campTblBody"><tr><td colspan="7" class="tbl-loading">CARREGANDO...</td></tr></tbody>
-      </table>
-    </div>
-  </div>
-
-  <!-- TIMES -->
-  <div class="section" style="padding-top:8px;">
-    <div class="section-title">Times</div>
-    <div class="subtabs" id="timesSubtabs">
-      <button class="subtab active" onclick="showTimesTab('geral')">Geral</button>
-      <button class="subtab" onclick="showTimesTab('casa')">Mandante</button>
-      <button class="subtab" onclick="showTimesTab('fora')">Visitante</button>
-    </div>
-
-    <!-- Top 10 geral -->
-    <div id="timesGeral">
-      <div class="charts" style="margin-bottom:14px;">
-        <div class="card" style="height:340px;">
-          <div class="card-title">Top 10 — maior % Over 1+ (geral)</div>
-          <canvas id="cTimesGeralBest"></canvas>
-        </div>
-        <div class="card" style="height:340px;">
-          <div class="card-title">Top 10 — maior % sem gol (geral)</div>
-          <canvas id="cTimesGeralWorst"></canvas>
-        </div>
-      </div>
-    </div>
-
-    <!-- Top 10 mandante -->
-    <div id="timesCasa" style="display:none;">
-      <div class="charts" style="margin-bottom:14px;">
-        <div class="card" style="height:340px;">
-          <div class="card-title">Top 10 — maior % Over 1+ como mandante</div>
-          <canvas id="cTimesCasaBest"></canvas>
-        </div>
-        <div class="card" style="height:340px;">
-          <div class="card-title">Top 10 — maior % sem gol como mandante</div>
-          <canvas id="cTimesCasaWorst"></canvas>
-        </div>
-      </div>
-    </div>
-
-    <!-- Top 10 visitante -->
-    <div id="timesFora" style="display:none;">
-      <div class="charts" style="margin-bottom:14px;">
-        <div class="card" style="height:340px;">
-          <div class="card-title">Top 10 — maior % Over 1+ como visitante</div>
-          <canvas id="cTimesForaBest"></canvas>
-        </div>
-        <div class="card" style="height:340px;">
-          <div class="card-title">Top 10 — maior % sem gol como visitante</div>
-          <canvas id="cTimesForaWorst"></canvas>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- BUSCA DE TIME -->
-  <div class="section" style="padding-top:8px;padding-bottom:48px;">
-    <div class="section-title">Buscar time</div>
-    <div style="display:flex;gap:10px;margin-bottom:20px;">
-      <input id="timeSearch" class="search-input" type="text" placeholder="Nome do time..." style="flex:1;">
-      <button class="btn-cta" onclick="buscaTime()" style="padding:8px 20px;font-size:11px;">BUSCAR</button>
-    </div>
-    <div id="timeResult"></div>
-  </div>
-
 </div><!-- /page-analise -->
+
+<!-- ══════════════════════════════════════
+     ABA: CAMPEONATOS
+══════════════════════════════════════ -->
+<div class="page" id="page-camp">
+  <div class="section" style="padding-top:48px;">
+    <div class="section-title">Top 10 melhores × piores — por % Over 1+ (mín. 10 jogos)</div>
+    <div class="charts">
+      <div class="card">
+        <div class="card-title g">Top 10 — maior % Over 1+</div>
+        <div id="top10CampBest"></div>
+      </div>
+      <div class="card">
+        <div class="card-title r">Top 10 — maior % sem gol</div>
+        <div id="top10CampWorst"></div>
+      </div>
+    </div>
+  </div>
+  <div class="section" style="padding-top:8px;padding-bottom:48px;">
+    <div class="section-title">Ranking geral (mín. 10 jogos)</div>
+    <div class="card">
+      <div class="card-title">Todos os campeonatos</div>
+      <input id="campSearch" class="search-input" type="text" placeholder="Buscar campeonato..." oninput="filterCamp()" style="margin-bottom:12px;">
+      <div class="tbl-wrap">
+        <table class="tbl">
+          <thead><tr>
+            <th>#</th><th>Campeonato</th><th>Jogos</th>
+            <th style="cursor:pointer" onclick="sortCamp('pct_over1')">Over 1+ ↕</th>
+            <th style="cursor:pointer" onclick="sortCamp('pct_over2')">Over 2+ ↕</th>
+            <th style="cursor:pointer" onclick="sortCamp('pct_zero')">Sem Gol ↕</th>
+            <th style="cursor:pointer" onclick="sortCamp('media_gols')">Média Gols ↕</th>
+          </tr></thead>
+          <tbody id="campTblBody"><tr><td colspan="7" class="tbl-loading">CARREGANDO...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div><!-- /page-camp -->
+
+<!-- ══════════════════════════════════════
+     ABA: TIMES
+══════════════════════════════════════ -->
+<div class="page" id="page-times">
+
+  <!-- BUSCA -->
+  <div class="section" style="padding-top:48px;">
+    <div class="section-title">Consulta por Time</div>
+    <div class="card" style="margin-bottom:18px;">
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+        <input id="inputBuscaTime" type="text" placeholder="Digite o nome do time (ex: Flamengo)..."
+          style="flex:1;min-width:200px;padding:10px 14px;border-radius:8px;border:1px solid var(--border);
+                 background:var(--card);color:var(--text);font-size:14px;outline:none;">
+        <button onclick="buscaTimeGol()"
+          style="padding:10px 22px;border-radius:8px;border:none;background:var(--green);color:#0A0C10;
+                 font-weight:700;font-size:14px;cursor:pointer;white-space:nowrap;">
+          Consultar
+        </button>
+      </div>
+      <div id="buscaTimeResultado" style="margin-top:16px;"></div>
+    </div>
+  </div>
+
+  <!-- CASA -->
+  <div class="section" style="padding-top:8px;">
+    <div class="section-title">Performance como Mandante — por % Over 1+ (mín. 5 jogos)</div>
+    <div class="charts">
+      <div class="card">
+        <div class="card-title g">🏠 Top 10 melhores — Mandante (Over 1+)</div>
+        <div id="timeCasaBest"></div>
+      </div>
+      <div class="card">
+        <div class="card-title r">🏠 Top 10 piores — Mandante (Sem Gol)</div>
+        <div id="timeCasaWorst"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FORA -->
+  <div class="section" style="padding-top:8px;">
+    <div class="section-title">Performance como Visitante — por % Over 1+ (mín. 5 jogos)</div>
+    <div class="charts">
+      <div class="card">
+        <div class="card-title g">✈ Top 10 melhores — Visitante (Over 1+)</div>
+        <div id="timeForaBest"></div>
+      </div>
+      <div class="card">
+        <div class="card-title r">✈ Top 10 piores — Visitante (Sem Gol)</div>
+        <div id="timeForaWorst"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- GERAL -->
+  <div class="section" style="padding-top:8px;padding-bottom:48px;">
+    <div class="section-title">Performance Geral (Mandante + Visitante) — por % Over 1+ (mín. 5 jogos)</div>
+    <div class="charts">
+      <div class="card">
+        <div class="card-title g">⚽ Top 10 melhores — Geral (Over 1+)</div>
+        <div id="timeGeralBest"></div>
+      </div>
+      <div class="card">
+        <div class="card-title r">⚽ Top 10 piores — Geral (Sem Gol)</div>
+        <div id="timeGeralWorst"></div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /page-times -->
 
 
 <!-- FOOTER -->
@@ -1037,49 +1059,91 @@ function timesHbar(id, labels, values, color) {
   });
 }
 
-function renderTimeCharts(raw) {
-  const top = (lst, key, rev) => [...lst].sort((a,b) => rev ? b[key]-a[key] : a[key]-b[key]).slice(0,10);
-  const names = lst => lst.map(r => r.time);
-  const vals  = (lst, key) => lst.map(r => r[key]);
-
-  timesHbar('cTimesGeralBest',  names(top(raw.geral_best,  'pct_over1', true)),  vals(top(raw.geral_best,  'pct_over1', true),  'pct_over1'), 'rgba(46,204,138,.75)');
-  timesHbar('cTimesGeralWorst', names(top(raw.geral_worst, 'pct_zero',  true)),  vals(top(raw.geral_worst, 'pct_zero',  true),  'pct_zero'),  'rgba(240,90,90,.7)');
-  timesHbar('cTimesCasaBest',   names(top(raw.casa_best,   'pct_over1', true)),  vals(top(raw.casa_best,   'pct_over1', true),  'pct_over1'), 'rgba(46,204,138,.75)');
-  timesHbar('cTimesCasaWorst',  names(top(raw.casa_best,   'pct_zero',  true)),  vals(top(raw.casa_best,   'pct_zero',  true),  'pct_zero'),  'rgba(240,90,90,.7)');
-  timesHbar('cTimesForaBest',   names(top(raw.fora_best,   'pct_over1', true)),  vals(top(raw.fora_best,   'pct_over1', true),  'pct_over1'), 'rgba(46,204,138,.75)');
-  timesHbar('cTimesForaWorst',  names(top(raw.fora_best,   'pct_zero',  true)),  vals(top(raw.fora_best,   'pct_zero',  true),  'pct_zero'),  'rgba(240,90,90,.7)');
+// ── times: renderiza top10 como lista HTML (padrão freefire) ─
+function renderTop10(elId, lista, metricaGood, metricaBad) {
+  const el = document.getElementById(elId);
+  if (!el) return;
+  const isBad = elId.toLowerCase().includes('worst');
+  const metric = isBad ? metricaBad : metricaGood;
+  const color  = isBad ? 'var(--red)' : 'var(--green)';
+  const bg     = isBad ? 'rgba(240,90,90,.03)' : 'rgba(46,204,138,.03)';
+  if (!lista || !lista.length) { el.innerHTML = '<div style="color:var(--text3);font-size:12px;padding:8px 0">Sem dados suficientes</div>'; return; }
+  el.innerHTML = lista.map((r, i) => `
+    <div class="top10-item" style="background:${bg};">
+      <span class="top10-rank">${i+1}</span>
+      <span class="top10-name" title="${r.time}">${r.time}</span>
+      <span class="top10-meta">${r.total} jogos · ${r.pct_over1}% Over1</span>
+      <span class="top10-val" style="color:${color}">${r[metric]}%</span>
+    </div>`).join('');
 }
 
-function showTimesTab(id) {
-  ['geral','casa','fora'].forEach(t => {
-    document.getElementById('times' + t.charAt(0).toUpperCase() + t.slice(1)).style.display = t === id ? '' : 'none';
-  });
-  document.querySelectorAll('.subtab').forEach((b, i) => {
-    b.classList.toggle('active', ['geral','casa','fora'][i] === id);
-  });
+function renderTimeCharts(raw) {
+  renderTop10('timeCasaBest',  raw.casa_best,  'pct_over1', 'pct_zero');
+  renderTop10('timeCasaWorst', raw.casa_best.slice().sort((a,b) => b.pct_zero - a.pct_zero).slice(0,10), 'pct_over1', 'pct_zero');
+  renderTop10('timeForaBest',  raw.fora_best,  'pct_over1', 'pct_zero');
+  renderTop10('timeForaWorst', raw.fora_best.slice().sort((a,b) => b.pct_zero - a.pct_zero).slice(0,10), 'pct_over1', 'pct_zero');
+  renderTop10('timeGeralBest',  raw.geral_best,  'pct_over1', 'pct_zero');
+  renderTop10('timeGeralWorst', raw.geral_worst, 'pct_over1', 'pct_zero');
+}
+
+// ── times: renderiza top10 campeonatos ───────────────────────
+function renderTop10Camp(campData) {
+  const sorted = [...campData].sort((a,b) => b.pct_over1 - a.pct_over1).slice(0,10);
+  const worst  = [...campData].sort((a,b) => b.pct_zero  - a.pct_zero ).slice(0,10);
+  const el1 = document.getElementById('top10CampBest');
+  const el2 = document.getElementById('top10CampWorst');
+  if (el1) el1.innerHTML = sorted.map((r,i) => `
+    <div class="top10-item" style="background:rgba(46,204,138,.03);">
+      <span class="top10-rank">${i+1}</span>
+      <span class="top10-name" title="${r.campeonato}">${r.campeonato}</span>
+      <span class="top10-meta">${r.total} jogos</span>
+      <span class="top10-val" style="color:var(--green)">${r.pct_over1}%</span>
+    </div>`).join('');
+  if (el2) el2.innerHTML = worst.map((r,i) => `
+    <div class="top10-item" style="background:rgba(240,90,90,.03);">
+      <span class="top10-rank">${i+1}</span>
+      <span class="top10-name" title="${r.campeonato}">${r.campeonato}</span>
+      <span class="top10-meta">${r.total} jogos</span>
+      <span class="top10-val" style="color:var(--red)">${r.pct_zero}%</span>
+    </div>`).join('');
 }
 
 // ── busca time ───────────────────────────────────────────────
-async function buscaTime() {
-  const nome = document.getElementById('timeSearch').value.trim();
-  if (nome.length < 2) return;
-  const el = document.getElementById('timeResult');
-  el.innerHTML = `<div style="font-family:var(--mono);font-size:11px;color:var(--text3);letter-spacing:.1em;padding:24px 0;">BUSCANDO...</div>`;
+async function buscaTimeGol() {
+  const input = document.getElementById('inputBuscaTime');
+  const el    = document.getElementById('buscaTimeResultado');
+  const nome  = (input?.value || '').trim();
+  if (!nome || nome.length < 2) {
+    el.innerHTML = '<div style="color:var(--red);font-size:13px;">Digite ao menos 2 caracteres.</div>';
+    return;
+  }
+  el.innerHTML = '<div style="color:var(--text3);font-size:13px;">Buscando...</div>';
   try {
     const d = await fetchJson(`/api/times-gols/busca?time=${encodeURIComponent(nome)}`);
     if (!d.geral) { el.innerHTML = `<div style="color:var(--text3);font-size:13px;">Nenhuma entrada encontrada para "<strong>${nome}</strong>".</div>`; return; }
 
-    function statCard(title, s) {
-      if (!s) return '';
-      return `<div class="time-stat">
-        <div class="time-stat-title">${title}</div>
-        <div class="time-stat-row"><span>Total jogos</span><span class="time-stat-val">${s.total}</span></div>
-        <div class="time-stat-row"><span>Over 1+</span><span class="time-stat-val" style="color:var(--green)">${s.pct_over1}%</span></div>
-        <div class="time-stat-row"><span>Over 2+</span><span class="time-stat-val" style="color:rgba(74,158,240,.9)">${s.pct_over2}%</span></div>
-        <div class="time-stat-row"><span>Sem gol</span><span class="time-stat-val" style="color:rgba(240,90,90,.9)">${s.pct_zero}%</span></div>
-        <div class="time-stat-row"><span>Média gols</span><span class="time-stat-val">${s.media_gols}</span></div>
+    const statCard = (titulo, s, cor) => !s || !s.total ? '' : `
+      <div style="background:var(--card);border:1px solid ${cor}33;border-radius:10px;padding:14px 16px;flex:1;min-width:150px;">
+        <div style="font-size:10px;color:var(--text3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px;">${titulo}</div>
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;">
+          <div style="text-align:center;">
+            <div style="font-size:18px;font-weight:800;color:var(--green)">${s.pct_over1}%</div>
+            <div style="font-size:9px;color:var(--text3);">OVER 1+</div>
+          </div>
+          <div style="text-align:center;">
+            <div style="font-size:18px;font-weight:800;color:rgba(240,90,90,.9)">${s.pct_zero}%</div>
+            <div style="font-size:9px;color:var(--text3);">SEM GOL</div>
+          </div>
+          <div style="text-align:center;">
+            <div style="font-size:15px;font-weight:700;color:var(--text2);">${s.total}</div>
+            <div style="font-size:9px;color:var(--text3);">JOGOS</div>
+          </div>
+          <div style="text-align:center;">
+            <div style="font-size:13px;font-weight:700;color:var(--text2);">${s.media_gols}</div>
+            <div style="font-size:9px;color:var(--text3);">MÉDIA GOLS</div>
+          </div>
+        </div>
       </div>`;
-    }
 
     const campRows = (d.campeonatos || []).map(r => `<tr>
       <td style="color:var(--text)">${r.campeonato}</td>
@@ -1091,17 +1155,20 @@ async function buscaTime() {
     </tr>`).join('');
 
     el.innerHTML = `
-      <div class="time-stat-grid">
-        ${statCard('🌐 Geral', d.geral)}
-        ${statCard('🏠 Mandante', d.casa)}
-        ${statCard('✈ Visitante', d.fora)}
+      <div style="font-size:13px;color:var(--text3);margin-bottom:12px;">
+        Resultado para: <strong style="color:var(--text);text-transform:capitalize;">${nome}</strong>
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;">
+        ${statCard('🌐 Geral', d.geral, '#A855F7')}
+        ${statCard('🏠 Como Mandante', d.casa, 'var(--green)')}
+        ${statCard('✈ Como Visitante', d.fora, 'rgba(240,160,48,1)')}
       </div>
       ${campRows ? `<div class="tbl-wrap"><table class="tbl">
         <thead><tr><th>Campeonato</th><th>Jogos</th><th>Over 1+</th><th>Over 2+</th><th>Sem Gol</th><th>Média Gols</th></tr></thead>
         <tbody>${campRows}</tbody>
       </table></div>` : ''}`;
   } catch(e) {
-    el.innerHTML = `<div style="color:var(--red);font-size:13px;">Erro ao buscar dados.</div>`;
+    el.innerHTML = `<div style="color:var(--red);font-size:13px;">Nenhuma entrada encontrada para "<strong>${nome}</strong>".</div>`;
   }
 }
 
@@ -1210,7 +1277,7 @@ function showTab(id) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   document.getElementById('page-' + id).classList.add('active');
-  const idx = ['inicio','jogos','analise'].indexOf(id);
+  const idx = ['inicio','jogos','analise','camp','times'].indexOf(id);
   document.querySelectorAll('.tab')[idx].classList.add('active');
 }
 
@@ -1316,13 +1383,13 @@ window.addEventListener('DOMContentLoaded', async () => {
     animateDonut();
     buildDiaSemana(diaSemana);
     buildBars(mensalGols);
-    if (golsPosAlerta) { renderRankingCamp(golsPosAlerta); renderPlacarZero(golsPosAlerta); }
+    if (golsPosAlerta) { renderPlacarZero(golsPosAlerta); }
     if (distPrimGol)   renderDistPrimGol(distPrimGol);
     if (intervaloGols) renderMinutoGols(intervaloGols);
-    if (campGols)  { campData = campGols; renderCampTable(); }
+    if (campGols)  { campData = campGols; renderCampTable(); renderTop10Camp(campGols); }
     if (timesGols) renderTimeCharts(timesGols);
 
-    document.getElementById('timeSearch').addEventListener('keydown', e => { if (e.key === 'Enter') buscaTime(); });
+    document.getElementById('inputBuscaTime')?.addEventListener('keydown', e => { if (e.key === 'Enter') buscaTimeGol(); });
 
     // Tabela de jogos
     if (kpis?.ultimas_operacoes?.length) {
