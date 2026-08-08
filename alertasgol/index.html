@@ -235,6 +235,22 @@ nav{
 .sum-pct{font-family:var(--mono);font-size:13px;font-weight:700;margin-top:4px;font-variant-numeric:tabular-nums;}
 @media(max-width:700px){.jogos-summary{grid-template-columns:repeat(2,1fr);padding:24px 16px 0;}}
 
+/* ── STREAK CARDS ── */
+.streak-row{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:12px;
+  padding:32px 32px 0;max-width:960px;margin:0 auto;
+}
+.streak-card{
+  background:var(--bg2);border:1px solid var(--border);border-radius:10px;
+  padding:20px 22px 18px;position:relative;overflow:hidden;
+  display:flex;flex-direction:column;gap:6px;
+}
+.streak-card-bar{position:absolute;top:0;left:0;right:0;height:3px;border-radius:3px 3px 0 0;}
+.streak-label{font-family:var(--mono);font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--text3);}
+.streak-num{font-family:var(--mono);font-size:44px;font-weight:700;line-height:1;font-variant-numeric:tabular-nums;}
+.streak-sub{font-size:11px;color:var(--text2);line-height:1.4;}
+@media(max-width:700px){.streak-row{grid-template-columns:1fr;padding:24px 16px 0;}}
+
 /* ── TABLE ── */
 .tbl-wrap{overflow-x:auto;}
 .tbl{width:100%;border-collapse:collapse;font-size:13px;}
@@ -495,6 +511,28 @@ footer a:hover{color:var(--green);}
 
 <!-- PAGE: ÚLTIMOS JOGOS -->
 <div class="page" id="page-jogos">
+
+  <!-- STREAK CARDS -->
+  <div class="streak-row">
+    <div class="streak-card">
+      <div class="streak-card-bar" style="background:var(--green)"></div>
+      <div class="streak-label">Maior sequência com gol</div>
+      <div class="streak-num" id="seqMaxCom" style="color:var(--green)">—</div>
+      <div class="streak-sub">jogos consecutivos com pelo menos 1 gol após o alerta</div>
+    </div>
+    <div class="streak-card">
+      <div class="streak-card-bar" style="background:#F05A5A"></div>
+      <div class="streak-label">Maior sequência sem gol</div>
+      <div class="streak-num" id="seqMaxSem" style="color:#F05A5A">—</div>
+      <div class="streak-sub">jogos consecutivos sem nenhum gol após o alerta</div>
+    </div>
+    <div class="streak-card">
+      <div class="streak-card-bar" id="seqAtualBar" style="background:#8A96A3"></div>
+      <div class="streak-label">Sequência atual</div>
+      <div class="streak-num" id="seqAtualNum">—</div>
+      <div class="streak-sub" id="seqAtualSub">jogos consecutivos</div>
+    </div>
+  </div>
 
   <!-- CARDS RESUMO -->
   <div class="jogos-summary" id="jogosSummary">
@@ -982,6 +1020,24 @@ function renderJogosSummary(d) {
   document.getElementById('sUmPct').textContent    = pct(exato1);
   document.getElementById('sDois').textContent     = over2.toLocaleString('pt-BR');
   document.getElementById('sDoisPct').textContent  = pct(over2);
+
+  // Streak cards
+  const maxCom = d.maior_seq_com_gol;
+  const maxSem = d.maior_seq_sem_gol;
+  const atualTipo = d.seq_atual_tipo;
+  const atualQtd  = d.seq_atual_qtd;
+  if (maxCom != null) document.getElementById('seqMaxCom').textContent = maxCom;
+  if (maxSem != null) document.getElementById('seqMaxSem').textContent = maxSem;
+  if (atualQtd != null) {
+    const comGol = atualTipo === 'com_gol';
+    const cor    = comGol ? 'var(--green)' : '#F05A5A';
+    document.getElementById('seqAtualNum').textContent  = atualQtd;
+    document.getElementById('seqAtualNum').style.color  = cor;
+    document.getElementById('seqAtualBar').style.background = cor;
+    document.getElementById('seqAtualSub').textContent  = comGol
+      ? 'jogos consecutivos com pelo menos 1 gol após o alerta'
+      : 'jogos consecutivos sem nenhum gol após o alerta';
+  }
 }
 
 // ── cards análise ────────────────────────────────────────────
