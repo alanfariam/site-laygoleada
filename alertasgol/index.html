@@ -1009,7 +1009,7 @@ function renderAnaliseCards(grupos, total) {
 
 // ── campeonatos tabela ───────────────────────────────────────
 let campData = [];
-let campSortKey = 'pct_over1';
+let campSortKey = 'total';
 let campSortDir = -1;
 
 function pctPill(v) {
@@ -1070,13 +1070,16 @@ function renderTop10(elId, lista, metricaGood, metricaBad) {
   const color  = isBad ? 'var(--red)' : 'var(--green)';
   const bg     = isBad ? 'rgba(240,90,90,.03)' : 'rgba(46,204,138,.03)';
   if (!lista || !lista.length) { el.innerHTML = '<div style="color:var(--text3);font-size:12px;padding:8px 0">Sem dados suficientes</div>'; return; }
-  el.innerHTML = lista.map((r, i) => `
+  el.innerHTML = lista.map((r, i) => {
+    const qty = Math.round(r[metric] / 100 * r.total);
+    return `
     <div class="top10-item" style="background:${bg};">
       <span class="top10-rank">${i+1}</span>
       <span class="top10-name" title="${r.time}">${r.time}</span>
-      <span class="top10-total">${r.total} <span style="font-size:9px;font-weight:400;">jogos</span></span>
+      <span class="top10-total" style="color:var(--text3)">${qty}/${r.total}</span>
       <span class="top10-val" style="color:${color}">${r[metric]}%</span>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 }
 
 function renderTimeCharts(raw) {
@@ -1094,20 +1097,26 @@ function renderTop10Camp(campData) {
   const worst  = [...campData].sort((a,b) => b.pct_zero  - a.pct_zero ).slice(0,10);
   const el1 = document.getElementById('top10CampBest');
   const el2 = document.getElementById('top10CampWorst');
-  if (el1) el1.innerHTML = sorted.map((r,i) => `
+  if (el1) el1.innerHTML = sorted.map((r,i) => {
+    const qty = Math.round(r.pct_over1 / 100 * r.total);
+    return `
     <div class="top10-item" style="background:rgba(46,204,138,.03);">
       <span class="top10-rank">${i+1}</span>
       <span class="top10-name" title="${r.campeonato}">${r.campeonato}</span>
-      <span class="top10-total">${r.total} <span style="font-size:9px;font-weight:400;">jogos</span></span>
+      <span class="top10-total" style="color:var(--text3)">${qty}/${r.total}</span>
       <span class="top10-val" style="color:var(--green)">${r.pct_over1}%</span>
-    </div>`).join('');
-  if (el2) el2.innerHTML = worst.map((r,i) => `
+    </div>`;
+  }).join('');
+  if (el2) el2.innerHTML = worst.map((r,i) => {
+    const qty = Math.round(r.pct_zero / 100 * r.total);
+    return `
     <div class="top10-item" style="background:rgba(240,90,90,.03);">
       <span class="top10-rank">${i+1}</span>
       <span class="top10-name" title="${r.campeonato}">${r.campeonato}</span>
-      <span class="top10-total">${r.total} <span style="font-size:9px;font-weight:400;">jogos</span></span>
+      <span class="top10-total" style="color:var(--text3)">${qty}/${r.total}</span>
       <span class="top10-val" style="color:var(--red)">${r.pct_zero}%</span>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 }
 
 // ── busca time ───────────────────────────────────────────────
