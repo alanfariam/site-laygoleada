@@ -331,14 +331,13 @@ footer a{color:var(--red);text-decoration:none;}
         <div class="pc-desc">Over limite para pegar um gol no meio da partida na proporção 1 red para 2 greens — sinais automáticos via bot Telegram.</div>
       </div>
       <div class="pc-stats" id="ff-stats">
-        <div class="pc-stat"><div class="pc-stat-val g" id="ff-lucro">—</div><div class="pc-stat-lbl">Lucro Total</div></div>
-        <div class="pc-stat"><div class="pc-stat-val w" id="ff-wr">—</div><div class="pc-stat-lbl">Win Rate</div></div>
-        <div class="pc-stat"><div class="pc-stat-val" id="ff-ent">—</div><div class="pc-stat-lbl">Operações</div></div>
+        <div class="pc-stat"><div class="pc-stat-val g">+23.9k</div><div class="pc-stat-lbl">Lucro Total</div></div>
+        <div class="pc-stat"><div class="pc-stat-val w">54.8%</div><div class="pc-stat-lbl">Win Rate</div></div>
+        <div class="pc-stat"><div class="pc-stat-val">4035</div><div class="pc-stat-lbl">Operações</div></div>
       </div>
       <div class="pc-chart">
         <div class="pc-chart-label">Curva de lucro acumulado</div>
         <canvas id="cFF" height="120"></canvas>
-        <div class="pc-loading" id="ff-loading">Carregando dados...</div>
       </div>
       <div class="pc-footer" style="text-align:center;padding:12px 0;">
         <span style="font-family:var(--mono);font-size:11px;letter-spacing:.08em;color:#F0A030;">Produto suspenso</span>
@@ -581,17 +580,9 @@ function renderMiniChart(canvasId, serie, color) {
   });
 }
 
-async function loadFF() {
-  try {
-    const d = await fetch(FF_API + '/api/kpis').then(r => r.json());
-    document.getElementById('ff-lucro').textContent = fmtK(d.lucro_total);
-    document.getElementById('ff-wr').textContent    = d.win_rate.toFixed(1) + '%';
-    document.getElementById('ff-ent').textContent   = d.total_entradas;
-    document.getElementById('ff-loading').style.display = 'none';
-    renderMiniChart('cFF', d.acumulado_serie, '#2ECC8A');
-  } catch(e) {
-    document.getElementById('ff-loading').textContent = 'Dados indisponíveis';
-  }
+function loadFF() {
+  const serie = [93.5,-552,-1197.5,-1649.5,-1521,-1392.5,-1651,-1909.5,-1200.5,-878.5,-1137,-428,281,990,925,1247,1182,1117,858.5,1374,1889.5,857,1372.5,1501,2016.5,2145,2854,2982.5,3498,4013.5,4722.5,4464,4592.5,4721,5236.5,5171.5,5880.5,6202.5,6137.5,6846.5,6975,6716.5,7232,7747.5,8650,9165.5,9294,9809.5,9357.5,9679.5,10195,10323.5,10645.5,10580.5,10709,10837.5,10966,11288,11416.5,12125.5,12641,12576,13091.5,13026.5,13929,14444.5,14766.5,15282,15023.5,14571.5,14119.5,14828.5,14763.5,15666,14827,15536,15664.5,15986.5,15728,16243.5,15598,16113.5,15855,15983.5,16692.5,17208,17530,17852,18754.5,19463.5,19011.5,18753,18881.5,17849,17784,18106,18041,18169.5,18491.5,18426.5,17974.5,18683.5,18618.5,19134,19262.5,19004,19713,19454.5,19970,20098.5,20420.5,20355.5,19710,19838.5,20354,19902,20417.5,20739.5,21255,20996.5,21125,21640.5,21188.5,21510.5,21058.5,21187,20735,21637.5,22733.5,22862,22216.5,21764.5,22473.5,22408.5,22343.5,22085,21439.5,21568,22083.5,22599,22727.5,22662.5,22791,22726,23241.5,22596,22724.5,22272.5,22594.5,23110,22658,22786.5,21754,21108.5,21237,20785,20913.5,21816,21944.5,21879.5,22201.5,22136.5,21684.5,22393.5,22135,22070,22005,22327,22842.5,22777.5,22906,23228,22969.5,22517.5,22839.5,22774.5,22516,22064,22966.5,22901.5,22836.5,22384.5,22900,22641.5,22383,22705,22833.5,23542.5,23671,23219,23734.5,23476,23024,23346,23861.5,23216,23538,24053.5,24762.5,24697.5,24245.5,24761,23941.5];
+  renderMiniChart('cFF', serie.map((v,i) => ({data: i, valor: v})), '#2ECC8A');
 }
 
 async function loadTR() {
