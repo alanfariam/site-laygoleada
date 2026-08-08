@@ -1147,22 +1147,12 @@ async function init() {
     await api('/api/ping');
     setLoadingText('Carregando dados...');
 
-    [rawKpisGeral, rawMensal, rawDias, rawCamp, rawOdds, rawGols, rawInterval, rawTimes, rawQtdGols, rawSilencio, rawLayCs, rawLucroDiario, rawGolsPosAlerta, rawDistPrimGol, rawWRMinAlerta] = await Promise.all([
+    [rawKpisGeral, rawMensal, rawDias, rawQtdGols, rawLucroDiario] = await Promise.all([
       api('/api/kpis'),
       api('/api/lucro-mensal'),
       api('/api/winrate-dias'),
-      api('/api/campeonatos'),
-      api('/api/odds-analise').catch(() => null),
-      api('/api/gols-alerta').catch(() => null),
-      api('/api/intervalo-gols').catch(() => null),
-      api('/api/times').catch(() => null),
       api('/api/qtd-gols').catch(() => null),
-      api('/api/silencio-alerta').catch(() => null),
-      api('/api/lay-cs').catch(() => null),
       api('/api/lucro-diario').catch(() => null),
-      api('/api/gols-pos-alerta').catch(() => null),
-      api('/api/dist-primeiro-gol').catch(() => null),
-      api('/api/wr-minuto-alerta').catch(() => null),
     ]);
 
     populateKpiSelects();
@@ -1172,17 +1162,7 @@ async function init() {
     renderUltimas(rawKpisGeral);
     renderLucro();
     renderDias();
-    renderCampeonatos();
-    if (rawOdds)     renderOdds();
-    if (rawGols)     renderGolsAlerta();
-    if (rawInterval) renderInterval();
-    if (rawTimes)    renderTimes();
-    if (rawQtdGols)  renderQtdGols();
-    if (rawLayCs)    renderLayCs();
-    if (rawSilencio)      renderSilencio();
-    if (rawGolsPosAlerta) renderGolsPosAlerta();
-    if (rawDistPrimGol)   renderDistPrimGol();
-    if (rawWRMinAlerta)   renderWRMinAlerta();
+    if (rawQtdGols)     renderQtdGols();
     if (rawLucroDiario) initCalendario();
 
     // Popula banner com dados reais
