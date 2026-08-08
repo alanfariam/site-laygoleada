@@ -250,6 +250,37 @@ nav{
 .disclaimer-block p{font-size:12px;color:var(--text3);line-height:1.7;}
 .disclaimer-block strong{color:rgba(240,160,48,.9);}
 
+/* ── SEARCH ── */
+.search-input{
+  width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:8px;
+  padding:10px 14px;font-family:var(--sans);font-size:13px;color:var(--text);outline:none;
+  transition:border-color .15s;
+}
+.search-input:focus{border-color:var(--green);}
+.tbl-loading{text-align:center;padding:48px;font-family:var(--mono);font-size:11px;color:var(--text3);letter-spacing:.1em;}
+
+/* ── SUBTABS ── */
+.subtabs{display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:16px;}
+.subtab{font-family:var(--mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--text3);background:none;border:none;border-bottom:2px solid transparent;
+  padding:10px 16px;cursor:pointer;transition:all .15s;}
+.subtab:hover{color:var(--text2);}
+.subtab.active{color:var(--green);border-bottom-color:var(--green);}
+
+/* ── PILL ── */
+.pill{font-family:var(--mono);font-size:11px;font-weight:700;padding:2px 7px;border-radius:4px;}
+.pill-g{background:rgba(46,204,138,.15);color:var(--green);}
+.pill-a{background:rgba(240,160,48,.12);color:rgba(240,160,48,.9);}
+.pill-r{background:rgba(240,90,90,.12);color:rgba(240,90,90,.9);}
+
+/* ── TIME RESULT ── */
+.time-stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px;}
+.time-stat{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:18px 20px;}
+.time-stat-title{font-family:var(--mono);font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--text3);margin-bottom:10px;}
+.time-stat-row{display:flex;justify-content:space-between;align-items:center;padding:4px 0;font-size:12px;color:var(--text2);}
+.time-stat-val{font-family:var(--mono);font-weight:700;}
+@media(max-width:640px){.time-stat-grid{grid-template-columns:1fr;}}
+
 /* ── FOOTER ── */
 footer{
   text-align:center;padding:28px 32px;
@@ -568,10 +599,86 @@ footer a:hover{color:var(--green);}
     </div>
   </div>
 
+  <!-- TABELA CAMPEONATOS -->
+  <div class="section" style="padding-top:8px;">
+    <div class="section-title">Tabela de campeonatos (mín. 10 jogos)</div>
+    <div style="margin-bottom:12px;">
+      <input id="campSearch" class="search-input" type="text" placeholder="Buscar campeonato..." oninput="filterCamp()">
+    </div>
+    <div class="tbl-wrap">
+      <table class="tbl">
+        <thead><tr>
+          <th>#</th><th>Campeonato</th><th>Jogos</th>
+          <th style="cursor:pointer" onclick="sortCamp('pct_over1')">Over 1+ ↕</th>
+          <th style="cursor:pointer" onclick="sortCamp('pct_over2')">Over 2+ ↕</th>
+          <th style="cursor:pointer" onclick="sortCamp('pct_zero')">Sem Gol ↕</th>
+          <th style="cursor:pointer" onclick="sortCamp('media_gols')">Média Gols ↕</th>
+        </tr></thead>
+        <tbody id="campTblBody"><tr><td colspan="7" class="tbl-loading">CARREGANDO...</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
   <!-- TIMES -->
-  <div class="section" style="padding-top:8px;padding-bottom:48px;">
+  <div class="section" style="padding-top:8px;">
     <div class="section-title">Times</div>
-    <div style="color:var(--text3);font-family:var(--mono);font-size:11px;letter-spacing:.1em;padding:48px 0;text-align:center;">EM BREVE</div>
+    <div class="subtabs" id="timesSubtabs">
+      <button class="subtab active" onclick="showTimesTab('geral')">Geral</button>
+      <button class="subtab" onclick="showTimesTab('casa')">Mandante</button>
+      <button class="subtab" onclick="showTimesTab('fora')">Visitante</button>
+    </div>
+
+    <!-- Top 10 geral -->
+    <div id="timesGeral">
+      <div class="charts" style="margin-bottom:14px;">
+        <div class="card" style="height:340px;">
+          <div class="card-title">Top 10 — maior % Over 1+ (geral)</div>
+          <canvas id="cTimesGeralBest"></canvas>
+        </div>
+        <div class="card" style="height:340px;">
+          <div class="card-title">Top 10 — maior % sem gol (geral)</div>
+          <canvas id="cTimesGeralWorst"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Top 10 mandante -->
+    <div id="timesCasa" style="display:none;">
+      <div class="charts" style="margin-bottom:14px;">
+        <div class="card" style="height:340px;">
+          <div class="card-title">Top 10 — maior % Over 1+ como mandante</div>
+          <canvas id="cTimesCasaBest"></canvas>
+        </div>
+        <div class="card" style="height:340px;">
+          <div class="card-title">Top 10 — maior % sem gol como mandante</div>
+          <canvas id="cTimesCasaWorst"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Top 10 visitante -->
+    <div id="timesFora" style="display:none;">
+      <div class="charts" style="margin-bottom:14px;">
+        <div class="card" style="height:340px;">
+          <div class="card-title">Top 10 — maior % Over 1+ como visitante</div>
+          <canvas id="cTimesForaBest"></canvas>
+        </div>
+        <div class="card" style="height:340px;">
+          <div class="card-title">Top 10 — maior % sem gol como visitante</div>
+          <canvas id="cTimesForaWorst"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BUSCA DE TIME -->
+  <div class="section" style="padding-top:8px;padding-bottom:48px;">
+    <div class="section-title">Buscar time</div>
+    <div style="display:flex;gap:10px;margin-bottom:20px;">
+      <input id="timeSearch" class="search-input" type="text" placeholder="Nome do time..." style="flex:1;">
+      <button class="btn-cta" onclick="buscaTime()" style="padding:8px 20px;font-size:11px;">BUSCAR</button>
+    </div>
+    <div id="timeResult"></div>
   </div>
 
 </div><!-- /page-analise -->
@@ -847,6 +954,128 @@ function renderAnaliseCards(grupos, total) {
     </div>`).join('');
 }
 
+// ── campeonatos tabela ───────────────────────────────────────
+let campData = [];
+let campSortKey = 'pct_over1';
+let campSortDir = -1;
+
+function pctPill(v) {
+  const cls = v >= 85 ? 'pill-g' : v >= 70 ? 'pill-a' : 'pill-r';
+  return `<span class="pill ${cls}">${v}%</span>`;
+}
+
+function renderCampTable() {
+  const q = (document.getElementById('campSearch')?.value || '').toLowerCase();
+  const rows = campData
+    .filter(r => r.campeonato.toLowerCase().includes(q))
+    .sort((a, b) => campSortDir * (b[campSortKey] - a[campSortKey]));
+  document.getElementById('campTblBody').innerHTML = rows.length
+    ? rows.map((r, i) => `<tr>
+        <td class="mono" style="color:var(--text3)">${i+1}</td>
+        <td style="font-weight:500;color:var(--text)">${r.campeonato}</td>
+        <td class="mono">${r.total}</td>
+        <td>${pctPill(r.pct_over1)}</td>
+        <td>${pctPill(r.pct_over2)}</td>
+        <td><span class="pill ${r.pct_zero <= 5 ? 'pill-g' : r.pct_zero <= 15 ? 'pill-a' : 'pill-r'}">${r.pct_zero}%</span></td>
+        <td class="mono" style="color:var(--text)">${r.media_gols}</td>
+      </tr>`).join('')
+    : `<tr><td colspan="7" class="tbl-loading">Nenhum resultado</td></tr>`;
+}
+
+function filterCamp() { renderCampTable(); }
+
+function sortCamp(key) {
+  if (campSortKey === key) campSortDir *= -1;
+  else { campSortKey = key; campSortDir = -1; }
+  renderCampTable();
+}
+
+// ── times charts ─────────────────────────────────────────────
+function timesHbar(id, labels, values, color) {
+  destroyC(id);
+  charts[id] = new Chart(document.getElementById(id), {
+    type: 'bar',
+    data: { labels, datasets: [{ data: values, backgroundColor: color, borderRadius: 4, barPercentage: .6 }] },
+    options: { ...cd(), indexAxis: 'y',
+      plugins: { ...cd().plugins, tooltip: { ...cd().plugins.tooltip, callbacks: {
+        label: ctx => ` ${ctx.raw}%`
+      }}},
+      scales: {
+        x: { min:0, max:100, ticks: { callback: v => v+'%', color:'#556070', font:{size:10} }, grid: { color:'rgba(255,255,255,.04)' } },
+        y: { ticks: { color:'#8A96A3', font:{size:9} }, grid: { display:false } }
+      }
+    }
+  });
+}
+
+function renderTimeCharts(raw) {
+  const top = (lst, key, rev) => [...lst].sort((a,b) => rev ? b[key]-a[key] : a[key]-b[key]).slice(0,10);
+  const names = lst => lst.map(r => r.time);
+  const vals  = (lst, key) => lst.map(r => r[key]);
+
+  timesHbar('cTimesGeralBest',  names(top(raw.geral_best,  'pct_over1', true)),  vals(top(raw.geral_best,  'pct_over1', true),  'pct_over1'), 'rgba(46,204,138,.75)');
+  timesHbar('cTimesGeralWorst', names(top(raw.geral_worst, 'pct_zero',  true)),  vals(top(raw.geral_worst, 'pct_zero',  true),  'pct_zero'),  'rgba(240,90,90,.7)');
+  timesHbar('cTimesCasaBest',   names(top(raw.casa_best,   'pct_over1', true)),  vals(top(raw.casa_best,   'pct_over1', true),  'pct_over1'), 'rgba(46,204,138,.75)');
+  timesHbar('cTimesCasaWorst',  names(top(raw.casa_best,   'pct_zero',  true)),  vals(top(raw.casa_best,   'pct_zero',  true),  'pct_zero'),  'rgba(240,90,90,.7)');
+  timesHbar('cTimesForaBest',   names(top(raw.fora_best,   'pct_over1', true)),  vals(top(raw.fora_best,   'pct_over1', true),  'pct_over1'), 'rgba(46,204,138,.75)');
+  timesHbar('cTimesForaWorst',  names(top(raw.fora_best,   'pct_zero',  true)),  vals(top(raw.fora_best,   'pct_zero',  true),  'pct_zero'),  'rgba(240,90,90,.7)');
+}
+
+function showTimesTab(id) {
+  ['geral','casa','fora'].forEach(t => {
+    document.getElementById('times' + t.charAt(0).toUpperCase() + t.slice(1)).style.display = t === id ? '' : 'none';
+  });
+  document.querySelectorAll('.subtab').forEach((b, i) => {
+    b.classList.toggle('active', ['geral','casa','fora'][i] === id);
+  });
+}
+
+// ── busca time ───────────────────────────────────────────────
+async function buscaTime() {
+  const nome = document.getElementById('timeSearch').value.trim();
+  if (nome.length < 2) return;
+  const el = document.getElementById('timeResult');
+  el.innerHTML = `<div style="font-family:var(--mono);font-size:11px;color:var(--text3);letter-spacing:.1em;padding:24px 0;">BUSCANDO...</div>`;
+  try {
+    const d = await fetchJson(`/api/times-gols/busca?time=${encodeURIComponent(nome)}`);
+    if (!d.geral) { el.innerHTML = `<div style="color:var(--text3);font-size:13px;">Nenhuma entrada encontrada para "<strong>${nome}</strong>".</div>`; return; }
+
+    function statCard(title, s) {
+      if (!s) return '';
+      return `<div class="time-stat">
+        <div class="time-stat-title">${title}</div>
+        <div class="time-stat-row"><span>Total jogos</span><span class="time-stat-val">${s.total}</span></div>
+        <div class="time-stat-row"><span>Over 1+</span><span class="time-stat-val" style="color:var(--green)">${s.pct_over1}%</span></div>
+        <div class="time-stat-row"><span>Over 2+</span><span class="time-stat-val" style="color:rgba(74,158,240,.9)">${s.pct_over2}%</span></div>
+        <div class="time-stat-row"><span>Sem gol</span><span class="time-stat-val" style="color:rgba(240,90,90,.9)">${s.pct_zero}%</span></div>
+        <div class="time-stat-row"><span>Média gols</span><span class="time-stat-val">${s.media_gols}</span></div>
+      </div>`;
+    }
+
+    const campRows = (d.campeonatos || []).map(r => `<tr>
+      <td style="color:var(--text)">${r.campeonato}</td>
+      <td class="mono">${r.total}</td>
+      <td>${pctPill(r.pct_over1)}</td>
+      <td>${pctPill(r.pct_over2)}</td>
+      <td><span class="pill ${r.pct_zero<=5?'pill-g':r.pct_zero<=15?'pill-a':'pill-r'}">${r.pct_zero}%</span></td>
+      <td class="mono">${r.media_gols}</td>
+    </tr>`).join('');
+
+    el.innerHTML = `
+      <div class="time-stat-grid">
+        ${statCard('🌐 Geral', d.geral)}
+        ${statCard('🏠 Mandante', d.casa)}
+        ${statCard('✈ Visitante', d.fora)}
+      </div>
+      ${campRows ? `<div class="tbl-wrap"><table class="tbl">
+        <thead><tr><th>Campeonato</th><th>Jogos</th><th>Over 1+</th><th>Over 2+</th><th>Sem Gol</th><th>Média Gols</th></tr></thead>
+        <tbody>${campRows}</tbody>
+      </table></div>` : ''}`;
+  } catch(e) {
+    el.innerHTML = `<div style="color:var(--red);font-size:13px;">Erro ao buscar dados.</div>`;
+  }
+}
+
 // ── análise: campeonatos ranking ─────────────────────────────
 function renderRankingCamp(rawGolsPosAlerta) {
   function hbar(id, labels, values, color, suffix) {
@@ -982,7 +1211,7 @@ function renderJogos(ops) {
 // ── init ─────────────────────────────────────────────────────
 window.addEventListener('DOMContentLoaded', async () => {
   try {
-    const [qtdGols, kpis, mensalGols, diaSemana, golsPosAlerta, distPrimGol, intervaloGols] = await Promise.all([
+    const [qtdGols, kpis, mensalGols, diaSemana, golsPosAlerta, distPrimGol, intervaloGols, campGols, timesGols] = await Promise.all([
       fetchJson('/api/qtd-gols'),
       fetchJson('/api/kpis'),
       fetchJson('/api/mensal-gols'),
@@ -990,6 +1219,8 @@ window.addEventListener('DOMContentLoaded', async () => {
       fetchJson('/api/gols-pos-alerta').catch(() => null),
       fetchJson('/api/dist-primeiro-gol').catch(() => null),
       fetchJson('/api/intervalo-gols').catch(() => null),
+      fetchJson('/api/campeonatos-gols').catch(() => null),
+      fetchJson('/api/times-gols').catch(() => null),
     ]);
 
     // Hero e tiles com dados reais
@@ -1028,6 +1259,10 @@ window.addEventListener('DOMContentLoaded', async () => {
     if (golsPosAlerta) { renderRankingCamp(golsPosAlerta); renderPlacarZero(golsPosAlerta); }
     if (distPrimGol)   renderDistPrimGol(distPrimGol);
     if (intervaloGols) renderMinutoGols(intervaloGols);
+    if (campGols)  { campData = campGols; renderCampTable(); }
+    if (timesGols) renderTimeCharts(timesGols);
+
+    document.getElementById('timeSearch').addEventListener('keydown', e => { if (e.key === 'Enter') buscaTime(); });
 
     // Tabela de jogos
     if (kpis?.ultimas_operacoes?.length) {
