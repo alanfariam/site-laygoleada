@@ -764,7 +764,8 @@ function renderAcumulado(data){
 
 function renderLucroDiario(dados){
   const canvas=document.getElementById('cLucroDiarioKpi');
-  if(!canvas||!dados.length)return;
+  if(!canvas)return;
+  if(!dados.length){destroyChart('cLucroDiarioKpi');return;}
   let f=[...dados];
   if(kpiMode==='mes'){const sel=document.getElementById('kpiMesSelect').value;if(sel){const[mm,yyyy]=sel.split('/');f=f.filter(d=>{const p=d.data.split('/');const a=p[2].length===2?'20'+p[2]:p[2];return p[1]===mm&&a===yyyy;});}}
   else if(kpiMode==='ano'){const sel=document.getElementById('kpiAnoSelect').value;if(sel){f=f.filter(d=>{const p=d.data.split('/');return(p[2].length===2?'20'+p[2]:p[2])===sel;});}}
@@ -777,7 +778,8 @@ function renderLucroDiario(dados){
 
 function renderDiaSemana(dados){
   const canvas=document.getElementById('cDiaSemana');
-  if(!canvas||!dados.length)return;
+  if(!canvas)return;
+  if(!dados.length){destroyChart('cDiaSemana');return;}
   const labels=['Seg','Ter','Qua','Qui','Sex','Sáb','Dom'];
   const greens=[0,0,0,0,0,0,0], total=[0,0,0,0,0,0,0];
   dados.forEach(d=>{
