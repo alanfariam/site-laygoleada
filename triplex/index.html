@@ -711,6 +711,10 @@ async function renderKpis(){
   if(!data||data.erro){
     ids.forEach(id=>{document.getElementById(id).textContent='—';});
     document.getElementById('k-lucro-s').textContent='Sem dados';
+    document.getElementById('k-good-run').textContent='—';
+    document.getElementById('k-bad-run').textContent='—';
+    document.getElementById('k-drawdown').textContent='—';
+    destroyChart('cKpiAcum');
     renderUltimas(null);renderLucroDiario([]);renderDiaSemana([]);return;
   }
   const sv=(id,val,cls,sub,sid)=>{const el=document.getElementById(id);el.textContent=val;el.className='kpi-value'+(cls?' '+cls:'');if(sid)document.getElementById(sid).textContent=sub||'';};
