@@ -101,6 +101,17 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 .pill{display:inline-block;padding:2px 8px;border-radius:99px;font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:.04em;}
 .pill.pg{background:rgba(46,204,138,.12);color:var(--green);border:1px solid rgba(46,204,138,.25);}
 .pill.pr{background:rgba(240,90,90,.12);color:var(--red);border:1px solid rgba(240,90,90,.25);}
+.pill.pm-op{background:rgba(249,115,22,.12);color:var(--accent);border:1px solid rgba(249,115,22,.3);}
+.pill.pm-pr{background:rgba(46,204,138,.12);color:var(--green);border:1px solid rgba(46,204,138,.25);}
+
+/* ── FILTRO MÉTODO GLOBAL ── */
+.metodo-bar{background:var(--bg2);border-bottom:1px solid var(--border);padding:8px 24px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.metodo-bar-label{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);}
+.mb-btn{background:var(--bg3);border:1px solid var(--border);border-radius:99px;padding:4px 14px;font-size:11px;font-family:var(--mono);color:var(--text2);cursor:pointer;transition:all .15s;letter-spacing:.04em;}
+.mb-btn:hover{color:var(--text);border-color:rgba(249,115,22,.4);}
+.mb-btn.active{background:rgba(249,115,22,.12);border-color:var(--accent);color:var(--accent);}
+.mb-btn.op.active{background:rgba(249,115,22,.12);border-color:var(--accent);color:var(--accent);}
+.mb-btn.pr.active{background:rgba(46,204,138,.12);border-color:var(--green);color:var(--green);}
 
 /* ── INÍCIO HERO ── */
 .ini-hero{text-align:center;padding:52px 24px 40px;}
@@ -249,6 +260,13 @@ footer{border-top:1px solid var(--border);padding:16px 24px;display:flex;justify
   <div class="tab" onclick="showTab('kpis')">KPIs Gerais</div>
   <div class="tab" onclick="showTab('lucro')">Lucro Mensal</div>
   <div class="tab" onclick="showTab('camp')">Campeonatos</div>
+</div>
+
+<div class="metodo-bar" id="metodoBar">
+  <span class="metodo-bar-label">Método:</span>
+  <button class="mb-btn active" onclick="setMetodoGlobal('todos',this)">Todos</button>
+  <button class="mb-btn op" onclick="setMetodoGlobal('OPORTUNIDADE',this)">OPORTUNIDADE</button>
+  <button class="mb-btn pr" onclick="setMetodoGlobal('PROJETO',this)">PROJETO</button>
 </div>
 
 <div class="container">
@@ -472,7 +490,7 @@ footer{border-top:1px solid var(--border);padding:16px 24px;display:flex;justify
       <div class="tbl-wrap">
         <table class="tbl">
           <thead><tr>
-            <th>Data</th><th>Jogo</th><th>Placar Ent.</th>
+            <th>Data</th><th>Método</th><th>Jogo</th><th>Placar Ent.</th>
             <th>Min.</th><th>Campeonato</th><th>Placar Final</th><th>Result.</th><th>Lucro</th>
           </tr></thead>
           <tbody id="tblUltimas"></tbody>
@@ -571,7 +589,7 @@ const API = window.location.hostname === 'localhost' || window.location.protocol
 
 let rawKpis=null, rawMensal=null, rawDiario=null, rawMesDetalhe=null, rawCamp=null;
 let campData=[];
-let kpiMode='geral', metodoKpi='todos', metodoLucro='todos';
+let kpiMode='geral', metodoKpi='todos', metodoLucro='todos', metodoGlobal='todos';
 let calYear=null, calMonth=null, charts={};
 let metodosCarregados=false;
 
@@ -597,6 +615,20 @@ function buildMetodoBtns(){}
 
 function setMetodo(m,btn){metodoKpi=m;document.querySelectorAll('#kpiFiltroMetodos .fp-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderKpis();}
 function setMetodoLucro(m,btn){metodoLucro=m;document.querySelectorAll('#lucroFiltroMetodos .fp-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderLucro();if(calYear!==null)fetchMesDetalhe();}
+
+async function setMetodoGlobal(m, btn){
+  metodoGlobal=m; metodoKpi=m; metodoLucro=m;
+  document.querySelectorAll('.metodo-bar .mb-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  // re-busca campeonatos filtrado
+  try{
+    const q=m==='todos'?'':'?metodo='+encodeURIComponent(m);
+    rawCamp=await apiFetch('/api/campeonatos'+q)||[];
+  }catch{}
+  renderKpis();
+  renderLucro();
+  renderCampeonatos();
+}
 
 function setKpiFilter(mode,btn){
   kpiMode=mode;
@@ -694,11 +726,18 @@ async function renderKpis(){
   renderAcumulado(data);renderUltimas(data);renderLucroDiario(diario||[]);renderDiaSemana(diario||[]);
 }
 
+function metodoPill(m){
+  if(!m)return'—';
+  const cls=m==='PROJETO'?'pm-pr':'pm-op';
+  return`<span class="pill ${cls}">${m}</span>`;
+}
+
 function renderUltimas(data){
   const tbody=document.getElementById('tblUltimas');
-  if(!data?.ultimas_operacoes?.length){tbody.innerHTML='<tr><td colspan="8" style="text-align:center;color:var(--text3);padding:24px;">Sem dados</td></tr>';return;}
+  if(!data?.ultimas_operacoes?.length){tbody.innerHTML='<tr><td colspan="9" style="text-align:center;color:var(--text3);padding:24px;">Sem dados</td></tr>';return;}
   tbody.innerHTML=data.ultimas_operacoes.map(op=>`<tr>
     <td style="font-family:var(--mono);font-size:11px;white-space:nowrap;">${op.data}</td>
+    <td>${metodoPill(op.metodo)}</td>
     <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${op.jogo}</td>
     <td style="font-family:var(--mono);">${op.placar||'—'}</td>
     <td style="font-family:var(--mono);text-align:center;">${op.min_alerta!=null?op.min_alerta+"'":'—'}</td>
