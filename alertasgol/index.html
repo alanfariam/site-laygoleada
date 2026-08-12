@@ -879,7 +879,7 @@ function buildDiaSemana(data) {
       {
         label: '% Over 1+',
         data: pcts,
-        backgroundColor: 'rgba(46,204,138,.7)',
+        backgroundColor: pcts.map(v => v >= 89 ? 'rgba(46,204,138,.7)' : 'rgba(240,160,48,.75)'),
         borderRadius: 4,
         barPercentage: .65,
         yAxisID: 'y'
@@ -949,7 +949,7 @@ function buildBars(months) {
       {
         label: '% Over 1+',
         data: pcts,
-        backgroundColor: 'rgba(46,204,138,.7)',
+        backgroundColor: pcts.map(v => v >= 89 ? 'rgba(46,204,138,.7)' : 'rgba(240,160,48,.75)'),
         borderRadius: 4,
         barPercentage: .7,
         yAxisID: 'y'
@@ -1374,7 +1374,7 @@ function renderJogos(ops) {
       <td class="mono" style="text-align:center;">${op.placar}</td>
       <td class="mono" style="text-align:center;">${op.min_alerta}'</td>
       <td class="camp-cell">${op.campeonato}</td>
-      <td class="mono" style="text-align:center;">${op.min_gol != null ? op.min_gol + "'" : '—'}</td>
+      <td class="mono" style="text-align:center;${op.min_gol != null ? 'color:#2ECC8A;font-weight:600;' : 'color:#F05A5A;'}">${op.min_gol != null ? op.min_gol + "'" : '—'}</td>
       <td class="mono">${op.final || '—'}</td>
     </tr>`).join('');
 }
