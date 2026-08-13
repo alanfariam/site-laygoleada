@@ -207,6 +207,7 @@ footer{margin-top:48px;padding:24px 32px;border-top:1px solid var(--border);
   <div class="tab active" onclick="showTab('inicio')">Início</div>
   <div class="tab" onclick="showTab('kpis')">KPIs Gerais</div>
   <div class="tab" onclick="showTab('lucro')">Lucro Mensal</div>
+  <div class="tab" onclick="showTab('goodrun')">Good Run</div>
 </div>
 <div class="container">
 
@@ -306,6 +307,11 @@ footer{margin-top:48px;padding:24px 32px;border-top:1px solid var(--border);
       <div class="kpi grn-accent"><div class="kpi-label">Greens</div><div class="kpi-value g" id="k-greens">&#8212;</div><div class="kpi-sub" id="k-greens-s"></div></div>
       <div class="kpi red-accent"><div class="kpi-label">Reds</div><div class="kpi-value r" id="k-reds">&#8212;</div><div class="kpi-sub" id="k-reds-s"></div></div>
     </div>
+    <div class="kpi-grid" style="margin-top:0;">
+      <div class="kpi grn-accent"><div class="kpi-label">Good Run</div><div class="kpi-value g" id="k-good-run">&#8212;</div><div class="kpi-sub">Maior sequência de greens</div></div>
+      <div class="kpi red-accent"><div class="kpi-label">Bad Run</div><div class="kpi-value r" id="k-bad-run">&#8212;</div><div class="kpi-sub">Maior sequência de reds</div></div>
+      <div class="kpi red-accent"><div class="kpi-label">Max Drawdown</div><div class="kpi-value r" id="k-drawdown">&#8212;</div><div class="kpi-sub">Maior queda acumulada</div></div>
+    </div>
     <div class="section-label">Evolução Acumulada</div>
     <div class="card">
       <div class="card-title">Curva de Lucro Acumulado</div>
@@ -382,6 +388,34 @@ footer{margin-top:48px;padding:24px 32px;border-top:1px solid var(--border);
   </div>
 
 
+  <div id="page-goodrun" class="page">
+    <div class="section-label">Filtros</div>
+    <div class="filter-row">
+      <span class="filter-label">Método:</span>
+      <button class="fp-btn active" onclick="setMetodoGoodRun('todos',this)">Todos</button>
+      <button class="fp-btn" onclick="setMetodoGoodRun('LG ALN CASA',this)">LG ALN</button>
+      <button class="fp-btn" onclick="setMetodoGoodRun('LG PUNTER CASA',this)">LG PUNTER</button>
+      <button class="fp-btn" onclick="setMetodoGoodRun('LG RAGNAROK CASA',this)">LG RAGNAROK</button>
+    </div>
+    <div class="kpi-grid" style="margin-bottom:0;">
+      <div class="kpi grn-accent"><div class="kpi-label">Recorde Histórico</div><div class="kpi-value g" id="gr-recorde">&#8212;</div><div class="kpi-sub">Maior sequência de greens (geral)</div></div>
+      <div class="kpi grn-accent"><div class="kpi-label">Sequência Atual</div><div class="kpi-value g" id="gr-atual">&#8212;</div><div class="kpi-sub">Greens seguidos agora</div></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Sequência de Greens</div>
+      <div class="chart-wrap"><canvas id="cGoodRun" height="220"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Mapa de Sequências</div>
+      <div id="grMapWrap" style="margin-top:4px;"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Gestão Fixa vs Gestão de Ciclos — Lucro Acumulado</div>
+      <div id="grComparativoInfo" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px;"></div>
+      <div class="chart-wrap"><canvas id="cComparativoGestao" height="260"></canvas></div>
+    </div>
+  </div>
+
 </div>
 <footer>
   <span id="footerInfo">LG TRINITY · Lay Goleada</span>
@@ -391,7 +425,7 @@ footer{margin-top:48px;padding:24px 32px;border-top:1px solid var(--border);
 const API = window.location.hostname === 'localhost' || window.location.protocol === 'file:'
   ? 'http://localhost:5001/trinity' : 'https://api.laygoleada.com.br/trinity';
 let rawKpis=null,rawMensal=null,rawDiario=null,rawMesDetalhe=null,rawResultados=null;
-let kpiMode='geral',metodoKpi='todos',metodoLucro='todos';
+let kpiMode='geral',metodoKpi='todos',metodoLucro='todos',metodoGoodRun='todos';
 let calYear=null,calMonth=null,charts={};
 function setStatus(t,x){const e=document.getElementById('statusPill');e.className='status-pill '+t;e.textContent=x;}
 function showErr(m){const e=document.getElementById('errBanner');e.style.display='block';e.textContent='⚠ '+m;}
@@ -404,12 +438,12 @@ function showTab(id){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
   document.getElementById('page-'+id).classList.add('active');
-  ['inicio','kpis','lucro'].forEach((n,i)=>{if(n===id)document.querySelectorAll('.tab')[i].classList.add('active');});
+  ['inicio','kpis','lucro','goodrun'].forEach((n,i)=>{if(n===id)document.querySelectorAll('.tab')[i].classList.add('active');});
 }
 async function apiFetch(path){const r=await fetch(API+path);if(!r.ok)throw new Error('HTTP '+r.status);return r.json();}
 function setMetodo(m,btn){metodoKpi=m;document.querySelectorAll('#page-kpis .fp-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderKpis();}
 function setMetodoLucro(m,btn){metodoLucro=m;document.querySelectorAll('#page-lucro .fp-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderLucro();if(calYear!==null)fetchMesDetalhe();}
-function setMetodoGoodRun(m,btn){}
+function setMetodoGoodRun(m,btn){metodoGoodRun=m;document.querySelectorAll('#page-goodrun .fp-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderGoodRun();}
 function setKpiFilter(mode,btn){kpiMode=mode;document.querySelectorAll('.kf-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');document.getElementById('kpiMesSelect').classList.toggle('show',mode==='mes');document.getElementById('kpiAnoSelect').classList.toggle('show',mode==='ano');renderKpis();}
 function populateKpiSelects(data){
   const meses=[...(data.meses_disponiveis||[])].sort((a,b)=>{const[ma,ya]=a.split('/').map(Number);const[mb,yb]=b.split('/').map(Number);return ya!==yb?yb-ya:mb-ma;});
@@ -459,6 +493,9 @@ async function renderKpis(){
   sv('k-roi',(data.roi>=0?'+':'')+data.roi.toFixed(2)+'%',data.roi>=0?'a':'r','','k-roi-s');
   sv('k-greens',data.greens.toLocaleString('pt-BR'),'g','','k-greens-s');
   sv('k-reds',data.reds.toLocaleString('pt-BR'),'r','','k-reds-s');
+  document.getElementById('k-good-run').textContent=(data.maior_good_run||0)+' greens';
+  document.getElementById('k-bad-run').textContent=(data.maior_bad_run||0)+' reds';
+  document.getElementById('k-drawdown').textContent=data.max_drawdown!=null?'-R$ '+data.max_drawdown.toLocaleString('pt-BR',{minimumFractionDigits:2}):'—';
   renderAcumulado(data);renderUltimas(data);renderLucroDiario(diario||[]);
 }
 function metodoPill(m){
@@ -570,6 +607,67 @@ function renderAcumuladoMes(){
   destroyChart('cCalAcum');
   if(vals.length){charts['cCalAcum']=new Chart(document.getElementById('cCalAcum'),{type:'line',data:{labels,datasets:[{data:vals,borderColor:pos?'#A855F7':'#F05A5A',borderWidth:2,pointRadius:3,pointBackgroundColor:pos?'#A855F7':'#F05A5A',tension:.3,fill:true,backgroundColor:pos?'rgba(168,85,247,.15)':'rgba(240,90,90,.15)'}]},options:{...cd(),plugins:{...cd().plugins,tooltip:{...cd().plugins.tooltip,callbacks:{label:ctx=>' R$ '+ctx.raw.toLocaleString('pt-BR',{minimumFractionDigits:2})}}},scales:{x:{ticks:{color:'#8A96A3',font:{size:10}},grid:{display:false}},y:{ticks:{callback:v=>'R$'+(v/1000).toFixed(1)+'k',color:'#556070',font:{size:10}},grid:{color:'rgba(255,255,255,.04)'}}}}});}
 }
+async function renderGoodRun(){
+  let ops=rawResultados,kpiData=rawKpis;
+  if(metodoGoodRun!=='todos'){
+    try{
+      [kpiData,ops]=await Promise.all([
+        apiFetch('/api/kpis?metodo='+encodeURIComponent(metodoGoodRun)),
+        apiFetch('/api/resultados?metodo='+encodeURIComponent(metodoGoodRun))
+      ]);
+    }catch{ops=rawResultados?.filter(o=>o.metodo===metodoGoodRun);}
+  }
+  const recEl=document.getElementById('gr-recorde'),atEl=document.getElementById('gr-atual');
+  if(recEl)recEl.textContent=(kpiData?.maior_good_run||0)+' greens';
+  if(!ops?.length){if(atEl)atEl.textContent='—';return;}
+  const toD=s=>{const p=s.split('/');const y=p[2].length===2?2000+parseInt(p[2]):parseInt(p[2]);return new Date(y,parseInt(p[1])-1,parseInt(p[0]));};
+  const sorted=[...ops].sort((a,b)=>toD(a.data)-toD(b.data));
+  let cur=0;
+  const vals=sorted.map(o=>{if(o.resultado==='GREEN')cur++;else cur=0;return cur;});
+  const labels=sorted.map(o=>o.data);
+  if(atEl)atEl.textContent=vals[vals.length-1]+' greens';
+  const ptColors=vals.map(v=>v===0?'rgba(240,90,90,.85)':'#2ECC8A');
+  destroyChart('cGoodRun');
+  const canvas=document.getElementById('cGoodRun');
+  if(canvas){
+    const refLine=n=>({data:labels.map(()=>n),borderColor:'rgba(245,158,11,.6)',backgroundColor:'transparent',borderWidth:1.5,borderDash:[6,4],pointRadius:0,pointHoverRadius:0,fill:false,tension:0,order:0,label:n+'x'});
+    charts['cGoodRun']=new Chart(canvas,{type:'line',data:{labels,datasets:[{data:vals,borderColor:'#2ECC8A',backgroundColor:'rgba(46,204,138,.12)',pointBackgroundColor:ptColors,pointBorderColor:ptColors,pointRadius:4,pointHoverRadius:6,fill:true,tension:.3,borderWidth:2,order:1},refLine(15),refLine(30),refLine(45),refLine(60)]},options:{...cd(),plugins:{...cd().plugins,legend:{display:false},tooltip:{...cd().plugins.tooltip,mode:'index',intersect:false,callbacks:{title:ctx=>sorted[ctx[0].dataIndex]?.data||'',label:ctx=>ctx.datasetIndex===1?' Zona dobra banca (15 greens)':ctx.raw>0?' '+ctx.raw+' green'+(ctx.raw>1?'s':'')+' seguido'+(ctx.raw>1?'s':''):' RED — sequência zerada'}}},scales:{x:{ticks:{color:'#8A96A3',font:{size:9},maxTicksLimit:14,autoSkip:true,maxRotation:0},grid:{color:'rgba(255,255,255,.03)'}},y:{ticks:{stepSize:1,color:'#556070',font:{size:10}},grid:{color:'rgba(255,255,255,.04)'},beginAtZero:true,title:{display:true,text:'Greens consecutivos',color:'#8A96A3',font:{size:10}}}}}});
+  }
+  renderComparativoGestao(sorted);
+  const wrap=document.getElementById('grMapWrap');
+  if(!wrap)return;
+  const segs=[];let i=0;
+  while(i<sorted.length){const type=sorted[i].resultado;let j=i;while(j<sorted.length&&sorted[j].resultado===type)j++;segs.push({type,len:j-i,start:sorted[i].data,end:sorted[j-1].data});i=j;}
+  const total=segs.reduce((s,g)=>s+g.len,0);
+  const barHtml=segs.map(seg=>{const pct=(seg.len/total*100).toFixed(2);const isG=seg.type==='GREEN';const bg=isG?'#2ECC8A':'#F05A5A';const lbl=seg.len>=4?`<span style="font-size:10px;font-weight:700;color:#fff;">${seg.len}</span>`:'';return`<div title="${isG?'🟢':'🔴'} ${seg.len} entrada${seg.len>1?'s':''} · ${seg.start}–${seg.end}" style="flex:0 0 ${pct}%;height:100%;background:${bg};display:flex;align-items:center;justify-content:center;border-radius:2px;cursor:default;transition:opacity .15s;" onmouseenter="this.style.opacity='.7'" onmouseleave="this.style.opacity='1'">${lbl}</div>`;}).join('');
+  wrap.innerHTML=`<div style="display:flex;height:48px;gap:2px;border-radius:8px;overflow:hidden;margin-bottom:6px;">${barHtml}</div><div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text3);font-family:var(--mono);"><span>${sorted[0].data}</span><span>${sorted[Math.floor(sorted.length/2)].data}</span><span>${sorted[sorted.length-1].data}</span></div>`;
+}
+function calcCiclos(ops,base){
+  base=base||1000;
+  var ca=0,ga=0,vals=[];
+  for(var i=0;i<ops.length;i++){
+    var le=parseFloat((ops[i].lucro*((base+ca)/base)).toFixed(2));
+    ga=parseFloat((ga+le).toFixed(2));
+    if(le>=0){ca=parseFloat((ca+le).toFixed(2));if(ca>=base)ca=0;}
+    else if(Math.abs(le)>=ca)ca=0;
+    else ca=parseFloat((ca+le).toFixed(2));
+    vals.push(ga);
+  }
+  return vals;
+}
+function renderComparativoGestao(ops){
+  destroyChart('cComparativoGestao');
+  const c=document.getElementById('cComparativoGestao');
+  if(!c||!ops||!ops.length)return;
+  var fa=0;
+  const fv=ops.map(o=>{fa=parseFloat((fa+o.lucro).toFixed(2));return fa;});
+  const cv=calcCiclos(ops);
+  const ff=fv[fv.length-1],cf=cv[cv.length-1];
+  const fmt=v=>(v>=0?'+R$ ':'-R$ ')+Math.abs(v).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+  const ie=document.getElementById('grComparativoInfo');
+  if(ie)ie.innerHTML=`<div style="padding:6px 14px;background:rgba(168,85,247,.12);border:1px solid rgba(168,85,247,.25);border-radius:8px;font-size:11px;color:#8A96A3;font-family:var(--mono);"><span style="color:#A855F7;font-weight:700;">Gestão Fixa</span>&nbsp;${fmt(ff)}</div><div style="padding:6px 14px;background:rgba(46,204,138,.12);border:1px solid rgba(46,204,138,.25);border-radius:8px;font-size:11px;color:#8A96A3;font-family:var(--mono);"><span style="color:#2ECC8A;font-weight:700;">Gestão Ciclos</span>&nbsp;${fmt(cf)}</div><div style="padding:6px 14px;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.2);border-radius:8px;font-size:11px;color:#8A96A3;font-family:var(--mono);"><span style="color:#F59E0B;font-weight:700;">Diferença</span>&nbsp;${fmt(cf-ff)}</div>`;
+  charts['cComparativoGestao']=new Chart(c,{type:'line',data:{labels:ops.map((_,i)=>i+1),datasets:[{label:'Gestão Fixa',data:fv,borderColor:'#A855F7',borderWidth:2,pointRadius:0,pointHoverRadius:4,pointBackgroundColor:'#A855F7',tension:.3,fill:false},{label:'Gestão Ciclos',data:cv,borderColor:'#2ECC8A',borderWidth:2,pointRadius:0,pointHoverRadius:4,pointBackgroundColor:'#2ECC8A',tension:.3,fill:false}]},options:{...cd(),plugins:{...cd().plugins,legend:{display:true,labels:{color:'#8A96A3',font:{size:11},boxWidth:14,padding:16}},tooltip:{...cd().plugins.tooltip,mode:'index',intersect:false,callbacks:{title:ctx=>'Entrada #'+ctx[0].label+' · '+(ops[ctx[0].dataIndex]?.data||''),label:ctx=>' '+ctx.dataset.label+': R$ '+ctx.raw.toLocaleString('pt-BR',{minimumFractionDigits:2})}}},scales:{x:{ticks:{color:'#8A96A3',font:{size:9},maxTicksLimit:14,autoSkip:true,maxRotation:0},grid:{color:'rgba(255,255,255,.03)'}},y:{ticks:{callback:v=>'R$'+(v>=0?'':'-')+(Math.abs(v)/1000).toFixed(1)+'k',color:'#556070',font:{size:10}},grid:{color:'rgba(255,255,255,.04)'}}}}});
+}
 async function init(){
   setStatus('loading','CARREGANDO');setLoadingText('Verificando conex\xe3o...');
   try{
@@ -577,6 +675,7 @@ async function init(){
     [rawKpis,rawMensal,rawDiario,rawResultados]=await Promise.all([apiFetch('/api/kpis'),apiFetch('/api/lucro-mensal'),apiFetch('/api/lucro-diario').catch(()=>null),apiFetch('/api/resultados').catch(()=>null)]);
     populateKpiSelects(rawKpis);renderInicio(rawKpis);renderBanner(rawKpis,rawMensal);renderKpis();renderLucro();
     if(rawDiario)initCalendario();
+    renderGoodRun();
     setStatus('ok','AO VIVO');hideLoading();
   }catch(e){setStatus('err','OFFLINE');showErr('N\xe3o foi poss\xedvel conectar ao backend em '+API+' \u2014 '+e.message);hideLoading();}
 }
