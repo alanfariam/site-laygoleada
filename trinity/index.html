@@ -461,12 +461,22 @@ async function renderKpis(){
   sv('k-reds',data.reds.toLocaleString('pt-BR'),'r','','k-reds-s');
   renderAcumulado(data);renderUltimas(data);renderLucroDiario(diario||[]);
 }
+function metodoPill(m){
+  if(!m)return'\u2014';
+  const map={
+    'LG ALN CASA':    {label:'ALN',     bg:'rgba(56,189,248,.18)', color:'#38BDF8', border:'rgba(56,189,248,.35)'},
+    'LG PUNTER CASA': {label:'PUNTER',  bg:'rgba(249,115,22,.18)', color:'#F97316', border:'rgba(249,115,22,.35)'},
+    'LG RAGNAROK CASA':{label:'RAGNAROK',bg:'rgba(46,204,138,.18)',color:'#2ECC8A',border:'rgba(46,204,138,.35)'},
+  };
+  const s=map[m]||{label:m,bg:'rgba(168,85,247,.18)',color:'#A855F7',border:'rgba(168,85,247,.35)'};
+  return`<span style="font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.06em;padding:2px 7px;border-radius:4px;background:${s.bg};color:${s.color};border:1px solid ${s.border};white-space:nowrap;">${s.label}</span>`;
+}
 function renderUltimas(data){
   const tbody=document.getElementById('tblUltimas');
   if(!data?.ultimas_operacoes?.length){tbody.innerHTML='<tr><td colspan="9" style="text-align:center;color:var(--text3);padding:24px;">Sem dados</td></tr>';return;}
   tbody.innerHTML=data.ultimas_operacoes.map(op=>`<tr>
     <td style="font-family:var(--mono);font-size:11px;white-space:nowrap;">${op.data}</td>
-    <td style="font-family:var(--mono);font-size:10px;color:var(--accent);white-space:nowrap;">${op.metodo||'\u2014'}</td>
+    <td>${metodoPill(op.metodo)}</td>
     <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${op.jogo}</td>
     <td style="font-family:var(--mono);">${op.placar||'\u2014'}</td>
     <td style="font-family:var(--mono);text-align:center;">${op.min_alerta!=null?op.min_alerta+"'":'\u2014'}</td>
