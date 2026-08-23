@@ -1081,6 +1081,7 @@ function renderAnaliseCards(grupos, total) {
 // ── campeonatos tabela ───────────────────────────────────────
 let campData = [];
 let campSortKey = 'total';
+let mediaDifHist = null;
 let campSortDir = -1;
 
 function pctPill(v) {
@@ -1097,7 +1098,11 @@ function renderCampTable() {
       return diff !== 0 ? diff : b.total - a.total;
     });
   document.getElementById('campTblBody').innerHTML = rows.length
-    ? rows.map((r, i) => `<tr>
+    ? rows.map((r, i) => {
+        const difColor = r.media_dif != null && mediaDifHist != null
+          ? (r.media_dif <= mediaDifHist ? 'color:var(--green);font-weight:600;' : 'color:var(--red);font-weight:600;')
+          : 'color:var(--text2);';
+        return `<tr>
         <td class="mono" style="color:var(--text3)">${i+1}</td>
         <td style="font-weight:500;color:var(--text)">${r.campeonato}</td>
         <td class="mono">${r.total}</td>
@@ -1105,8 +1110,8 @@ function renderCampTable() {
         <td>${pctPill(r.pct_over2)}</td>
         <td><span class="pill ${r.pct_zero <= 5 ? 'pill-g' : r.pct_zero <= 15 ? 'pill-a' : 'pill-r'}">${r.pct_zero}%</span></td>
         <td class="mono" style="color:var(--text)">${r.media_gols}</td>
-        <td class="mono" style="color:var(--text2)">${r.media_dif != null ? r.media_dif + "'" : '—'}</td>
-      </tr>`).join('')
+        <td class="mono" style="${difColor}">${r.media_dif != null ? r.media_dif + "'" : '—'}</td>
+      </tr>`;}).join('')
     : `<tr><td colspan="8" class="tbl-loading">Nenhum resultado</td></tr>`;
 }
 
@@ -1147,7 +1152,8 @@ function renderTop10(elId, lista, metricaGood, metricaBad) {
   if (!lista || !lista.length) { el.innerHTML = '<div style="color:var(--text3);font-size:12px;padding:8px 0">Sem dados suficientes</div>'; return; }
   el.innerHTML = lista.map((r, i) => {
     const qty = Math.round(r[metric] / 100 * r.total);
-    const dif = r.media_dif != null ? `<span style="color:var(--text3);font-size:10px;margin-left:6px;">#DIF ${r.media_dif}'</span>` : '';
+    const difC = r.media_dif != null && mediaDifHist != null ? (r.media_dif <= mediaDifHist ? 'var(--green)' : 'var(--red)') : 'var(--text3)';
+    const dif = r.media_dif != null ? `<span style="color:${difC};font-size:10px;margin-left:6px;font-weight:600;">#DIF ${r.media_dif}'</span>` : '';
     return `
     <div class="top10-item" style="background:${bg};">
       <span class="top10-rank">${i+1}</span>
@@ -1175,7 +1181,8 @@ function renderTop10Camp(campData) {
   const el2 = document.getElementById('top10CampWorst');
   if (el1) el1.innerHTML = sorted.map((r,i) => {
     const qty = Math.round(r.pct_over1 / 100 * r.total);
-    const dif = r.media_dif != null ? `<span style="color:var(--text3);font-size:10px;margin-left:6px;">#DIF ${r.media_dif}'</span>` : '';
+    const difC = r.media_dif != null && mediaDifHist != null ? (r.media_dif <= mediaDifHist ? 'var(--green)' : 'var(--red)') : 'var(--text3)';
+    const dif = r.media_dif != null ? `<span style="color:${difC};font-size:10px;margin-left:6px;font-weight:600;">#DIF ${r.media_dif}'</span>` : '';
     return `
     <div class="top10-item" style="background:rgba(46,204,138,.03);">
       <span class="top10-rank">${i+1}</span>
@@ -1186,7 +1193,8 @@ function renderTop10Camp(campData) {
   }).join('');
   if (el2) el2.innerHTML = worst.map((r,i) => {
     const qty = Math.round(r.pct_zero / 100 * r.total);
-    const dif = r.media_dif != null ? `<span style="color:var(--text3);font-size:10px;margin-left:6px;">#DIF ${r.media_dif}'</span>` : '';
+    const difC = r.media_dif != null && mediaDifHist != null ? (r.media_dif <= mediaDifHist ? 'var(--green)' : 'var(--red)') : 'var(--text3)';
+    const dif = r.media_dif != null ? `<span style="color:${difC};font-size:10px;margin-left:6px;font-weight:600;">#DIF ${r.media_dif}'</span>` : '';
     return `
     <div class="top10-item" style="background:rgba(240,90,90,.03);">
       <span class="top10-rank">${i+1}</span>
@@ -1466,6 +1474,7 @@ window.addEventListener('DOMContentLoaded', async () => {
       document.getElementById('bannerTotal').textContent = qtdGols.total.toLocaleString('pt-BR');
 
       if (kpis?.media_dif_historica != null) {
+        mediaDifHist = kpis.media_dif_historica;
         document.getElementById('bannerDifGeral').textContent = kpis.media_dif_historica + "'";
       }
       if (kpis?.media_dif_mes != null) {
