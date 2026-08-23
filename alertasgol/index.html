@@ -361,15 +361,15 @@ footer a:hover{color:var(--green);}
   </div>
   <div class="banner-stats">
     <div class="bstat">
-      <div class="bstat-val" id="bannerGolGeral">—</div>
-      <div class="bstat-lbl">TAXA GOLS GERAL</div>
+      <div class="bstat-val" id="bannerDifGeral">—</div>
+      <div class="bstat-lbl">MÉDIA #DIF HISTÓRICA</div>
     </div>
     <div class="bstat" style="border-left:1px solid var(--border);padding-left:28px;">
       <div style="display:flex;align-items:center;gap:8px;">
-        <div class="bstat-val" id="bannerGolMes">—</div>
-        <div id="bannerGolIndicador" style="font-size:18px;"></div>
+        <div class="bstat-val" id="bannerDifMes">—</div>
+        <div id="bannerDifIndicador" style="font-size:18px;"></div>
       </div>
-      <div class="bstat-lbl">TAXA GOLS MÊS ATUAL</div>
+      <div class="bstat-lbl">MÉDIA #DIF MÊS ATUAL</div>
     </div>
   </div>
 </div>
@@ -619,10 +619,11 @@ footer a:hover{color:var(--green);}
           <th>Min. Alerta</th>
           <th>Campeonato</th>
           <th>Min. 1º Gol</th>
+          <th>#DIF</th>
           <th>Placar Final</th>
         </tr></thead>
         <tbody id="tblJogos">
-          <tr><td colspan="7" style="text-align:center;padding:48px;font-family:var(--mono);font-size:11px;color:var(--text3);letter-spacing:.1em;">CARREGANDO...</td></tr>
+          <tr><td colspan="8" style="text-align:center;padding:48px;font-family:var(--mono);font-size:11px;color:var(--text3);letter-spacing:.1em;">CARREGANDO...</td></tr>
         </tbody>
       </table>
     </div>
@@ -1382,6 +1383,7 @@ function renderJogos(ops) {
       <td class="mono" style="text-align:center;">${op.min_alerta}'</td>
       <td class="camp-cell">${op.campeonato}</td>
       <td class="mono" style="text-align:center;${op.min_gol != null ? 'color:#2ECC8A;font-weight:600;' : 'color:#F05A5A;'}">${op.min_gol != null ? op.min_gol + "'" : '—'}</td>
+      <td class="mono" style="text-align:center;color:var(--text2);">${op.dif != null ? op.dif + "'" : '—'}</td>
       <td class="mono">${op.final || '—'}</td>
     </tr>`).join('');
 }
@@ -1406,23 +1408,18 @@ window.addEventListener('DOMContentLoaded', async () => {
       counter(document.getElementById('tileAlerts'), qtdGols.total, 1600);
       document.getElementById('heroN2').textContent = pctVal;
 
-      const pctGeral = pctVal;
-      document.getElementById('bannerGolGeral').textContent = pctGeral + '%';
       document.getElementById('bannerTotal').textContent = qtdGols.total.toLocaleString('pt-BR');
 
-      if (mensalGols?.length) {
-        const agora = new Date();
-        const mesKey = `${agora.getFullYear()}-${String(agora.getMonth()+1).padStart(2,'0')}`;
-        const mesAtual = mensalGols.find(m => m.mes === mesKey);
-        if (mesAtual?.total > 0) {
-          const pctMes = Math.round(mesAtual.pct * 10) / 10;
-          document.getElementById('bannerGolMes').textContent = pctMes + '%';
-          const diff = pctMes - pctGeral;
-          const el = document.getElementById('bannerGolIndicador');
-          if (diff > 1)       { el.textContent='▲'; el.style.color='var(--green)'; document.getElementById('bannerGolMes').style.color='var(--green)'; }
-          else if (diff < -1) { el.textContent='▼'; el.style.color='var(--red)';   document.getElementById('bannerGolMes').style.color='var(--red)'; }
-          else                { el.textContent='▬'; el.style.color='var(--amber)'; document.getElementById('bannerGolMes').style.color='var(--amber)'; }
-        }
+      if (kpis?.media_dif_historica != null) {
+        document.getElementById('bannerDifGeral').textContent = kpis.media_dif_historica + "'";
+      }
+      if (kpis?.media_dif_mes != null) {
+        document.getElementById('bannerDifMes').textContent = kpis.media_dif_mes + "'";
+        const difDiff = kpis.media_dif_mes - kpis.media_dif_historica;
+        const elDif = document.getElementById('bannerDifIndicador');
+        if (difDiff > 1)       { elDif.textContent='▲'; elDif.style.color='var(--green)'; document.getElementById('bannerDifMes').style.color='var(--green)'; }
+        else if (difDiff < -1) { elDif.textContent='▼'; elDif.style.color='var(--red)';   document.getElementById('bannerDifMes').style.color='var(--red)'; }
+        else                   { elDif.textContent='▬'; elDif.style.color='var(--amber)'; document.getElementById('bannerDifMes').style.color='var(--amber)'; }
       }
     }
 
