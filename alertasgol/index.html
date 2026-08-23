@@ -613,14 +613,14 @@ footer a:hover{color:var(--green);}
     <div class="tbl-wrap">
       <table class="tbl">
         <thead><tr>
-          <th>Data</th>
-          <th>Jogo</th>
-          <th>Placar Alerta</th>
-          <th>Min. Alerta</th>
-          <th>Campeonato</th>
-          <th>Min. 1º Gol</th>
-          <th>#DIF</th>
-          <th>Placar Final</th>
+          <th title="Data do jogo">Data</th>
+          <th title="Times da partida">Jogo</th>
+          <th title="Placar no momento em que o alerta foi emitido">Placar Alerta</th>
+          <th title="Minuto em que o alerta foi emitido">Min. Alerta</th>
+          <th title="Competição do jogo">Campeonato</th>
+          <th title="Minuto em que o primeiro gol saiu após o alerta. Verde = saiu gol, Vermelho = sem gol">Min. 1º Gol</th>
+          <th title="Diferença em minutos entre o alerta e o primeiro gol. Verde = abaixo da média histórica, Vermelho = acima da média histórica">#DIF</th>
+          <th title="Placar final da partida">Placar Final</th>
         </tr></thead>
         <tbody id="tblJogos">
           <tr><td colspan="8" style="text-align:center;padding:48px;font-family:var(--mono);font-size:11px;color:var(--text3);letter-spacing:.1em;">CARREGANDO...</td></tr>
@@ -1374,8 +1374,12 @@ async function fetchJson(path) {
 }
 
 // ── render jogos ─────────────────────────────────────────────
-function renderJogos(ops) {
-  document.getElementById('tblJogos').innerHTML = ops.map(op => `
+function renderJogos(ops, mediaDif) {
+  document.getElementById('tblJogos').innerHTML = ops.map(op => {
+    const difColor = op.dif != null
+      ? (mediaDif != null && op.dif < mediaDif ? 'color:#2ECC8A;font-weight:600;' : 'color:#F05A5A;font-weight:600;')
+      : 'color:var(--text3);';
+    return `
     <tr>
       <td class="mono" style="font-size:11px;white-space:nowrap;">${op.data}</td>
       <td class="jogo-cell">${op.jogo}</td>
@@ -1383,9 +1387,10 @@ function renderJogos(ops) {
       <td class="mono" style="text-align:center;">${op.min_alerta}'</td>
       <td class="camp-cell">${op.campeonato}</td>
       <td class="mono" style="text-align:center;${op.min_gol != null ? 'color:#2ECC8A;font-weight:600;' : 'color:#F05A5A;'}">${op.min_gol != null ? op.min_gol + "'" : '—'}</td>
-      <td class="mono" style="text-align:center;color:var(--text2);">${op.dif != null ? op.dif + "'" : '—'}</td>
+      <td class="mono" style="text-align:center;${difColor}">${op.dif != null ? op.dif + "'" : '—'}</td>
       <td class="mono">${op.final || '—'}</td>
-    </tr>`).join('');
+    </tr>`;
+  }).join('');
 }
 
 // ── lazy load flags ──────────────────────────────────────────
@@ -1440,7 +1445,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     buildDiaSemana(diaSemana);
     buildBars(mensalGols);
 
-    if (kpis?.ultimas_operacoes?.length) renderJogos(kpis.ultimas_operacoes);
+    if (kpis?.ultimas_operacoes?.length) renderJogos(kpis.ultimas_operacoes, kpis.media_dif_historica);
 
   } catch(e) {
     counter(document.getElementById('heroN'), 89, 2000);
