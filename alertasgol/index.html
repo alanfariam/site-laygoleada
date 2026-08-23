@@ -1166,9 +1166,9 @@ function renderTop10(elId, lista, metricaGood, metricaBad) {
 
 function renderTimeCharts(raw) {
   renderTop10('timeCasaBest',  raw.casa_best,  'pct_over1', 'pct_zero');
-  renderTop10('timeCasaWorst', raw.casa_best.slice().sort((a,b) => b.pct_zero - a.pct_zero).slice(0,10), 'pct_over1', 'pct_zero');
+  renderTop10('timeCasaWorst', raw.casa_worst, 'pct_over1', 'pct_zero');
   renderTop10('timeForaBest',  raw.fora_best,  'pct_over1', 'pct_zero');
-  renderTop10('timeForaWorst', raw.fora_best.slice().sort((a,b) => b.pct_zero - a.pct_zero).slice(0,10), 'pct_over1', 'pct_zero');
+  renderTop10('timeForaWorst', raw.fora_worst, 'pct_over1', 'pct_zero');
   renderTop10('timeGeralBest',  raw.geral_best,  'pct_over1', 'pct_zero');
   renderTop10('timeGeralWorst', raw.geral_worst, 'pct_over1', 'pct_zero');
 }
