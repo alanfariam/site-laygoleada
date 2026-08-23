@@ -356,7 +356,7 @@ footer a:hover{color:var(--green);}
 <!-- BANNER STATS -->
 <div class="banner" id="bannerStats">
   <div class="banner-text">
-    <strong>Alertas Gol</strong> — Estatísticas reais de gols pós-alerta.<br>
+    <strong>Alertas Gol</strong> — #DIF mede o tempo entre o alerta e o primeiro gol. Quanto menor, mais rápido o gol saiu após o sinal.<br>
     <strong id="bannerTotal">—</strong> jogos analisados no histórico completo.
   </div>
   <div class="banner-stats">
@@ -641,6 +641,14 @@ footer a:hover{color:var(--green);}
     </div>
   </div>
 
+  <!-- MÉDIA DIF POR PLACAR -->
+  <div class="section" style="padding-top:8px;">
+    <div class="section-title">Média de #DIF por placar no momento do alerta</div>
+    <div class="card card-full" style="height:280px;">
+      <canvas id="cPlacarDif"></canvas>
+    </div>
+  </div>
+
   <!-- MINUTOS PARA O GOL -->
   <div class="section" style="padding-top:8px;">
     <div class="section-title">Em quantos minutos chegou o primeiro gol após o alerta?</div>
@@ -697,8 +705,9 @@ footer a:hover{color:var(--green);}
             <th style="cursor:pointer" onclick="sortCamp('pct_over2')">Over 2+ ↕</th>
             <th style="cursor:pointer" onclick="sortCamp('pct_zero')">Sem Gol ↕</th>
             <th style="cursor:pointer" onclick="sortCamp('media_gols')">Média Gols ↕</th>
+            <th style="cursor:pointer" onclick="sortCamp('media_dif')">Média #DIF ↕</th>
           </tr></thead>
-          <tbody id="campTblBody"><tr><td colspan="7" class="tbl-loading">CARREGANDO...</td></tr></tbody>
+          <tbody id="campTblBody"><tr><td colspan="8" class="tbl-loading">CARREGANDO...</td></tr></tbody>
         </table>
       </div>
     </div>
@@ -1096,8 +1105,9 @@ function renderCampTable() {
         <td>${pctPill(r.pct_over2)}</td>
         <td><span class="pill ${r.pct_zero <= 5 ? 'pill-g' : r.pct_zero <= 15 ? 'pill-a' : 'pill-r'}">${r.pct_zero}%</span></td>
         <td class="mono" style="color:var(--text)">${r.media_gols}</td>
+        <td class="mono" style="color:var(--text2)">${r.media_dif != null ? r.media_dif + "'" : '—'}</td>
       </tr>`).join('')
-    : `<tr><td colspan="7" class="tbl-loading">Nenhum resultado</td></tr>`;
+    : `<tr><td colspan="8" class="tbl-loading">Nenhum resultado</td></tr>`;
 }
 
 function filterCamp() { renderCampTable(); }
@@ -1137,12 +1147,13 @@ function renderTop10(elId, lista, metricaGood, metricaBad) {
   if (!lista || !lista.length) { el.innerHTML = '<div style="color:var(--text3);font-size:12px;padding:8px 0">Sem dados suficientes</div>'; return; }
   el.innerHTML = lista.map((r, i) => {
     const qty = Math.round(r[metric] / 100 * r.total);
+    const dif = r.media_dif != null ? `<span style="color:var(--text3);font-size:10px;margin-left:6px;">#DIF ${r.media_dif}'</span>` : '';
     return `
     <div class="top10-item" style="background:${bg};">
       <span class="top10-rank">${i+1}</span>
       <span class="top10-name" title="${r.time}">${r.time}</span>
       <span class="top10-total" style="color:var(--text3)">${qty}/${r.total}</span>
-      <span class="top10-val" style="color:${color}">${r[metric]}%</span>
+      <span class="top10-val" style="color:${color}">${r[metric]}%${dif}</span>
     </div>`;
   }).join('');
 }
@@ -1164,22 +1175,24 @@ function renderTop10Camp(campData) {
   const el2 = document.getElementById('top10CampWorst');
   if (el1) el1.innerHTML = sorted.map((r,i) => {
     const qty = Math.round(r.pct_over1 / 100 * r.total);
+    const dif = r.media_dif != null ? `<span style="color:var(--text3);font-size:10px;margin-left:6px;">#DIF ${r.media_dif}'</span>` : '';
     return `
     <div class="top10-item" style="background:rgba(46,204,138,.03);">
       <span class="top10-rank">${i+1}</span>
       <span class="top10-name" title="${r.campeonato}">${r.campeonato}</span>
       <span class="top10-total" style="color:var(--text3)">${qty}/${r.total}</span>
-      <span class="top10-val" style="color:var(--green)">${r.pct_over1}%</span>
+      <span class="top10-val" style="color:var(--green)">${r.pct_over1}%${dif}</span>
     </div>`;
   }).join('');
   if (el2) el2.innerHTML = worst.map((r,i) => {
     const qty = Math.round(r.pct_zero / 100 * r.total);
+    const dif = r.media_dif != null ? `<span style="color:var(--text3);font-size:10px;margin-left:6px;">#DIF ${r.media_dif}'</span>` : '';
     return `
     <div class="top10-item" style="background:rgba(240,90,90,.03);">
       <span class="top10-rank">${i+1}</span>
       <span class="top10-name" title="${r.campeonato}">${r.campeonato}</span>
       <span class="top10-total" style="color:var(--text3)">${qty}/${r.total}</span>
-      <span class="top10-val" style="color:var(--red)">${r.pct_zero}%</span>
+      <span class="top10-val" style="color:var(--red)">${r.pct_zero}%${dif}</span>
     </div>`;
   }).join('');
 }
@@ -1291,6 +1304,38 @@ function renderPlacarZero(rawGolsPosAlerta) {
       }}},
       scales: {
         y: { ticks: { callback: v => v+'%', color: '#556070', font: {size:10} }, grid: { color: 'rgba(255,255,255,.04)' } },
+        y2: { position: 'right', ticks: { color: '#4A9EF0', font: {size:10} }, grid: { display: false } },
+        x: { ticks: { color: '#8A96A3', font: {size:10}, maxRotation: 45 }, grid: { display: false } }
+      }
+    }
+  });
+}
+
+// ── análise: média DIF por placar ─────────────────────────────
+function renderPlacarDif(rawGolsPosAlerta) {
+  const p = (rawGolsPosAlerta.por_placar_dif || []).slice(0, 20);
+  if (!p.length) return;
+  const mediaDifHist = p.reduce((s, x) => s + x.media_dif, 0) / p.length;
+  destroyC('cPlacarDif');
+  charts['cPlacarDif'] = new Chart(document.getElementById('cPlacarDif'), {
+    type: 'bar',
+    data: { labels: p.map(x => x.placar), datasets: [
+      { label: 'Média #DIF', data: p.map(x => x.media_dif),
+        backgroundColor: p.map(x => x.media_dif <= mediaDifHist ? 'rgba(46,204,138,.7)' : 'rgba(240,90,90,.65)'),
+        borderRadius: 4, barPercentage: .6, yAxisID: 'y' },
+      { label: 'Volume', data: p.map(x => x.total), type: 'line', borderColor: '#4A9EF0',
+        backgroundColor: 'rgba(74,158,240,.12)', fill: true, tension: .35,
+        pointRadius: 3, pointBackgroundColor: '#4A9EF0', yAxisID: 'y2' }
+    ]},
+    options: { ...cd(),
+      interaction: { mode: 'index', intersect: false },
+      plugins: { ...cd().plugins, tooltip: { ...cd().plugins.tooltip, callbacks: {
+        label: ctx => ctx.datasetIndex === 0
+          ? ` Média #DIF: ${ctx.raw}'`
+          : ` Volume: ${ctx.raw} entradas`
+      }}},
+      scales: {
+        y: { ticks: { callback: v => v+"'", color: '#556070', font: {size:10} }, grid: { color: 'rgba(255,255,255,.04)' } },
         y2: { position: 'right', ticks: { color: '#4A9EF0', font: {size:10} }, grid: { display: false } },
         x: { ticks: { color: '#8A96A3', font: {size:10}, maxRotation: 45 }, grid: { display: false } }
       }
@@ -1473,7 +1518,7 @@ async function lazyAnalise() {
       fetchJson('/api/dist-primeiro-gol').catch(() => null),
       fetchJson('/api/intervalo-gols').catch(() => null),
     ]);
-    if (golsPosAlerta) renderPlacarZero(golsPosAlerta);
+    if (golsPosAlerta) { renderPlacarZero(golsPosAlerta); renderPlacarDif(golsPosAlerta); }
     if (distPrimGol)   renderDistPrimGol(distPrimGol);
     if (intervaloGols) renderMinutoGols(intervaloGols);
   } catch(e) {}
