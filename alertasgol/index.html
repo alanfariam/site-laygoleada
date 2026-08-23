@@ -1228,8 +1228,8 @@ async function buscaTimeGol() {
             <div style="font-size:9px;color:var(--text3);">OVER 1+</div>
           </div>
           <div style="text-align:center;">
-            <div style="font-size:18px;font-weight:800;color:rgba(240,90,90,.9)">${s.pct_zero}%</div>
-            <div style="font-size:9px;color:var(--text3);">SEM GOL</div>
+            <div style="font-size:18px;font-weight:800;color:${s.media_dif != null && mediaDifHist != null ? (s.media_dif <= mediaDifHist ? 'var(--green)' : 'var(--red)') : 'var(--text2)'}">${s.media_dif != null ? s.media_dif + "'" : '—'}</div>
+            <div style="font-size:9px;color:var(--text3);">MÉDIA #DIF</div>
           </div>
           <div style="text-align:center;">
             <div style="font-size:15px;font-weight:700;color:var(--text2);">${s.total}</div>
@@ -1242,14 +1242,15 @@ async function buscaTimeGol() {
         </div>
       </div>`;
 
-    const campRows = (d.campeonatos || []).map(r => `<tr>
+    const campRows = (d.campeonatos || []).map(r => {
+      const difC = r.media_dif != null && mediaDifHist != null ? (r.media_dif <= mediaDifHist ? 'var(--green)' : 'var(--red)') : 'var(--text2)';
+      return `<tr>
       <td style="color:var(--text)">${r.campeonato}</td>
       <td class="mono">${r.total}</td>
       <td>${pctPill(r.pct_over1)}</td>
-      <td>${pctPill(r.pct_over2)}</td>
-      <td><span class="pill ${r.pct_zero<=5?'pill-g':r.pct_zero<=15?'pill-a':'pill-r'}">${r.pct_zero}%</span></td>
       <td class="mono">${r.media_gols}</td>
-    </tr>`).join('');
+      <td class="mono" style="color:${difC};font-weight:600;">${r.media_dif != null ? r.media_dif + "'" : '—'}</td>
+    </tr>`;}).join('');
 
     el.innerHTML = `
       <div style="font-size:13px;color:var(--text3);margin-bottom:12px;">
@@ -1261,7 +1262,7 @@ async function buscaTimeGol() {
         ${statCard('✈ Como Visitante', d.fora, 'rgba(240,160,48,1)')}
       </div>
       ${campRows ? `<div class="tbl-wrap"><table class="tbl">
-        <thead><tr><th>Campeonato</th><th>Jogos</th><th>Over 1+</th><th>Over 2+</th><th>Sem Gol</th><th>Média Gols</th></tr></thead>
+        <thead><tr><th>Campeonato</th><th>Jogos</th><th>Over 1+</th><th>Média Gols</th><th>Média #DIF</th></tr></thead>
         <tbody>${campRows}</tbody>
       </table></div>` : ''}`;
   } catch(e) {
