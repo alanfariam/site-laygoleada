@@ -581,28 +581,28 @@ footer a:hover{color:var(--green);}
         </div>
       </div>
 
-      <!-- Dia da semana -->
+      <!-- Dia da semana DIF -->
       <div class="card">
         <div class="card-title">
-          % de jogos com gol por dia (Over 1+)
+          % de alertas com #DIF abaixo da média por dia
           <span style="float:right;display:flex;gap:14px;font-size:9px;letter-spacing:.06em;font-weight:400;">
-            <span><span style="display:inline-block;width:10px;height:10px;background:rgba(46,204,138,.75);border-radius:2px;margin-right:4px;vertical-align:middle;"></span>% Over 1+</span>
+            <span><span style="display:inline-block;width:10px;height:10px;background:rgba(46,204,138,.75);border-radius:2px;margin-right:4px;vertical-align:middle;"></span>% DIF &lt; Média</span>
             <span><span style="display:inline-block;width:10px;height:2px;background:#4A9EF0;margin-right:4px;vertical-align:middle;border-radius:2px;"></span>Volume</span>
           </span>
         </div>
         <canvas id="cDiaSemana" height="160"></canvas>
       </div>
 
-      <!-- Monthly chart -->
+      <!-- Monthly DIF chart -->
       <div class="card card-full">
         <div class="card-title">
-          % de jogos com gol por mês (Over 1+)
+          % de alertas com #DIF abaixo da média histórica por mês
           <span style="float:right;display:flex;gap:14px;font-size:9px;letter-spacing:.06em;font-weight:400;">
-            <span><span style="display:inline-block;width:10px;height:10px;background:rgba(46,204,138,.75);border-radius:2px;margin-right:4px;vertical-align:middle;"></span>% Over 1+</span>
+            <span><span style="display:inline-block;width:10px;height:10px;background:rgba(46,204,138,.75);border-radius:2px;margin-right:4px;vertical-align:middle;"></span>% DIF &lt; Média</span>
             <span><span style="display:inline-block;width:10px;height:2px;background:#4A9EF0;margin-right:4px;vertical-align:middle;border-radius:2px;"></span>Volume</span>
           </span>
         </div>
-        <canvas id="cMensalGols" height="90"></canvas>
+        <canvas id="cMensalDif" height="90"></canvas>
       </div>
 
     </div>
@@ -867,20 +867,22 @@ function animateDonut() {
   })(t0);
 }
 
-// ── chart dia da semana ──────────────────────────────────────
+// ── chart dia da semana DIF ───────────────────────────────────
 let chartDia = null;
 function buildDiaSemana(data) {
-  const labels = data.map(d => d.label);
-  const pcts   = data.map(d => d.pct);
-  const vols   = data.map(d => d.total);
+  const labels   = data.map(d => d.label);
+  const pcts     = data.map(d => d.pct);
+  const vols     = data.map(d => d.total);
+  const pctHist  = data[0]?.pct_hist ?? 50;
+  const mediaMin = data[0]?.media_hist ?? '—';
   if (chartDia) chartDia.destroy();
   chartDia = new Chart(document.getElementById('cDiaSemana'), {
     type: 'bar',
     data: { labels, datasets: [
       {
-        label: '% Over 1+',
+        label: '% DIF < Média',
         data: pcts,
-        backgroundColor: pcts.map(v => v >= 89 ? 'rgba(46,204,138,.7)' : 'rgba(240,160,48,.75)'),
+        backgroundColor: pcts.map(v => v >= pctHist ? 'rgba(46,204,138,.7)' : 'rgba(240,160,48,.75)'),
         borderRadius: 4,
         barPercentage: .65,
         yAxisID: 'y'
@@ -911,14 +913,14 @@ function buildDiaSemana(data) {
           bodyColor: '#E8ECF4',
           callbacks: {
             label: ctx => ctx.datasetIndex === 0
-              ? ` Over 1+: ${ctx.raw}%`
+              ? ` DIF < ${mediaMin}': ${ctx.raw}%`
               : ` Volume: ${ctx.raw} jogos`
           }
         }
       },
       scales: {
         y: {
-          min: 70, max: 100,
+          min: 0, max: 100,
           ticks: { callback: v => v + '%', color: '#556070', font: { size: 10 } },
           grid: { color: 'rgba(255,255,255,.04)' }
         },
@@ -936,21 +938,23 @@ function buildDiaSemana(data) {
   });
 }
 
-// ── chart mensal ─────────────────────────────────────────────
-let chartMensal = null;
-function buildBars(months) {
-  const data = months.slice(-14);
-  const labels = data.map(d => d.label);
-  const pcts   = data.map(d => d.pct);
-  const vols   = data.map(d => d.total);
-  if (chartMensal) chartMensal.destroy();
-  chartMensal = new Chart(document.getElementById('cMensalGols'), {
+// ── chart mensal DIF ─────────────────────────────────────────
+let chartMensalDif = null;
+function buildMensalDif(months) {
+  const data    = months.slice(-14);
+  const labels  = data.map(d => d.label);
+  const pcts    = data.map(d => d.pct);
+  const vols    = data.map(d => d.total);
+  const media   = data[0]?.media_hist ?? '—';
+  const pctHist = data[0]?.pct_hist ?? 50;
+  if (chartMensalDif) chartMensalDif.destroy();
+  chartMensalDif = new Chart(document.getElementById('cMensalDif'), {
     type: 'bar',
     data: { labels, datasets: [
       {
-        label: '% Over 1+',
+        label: '% DIF < Média',
         data: pcts,
-        backgroundColor: pcts.map(v => v >= 89 ? 'rgba(46,204,138,.7)' : 'rgba(240,160,48,.75)'),
+        backgroundColor: pcts.map(v => v >= pctHist ? 'rgba(46,204,138,.7)' : 'rgba(240,160,48,.75)'),
         borderRadius: 4,
         barPercentage: .7,
         yAxisID: 'y'
@@ -981,14 +985,14 @@ function buildBars(months) {
           bodyColor: '#E8ECF4',
           callbacks: {
             label: ctx => ctx.datasetIndex === 0
-              ? ` Over 1+: ${ctx.raw}%`
+              ? ` DIF < ${media}': ${ctx.raw}%`
               : ` Volume: ${ctx.raw} jogos`
           }
         }
       },
       scales: {
         y: {
-          min: 70, max: 100,
+          min: 0, max: 100,
           ticks: { callback: v => v + '%', color: '#556070', font: { size: 10 } },
           grid: { color: 'rgba(255,255,255,.04)' }
         },
@@ -1005,6 +1009,7 @@ function buildBars(months) {
     }
   });
 }
+
 
 // ── summary aba jogos ────────────────────────────────────────
 function renderJogosSummary(d) {
@@ -1399,11 +1404,11 @@ const _loaded = { analise: false, camp: false, times: false };
 // ── init fase 1: dados críticos (Início + Dashboard) ─────────
 window.addEventListener('DOMContentLoaded', async () => {
   try {
-    const [qtdGols, kpis, mensalGols, diaSemana] = await Promise.all([
+    const [qtdGols, kpis, mensalDif, diaSemana] = await Promise.all([
       fetchJson('/api/qtd-gols'),
       fetchJson('/api/kpis'),
-      fetchJson('/api/mensal-gols'),
-      fetchJson('/api/gols-dia-semana'),
+      fetchJson('/api/mensal-dif'),
+      fetchJson('/api/dif-dia-semana'),
     ]);
 
     const overLimite = qtdGols.grupos.find(g => g.label === 'Over Limite (1+)');
@@ -1443,7 +1448,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('sectionTitle').textContent = `Análise de eficiência · ${total.toLocaleString('pt-BR')} jogos`;
     animateDonut();
     buildDiaSemana(diaSemana);
-    buildBars(mensalGols);
+    if (mensalDif?.length) buildMensalDif(mensalDif);
 
     if (kpis?.ultimas_operacoes?.length) renderJogos(kpis.ultimas_operacoes, kpis.media_dif_historica);
 
