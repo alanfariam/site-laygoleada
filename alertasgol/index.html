@@ -584,9 +584,9 @@ footer a:hover{color:var(--green);}
       <!-- Dia da semana DIF -->
       <div class="card">
         <div class="card-title">
-          % de alertas com #DIF abaixo da média por dia
+          Média #DIF por dia da semana
           <span style="float:right;display:flex;gap:14px;font-size:9px;letter-spacing:.06em;font-weight:400;">
-            <span><span style="display:inline-block;width:10px;height:10px;background:rgba(46,204,138,.75);border-radius:2px;margin-right:4px;vertical-align:middle;"></span>% DIF &lt; Média</span>
+            <span><span style="display:inline-block;width:10px;height:10px;background:rgba(46,204,138,.75);border-radius:2px;margin-right:4px;vertical-align:middle;"></span>Abaixo da média</span>
             <span><span style="display:inline-block;width:10px;height:2px;background:#4A9EF0;margin-right:4px;vertical-align:middle;border-radius:2px;"></span>Volume</span>
           </span>
         </div>
@@ -596,9 +596,9 @@ footer a:hover{color:var(--green);}
       <!-- Monthly DIF chart -->
       <div class="card card-full">
         <div class="card-title">
-          % de alertas com #DIF abaixo da média histórica por mês
+          Média #DIF por mês
           <span style="float:right;display:flex;gap:14px;font-size:9px;letter-spacing:.06em;font-weight:400;">
-            <span><span style="display:inline-block;width:10px;height:10px;background:rgba(46,204,138,.75);border-radius:2px;margin-right:4px;vertical-align:middle;"></span>% DIF &lt; Média</span>
+            <span><span style="display:inline-block;width:10px;height:10px;background:rgba(46,204,138,.75);border-radius:2px;margin-right:4px;vertical-align:middle;"></span>Abaixo da média</span>
             <span><span style="display:inline-block;width:10px;height:2px;background:#4A9EF0;margin-right:4px;vertical-align:middle;border-radius:2px;"></span>Volume</span>
           </span>
         </div>
@@ -880,18 +880,17 @@ function animateDonut() {
 let chartDia = null;
 function buildDiaSemana(data) {
   const labels   = data.map(d => d.label);
-  const pcts     = data.map(d => d.pct);
+  const vals     = data.map(d => d.media_dif);
   const vols     = data.map(d => d.total);
-  const pctHist  = data[0]?.pct_hist ?? 50;
-  const mediaMin = data[0]?.media_hist ?? '—';
+  const ref      = mediaDifHist ?? data[0]?.media_hist ?? 28;
   if (chartDia) chartDia.destroy();
   chartDia = new Chart(document.getElementById('cDiaSemana'), {
     type: 'bar',
     data: { labels, datasets: [
       {
-        label: '% DIF < Média',
-        data: pcts,
-        backgroundColor: pcts.map(v => v >= pctHist ? 'rgba(46,204,138,.7)' : 'rgba(240,160,48,.75)'),
+        label: 'Média #DIF',
+        data: vals,
+        backgroundColor: vals.map(v => v != null && v <= ref ? 'rgba(46,204,138,.7)' : 'rgba(240,90,90,.65)'),
         borderRadius: 4,
         barPercentage: .65,
         yAxisID: 'y'
@@ -922,15 +921,14 @@ function buildDiaSemana(data) {
           bodyColor: '#E8ECF4',
           callbacks: {
             label: ctx => ctx.datasetIndex === 0
-              ? ` DIF < ${mediaMin}': ${ctx.raw}%`
+              ? ` Média #DIF: ${ctx.raw}'`
               : ` Volume: ${ctx.raw} jogos`
           }
         }
       },
       scales: {
         y: {
-          min: 0, max: 100,
-          ticks: { callback: v => v + '%', color: '#556070', font: { size: 10 } },
+          ticks: { callback: v => v + "'", color: '#556070', font: { size: 10 } },
           grid: { color: 'rgba(255,255,255,.04)' }
         },
         y2: {
@@ -950,20 +948,19 @@ function buildDiaSemana(data) {
 // ── chart mensal DIF ─────────────────────────────────────────
 let chartMensalDif = null;
 function buildMensalDif(months) {
-  const data    = months.slice(-14);
-  const labels  = data.map(d => d.label);
-  const pcts    = data.map(d => d.pct);
-  const vols    = data.map(d => d.total);
-  const media   = data[0]?.media_hist ?? '—';
-  const pctHist = data[0]?.pct_hist ?? 50;
+  const data   = months.slice(-14);
+  const labels = data.map(d => d.label);
+  const vals   = data.map(d => d.media_dif);
+  const vols   = data.map(d => d.total);
+  const ref    = mediaDifHist ?? data[0]?.media_hist ?? 28;
   if (chartMensalDif) chartMensalDif.destroy();
   chartMensalDif = new Chart(document.getElementById('cMensalDif'), {
     type: 'bar',
     data: { labels, datasets: [
       {
-        label: '% DIF < Média',
-        data: pcts,
-        backgroundColor: pcts.map(v => v >= pctHist ? 'rgba(46,204,138,.7)' : 'rgba(240,160,48,.75)'),
+        label: 'Média #DIF',
+        data: vals,
+        backgroundColor: vals.map(v => v != null && v <= ref ? 'rgba(46,204,138,.7)' : 'rgba(240,90,90,.65)'),
         borderRadius: 4,
         barPercentage: .7,
         yAxisID: 'y'
@@ -994,15 +991,14 @@ function buildMensalDif(months) {
           bodyColor: '#E8ECF4',
           callbacks: {
             label: ctx => ctx.datasetIndex === 0
-              ? ` DIF < ${media}': ${ctx.raw}%`
+              ? ` Média #DIF: ${ctx.raw}'`
               : ` Volume: ${ctx.raw} jogos`
           }
         }
       },
       scales: {
         y: {
-          min: 0, max: 100,
-          ticks: { callback: v => v + '%', color: '#556070', font: { size: 10 } },
+          ticks: { callback: v => v + "'", color: '#556070', font: { size: 10 } },
           grid: { color: 'rgba(255,255,255,.04)' }
         },
         y2: {
