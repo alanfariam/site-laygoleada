@@ -131,6 +131,7 @@ nav{
   .banner{padding:12px 16px;flex-direction:column;align-items:flex-start;gap:12px;}
   .banner-stats{width:100%;justify-content:space-around;}
   .bstat-val{font-size:18px;}
+  .banner-desc{display:none;}
 }
 
 /* ── TABS ── */
@@ -361,7 +362,7 @@ footer a:hover{color:var(--green);}
 <!-- BANNER STATS -->
 <div class="banner" id="bannerStats">
   <div class="banner-text">
-    <strong>Alertas Gol</strong> — #DIF mede o tempo entre o alerta e o primeiro gol. Quanto menor, mais rápido o gol saiu após o sinal.<br>
+    <span class="banner-desc"><strong>Alertas Gol</strong> — #DIF mede o tempo entre o alerta e o primeiro gol. Quanto menor, mais rápido o gol saiu após o sinal.<br></span>
     <strong id="bannerTotal">—</strong> jogos analisados no histórico completo.
   </div>
   <div class="banner-stats">
