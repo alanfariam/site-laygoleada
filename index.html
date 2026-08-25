@@ -101,7 +101,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
   font-size:14px;color:var(--text2);text-align:center;margin-bottom:40px;
 }
 .products-grid{display:flex;justify-content:center;}
-.products-grid .product-card{max-width:560px;width:100%;}
+.products-grid .product-card{max-width:700px;width:100%;}
 .product-card{
   background:var(--bg2);border-radius:var(--r2);overflow:hidden;
   border:1px solid var(--border);transition:border-color .2s,transform .2s;
@@ -135,14 +135,15 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
 .card-blue::before{background:linear-gradient(90deg,transparent,#4A9EF0,transparent);}
 .card-blue .pc-tag{color:#4A9EF0;background:rgba(74,158,240,.1);border-color:rgba(74,158,240,.3);}
 .card-blue .btn-produto{background:#4A9EF0;color:#0A0A0A;font-weight:800;box-shadow:0 4px 20px rgba(74,158,240,.35);}
-.ag-board{padding:28px 22px 20px;border-bottom:1px solid var(--border);text-align:center;background:radial-gradient(ellipse at 50% 0%,rgba(74,158,240,.06) 0%,transparent 70%);}
-.ag-eyebrow{font-family:var(--mono);font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--text3);margin-bottom:14px;}
-.ag-num{font-size:76px;font-weight:900;line-height:1;color:#E8EDF2;display:inline;}
-.ag-sym{font-size:38px;font-weight:700;color:#4A9EF0;vertical-align:top;margin-top:12px;display:inline-block;}
-.ag-sub{font-size:12px;color:var(--text2);line-height:1.6;margin-top:12px;}
+.ag-board{padding:40px 32px 28px;border-bottom:1px solid var(--border);text-align:center;background:radial-gradient(ellipse at 50% 0%,rgba(74,158,240,.10) 0%,transparent 65%);}
+.ag-eyebrow{font-family:var(--mono);font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--text3);margin-bottom:18px;}
+.ag-num{font-size:100px;font-weight:900;line-height:1;color:#E8EDF2;display:inline;text-shadow:0 0 60px rgba(74,158,240,.35);}
+.ag-sym{font-size:52px;font-weight:700;color:#4A9EF0;vertical-align:top;margin-top:16px;display:inline-block;}
+.ag-sub{font-size:13px;color:var(--text2);line-height:1.7;margin-top:16px;}
 .btn-soon{display:block;text-align:center;background:var(--bg3);color:var(--text3);font-weight:700;font-size:14px;padding:13px;border-radius:var(--r);border:1px solid var(--border);letter-spacing:.02em;cursor:default;}
 
-.pc-header{padding:22px 22px 16px;border-bottom:1px solid var(--border);}
+.pc-header{padding:28px 32px 20px;border-bottom:1px solid var(--border);}
+.pc-footer{padding:20px 32px 28px;}
 .pc-tag{
   font-family:var(--mono);font-size:9px;letter-spacing:.12em;text-transform:uppercase;
   color:var(--red);background:var(--red-dim);border:1px solid var(--red-glow);
@@ -302,22 +303,25 @@ footer a{color:var(--red);text-decoration:none;}
 </section>
 
 <!-- PRODUTOS -->
-<div class="section">
+<div class="section" style="padding-top:40px;padding-bottom:40px;">
   <div class="section-eyebrow">Meus Produtos</div>
   <h2 class="section-title">Alertas de gols automatizados direto no Telegram.</h2>
-  <p class="section-sub">Assine, entre no grupo e receba as tips automaticamente — sem edição, sem filtro.</p>
+  <p class="section-sub">Assine, entre no grupo e receba os alertas automaticamente — sem edição, sem filtro.</p>
   <div style="display:flex;justify-content:center;gap:0;margin-bottom:36px;">
     <div style="display:flex;align-items:center;gap:0;background:var(--bg2);border:1px solid var(--border2);border-radius:99px;padding:0;overflow:hidden;">
-      <div style="display:flex;align-items:center;gap:8px;padding:10px 20px;font-size:13px;color:var(--text2);">
-        <span style="font-size:16px;">1️⃣</span> <span>Assine o grupo</span>
+      <div style="display:flex;align-items:center;gap:10px;padding:10px 22px;font-size:13px;color:var(--text2);">
+        <span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:rgba(74,158,240,.15);border:1px solid rgba(74,158,240,.35);font-family:var(--mono);font-size:11px;font-weight:700;color:#4A9EF0;flex-shrink:0;">1</span>
+        <span>Assine o grupo</span>
       </div>
       <div style="width:1px;height:36px;background:var(--border2);"></div>
-      <div style="display:flex;align-items:center;gap:8px;padding:10px 20px;font-size:13px;color:var(--text2);">
-        <span style="font-size:16px;">2️⃣</span> <span>Bot envia a tip no Telegram</span>
+      <div style="display:flex;align-items:center;gap:10px;padding:10px 22px;font-size:13px;color:var(--text2);">
+        <span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:rgba(74,158,240,.15);border:1px solid rgba(74,158,240,.35);font-family:var(--mono);font-size:11px;font-weight:700;color:#4A9EF0;flex-shrink:0;">2</span>
+        <span>Bot envia o alerta no Telegram</span>
       </div>
       <div style="width:1px;height:36px;background:var(--border2);"></div>
-      <div style="display:flex;align-items:center;gap:8px;padding:10px 20px;font-size:13px;color:var(--text2);">
-        <span style="font-size:16px;">3️⃣</span> <span>Acompanhe os resultados pelo site</span>
+      <div style="display:flex;align-items:center;gap:10px;padding:10px 22px;font-size:13px;color:var(--text2);">
+        <span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:rgba(74,158,240,.15);border:1px solid rgba(74,158,240,.35);font-family:var(--mono);font-size:11px;font-weight:700;color:#4A9EF0;flex-shrink:0;">3</span>
+        <span>Acompanhe os resultados pelo site</span>
       </div>
     </div>
   </div>
