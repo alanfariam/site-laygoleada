@@ -100,8 +100,8 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
 .section-sub{
   font-size:14px;color:var(--text2);text-align:center;margin-bottom:40px;
 }
-.products-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;}
-.products-grid > .product-card:last-child:nth-child(odd){grid-column:1/2;justify-self:center;width:100%;}
+.products-grid{display:flex;justify-content:center;}
+.products-grid .product-card{max-width:560px;width:100%;}
 .product-card{
   background:var(--bg2);border-radius:var(--r2);overflow:hidden;
   border:1px solid var(--border);transition:border-color .2s,transform .2s;
@@ -323,27 +323,6 @@ footer a{color:var(--red);text-decoration:none;}
   </div>
   <div class="products-grid">
 
-    <!-- FREEFIRE -->
-    <div class="product-card card-green" style="opacity:.5;pointer-events:none;filter:grayscale(.6);">
-      <div class="pc-header">
-        <div class="pc-tag" style="background:rgba(240,160,48,.12);color:#F0A030;border-color:rgba(240,160,48,.3);">⚠ SUSPENSO</div>
-        <div class="pc-name">Over FREEFIRE</div>
-        <div class="pc-desc">Over limite para pegar um gol no meio da partida na proporção 1 red para 2 greens — sinais automáticos via bot Telegram.</div>
-      </div>
-      <div class="pc-stats" id="ff-stats">
-        <div class="pc-stat"><div class="pc-stat-val g">+23.9k</div><div class="pc-stat-lbl">Lucro Total</div></div>
-        <div class="pc-stat"><div class="pc-stat-val w">54.8%</div><div class="pc-stat-lbl">Win Rate</div></div>
-        <div class="pc-stat"><div class="pc-stat-val">4035</div><div class="pc-stat-lbl">Operações</div></div>
-      </div>
-      <div class="pc-chart">
-        <div class="pc-chart-label">Curva de lucro acumulado</div>
-        <canvas id="cFF" height="120"></canvas>
-      </div>
-      <div class="pc-footer" style="text-align:center;padding:12px 0;">
-        <span style="font-family:var(--mono);font-size:11px;letter-spacing:.08em;color:#F0A030;">Produto suspenso</span>
-      </div>
-    </div>
-
     <!-- ALERTAS GOL -->
     <div class="product-card card-blue">
       <div class="pc-header">
@@ -358,50 +337,6 @@ footer a{color:var(--red);text-decoration:none;}
       </div>
       <div class="pc-footer">
         <a class="btn-produto" href="/alertasgol">Ver dados completos →</a>
-      </div>
-    </div>
-
-    <!-- TRINITY -->
-    <div class="product-card card-purple">
-      <div class="pc-header">
-        <div class="pc-tag">Mercado Lay Goleada</div>
-        <div class="pc-name">Lay Goleada TRINITY</div>
-        <div class="pc-desc">Quatro estratégias de Lay Goleada em um único grupo no Telegram — sinais automáticos 24/7 enviados pelo bot direto para o seu celular.</div>
-      </div>
-      <div class="pc-stats">
-        <div class="pc-stat"><div class="pc-stat-val g" id="tr-lucro">—</div><div class="pc-stat-lbl">Lucro Total</div></div>
-        <div class="pc-stat"><div class="pc-stat-val w" id="tr-wr">—</div><div class="pc-stat-lbl">Win Rate</div></div>
-        <div class="pc-stat"><div class="pc-stat-val" id="tr-ent">—</div><div class="pc-stat-lbl">Operações</div></div>
-      </div>
-      <div class="pc-chart">
-        <div class="pc-chart-label">Curva de lucro acumulado</div>
-        <canvas id="cTR" height="120"></canvas>
-        <div class="pc-loading" id="tr-loading">Carregando dados...</div>
-      </div>
-      <div class="pc-footer">
-        <a class="btn-produto" href="/trinity">Ver dashboard TRINITY →</a>
-      </div>
-    </div>
-
-    <!-- OVER TRIPLEX -->
-    <div class="product-card card-orange">
-      <div class="pc-header">
-        <div class="pc-tag">Mercado Over Gols</div>
-        <div class="pc-name">Over TRIPLEX</div>
-        <div class="pc-desc">Estratégia Over com análise manual pré-live e live — sinais enviados diretamente no Telegram com orientação completa de entrada e saída.</div>
-      </div>
-      <div class="pc-stats">
-        <div class="pc-stat"><div class="pc-stat-val g" id="ot-lucro">—</div><div class="pc-stat-lbl">Lucro Total</div></div>
-        <div class="pc-stat"><div class="pc-stat-val w" id="ot-wr">—</div><div class="pc-stat-lbl">Win Rate</div></div>
-        <div class="pc-stat"><div class="pc-stat-val" id="ot-ent">—</div><div class="pc-stat-lbl">Operações</div></div>
-      </div>
-      <div class="pc-chart">
-        <div class="pc-chart-label">Curva de lucro acumulado</div>
-        <canvas id="cOT" height="120"></canvas>
-        <div class="pc-loading" id="ot-loading">Carregando dados...</div>
-      </div>
-      <div class="pc-footer">
-        <a class="btn-produto" href="/triplex">Ver dashboard TRIPLEX →</a>
       </div>
     </div>
 
