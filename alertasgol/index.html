@@ -891,7 +891,7 @@ function buildDiaSemana(data) {
   const labels   = data.map(d => d.label);
   const vals     = data.map(d => d.media_dif);
   const vols     = data.map(d => d.total);
-  const ref      = mediaDifHist ?? data[0]?.media_hist ?? 28;
+  const ref      = 30;
   if (chartDia) chartDia.destroy();
   chartDia = new Chart(document.getElementById('cDiaSemana'), {
     type: 'bar',
@@ -961,7 +961,7 @@ function buildMensalDif(months) {
   const labels = data.map(d => d.label);
   const vals   = data.map(d => d.media_dif);
   const vols   = data.map(d => d.total);
-  const ref    = mediaDifHist ?? data[0]?.media_hist ?? 28;
+  const ref    = 30;
   if (chartMensalDif) chartMensalDif.destroy();
   chartMensalDif = new Chart(document.getElementById('cMensalDif'), {
     type: 'bar',
