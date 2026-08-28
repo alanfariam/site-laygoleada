@@ -821,7 +821,7 @@ footer a:hover{color:var(--green);}
 
   <div class="section-title" style="margin-bottom:6px;">Backtest de Filtros</div>
   <p style="font-size:13px;color:var(--text2);margin-bottom:32px;">
-    Simule diferentes critérios de entrada e veja como o método teria performado historicamente.
+    Simule diferentes critérios de entrada para o método <strong style="color:var(--text);">Lay ao Under Limite</strong> e veja como teria performado historicamente com base nos alertas emitidos.
   </p>
 
   <!-- FORMULÁRIO -->
@@ -860,10 +860,16 @@ footer a:hover{color:var(--green);}
 
     </div>
     <div id="bt-erro" style="display:none;color:var(--red);font-size:13px;margin-bottom:14px;"></div>
-    <button id="bt-btn-calcular" onclick="btCalcular()"
-      style="width:100%;padding:13px;border-radius:8px;border:none;background:var(--green);color:#0A0C10;font-weight:700;font-size:15px;cursor:pointer;letter-spacing:.02em;">
-      Calcular
-    </button>
+    <div style="display:flex;gap:12px;">
+      <button id="bt-btn-calcular" onclick="btCalcular()"
+        style="flex:1;padding:13px;border-radius:8px;border:none;background:var(--green);color:#0A0C10;font-weight:700;font-size:15px;cursor:pointer;letter-spacing:.02em;">
+        Calcular
+      </button>
+      <button onclick="btLimpar()"
+        style="padding:13px 24px;border-radius:8px;border:1px solid var(--border2);background:transparent;color:var(--text2);font-weight:600;font-size:15px;cursor:pointer;letter-spacing:.02em;">
+        Limpar
+      </button>
+    </div>
   </div>
 
   <!-- RESULTADOS (ocultos até calcular) -->
@@ -890,7 +896,7 @@ footer a:hover{color:var(--green);}
           <div style="font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;">Red Máx. p/ Lucro</div>
           <span class="bt-tip" title="Red médio máximo (por operação) para o método fechar no zero, considerando stake de R$100 e green líquido de R$93,50. Fórmula: (WR × 93,50) ÷ (1 − WR).">ⓘ</span>
         </div>
-        <div id="bt-red-max" style="font-family:var(--mono);font-size:36px;font-weight:700;color:var(--gold);">—</div>
+        <div id="bt-red-max" style="font-family:var(--mono);font-size:36px;font-weight:700;color:var(--red);">—</div>
       </div>
     </div>
 
@@ -1645,6 +1651,26 @@ async function btCalcular() {
     btn.textContent = 'Calcular';
     btn.disabled = false;
   }
+}
+
+function btLimpar() {
+  // Campos
+  document.getElementById('bt-min-entrada').value = '';
+  document.getElementById('bt-max-entrada').value = '';
+  document.getElementById('bt-exposicao').value   = '';
+  document.getElementById('bt-red-valor').value   = '';
+  document.getElementById('bt-erro').style.display = 'none';
+  // Resultados
+  document.getElementById('bt-resultados').style.display = 'none';
+  document.getElementById('bt-graficos').style.display   = 'none';
+  document.getElementById('bt-total').textContent   = '—';
+  document.getElementById('bt-wr').textContent      = '—';
+  document.getElementById('bt-wr').style.color      = '';
+  document.getElementById('bt-red-max').textContent = '—';
+  document.getElementById('bt-lista').innerHTML     = '';
+  destroyC('bt-chart-acum');
+  destroyC('bt-chart-mensal');
+  window._btJogos = null;
 }
 
 function btSimular() {
