@@ -859,8 +859,35 @@ footer a:hover{color:var(--green);}
       </div>
 
     </div>
-    <div id="bt-erro" style="display:none;color:var(--red);font-size:13px;margin-bottom:14px;"></div>
-    <div style="display:flex;gap:12px;">
+
+    <!-- PERÍODO -->
+    <div style="margin-top:20px;border-top:1px solid var(--border);padding-top:20px;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:0;">
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none;">
+          <input type="checkbox" id="bt-usar-periodo" onchange="btTogglePeriodo()"
+            style="width:16px;height:16px;accent-color:var(--green);cursor:pointer;">
+          <span style="font-size:12px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;">Filtrar por período</span>
+        </label>
+        <span class="bt-tip" title="Por padrão o backtest usa todo o histórico disponível. Ative esta opção para restringir a análise a um intervalo de datas específico.">ⓘ</span>
+      </div>
+      <div id="bt-periodo-campos" style="display:none;margin-top:14px;display:none;">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+          <div>
+            <label style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:6px;">Data Início</label>
+            <input id="bt-data-ini" type="date"
+              style="width:100%;padding:10px 14px;border-radius:8px;border:1px solid var(--border);background:var(--bg3);color:var(--text);font-size:14px;font-family:var(--mono);outline:none;color-scheme:dark;">
+          </div>
+          <div>
+            <label style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:6px;">Data Fim</label>
+            <input id="bt-data-fim" type="date"
+              style="width:100%;padding:10px 14px;border-radius:8px;border:1px solid var(--border);background:var(--bg3);color:var(--text);font-size:14px;font-family:var(--mono);outline:none;color-scheme:dark;">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="bt-erro" style="display:none;color:var(--red);font-size:13px;margin-top:16px;margin-bottom:0;"></div>
+    <div style="display:flex;gap:12px;margin-top:16px;">
       <button id="bt-btn-calcular" onclick="btCalcular()"
         style="flex:1;padding:13px;border-radius:8px;border:none;background:var(--green);color:#0A0C10;font-weight:700;font-size:15px;cursor:pointer;letter-spacing:.02em;">
         Calcular
@@ -1611,10 +1638,28 @@ async function btCalcular() {
       btDados = await r.json();
     }
 
+    // Filtro de período
+    const usarPeriodo = document.getElementById('bt-usar-periodo').checked;
+    const dataIniStr  = document.getElementById('bt-data-ini').value;
+    const dataFimStr  = document.getElementById('bt-data-fim').value;
+    if (usarPeriodo && (!dataIniStr || !dataFimStr)) {
+      erro.textContent = 'Informe data de início e fim para filtrar por período.';
+      erro.style.display = 'block';
+      btn.textContent = 'Calcular'; btn.disabled = false; return;
+    }
+    const dataIni = usarPeriodo ? new Date(dataIniStr + 'T00:00:00') : null;
+    const dataFim = usarPeriodo ? new Date(dataFimStr + 'T23:59:59') : null;
+    erro.style.display = 'none';
+
     // Filtro
     const filtrados = btDados.filter(j => {
-      if (j.min_alerta > maxE) return false;    // alerta depois do máximo
-      if (j.min_gol > 0 && j.min_gol < minE) return false; // gol antes do mínimo
+      if (usarPeriodo) {
+        const [d, m, y] = j.data.split('/');
+        const dt = new Date(`${y}-${m}-${d}T00:00:00`);
+        if (dt < dataIni || dt > dataFim) return false;
+      }
+      if (j.min_alerta > maxE) return false;
+      if (j.min_gol > 0 && j.min_gol < minE) return false;
       return true;
     });
 
@@ -1653,21 +1698,28 @@ async function btCalcular() {
   }
 }
 
+function btTogglePeriodo() {
+  const ativo = document.getElementById('bt-usar-periodo').checked;
+  document.getElementById('bt-periodo-campos').style.display = ativo ? 'block' : 'none';
+}
+
 function btLimpar() {
-  // Campos
-  document.getElementById('bt-min-entrada').value = '';
-  document.getElementById('bt-max-entrada').value = '';
-  document.getElementById('bt-exposicao').value   = '';
-  document.getElementById('bt-red-valor').value   = '';
-  document.getElementById('bt-erro').style.display = 'none';
-  // Resultados
+  document.getElementById('bt-min-entrada').value    = '';
+  document.getElementById('bt-max-entrada').value    = '';
+  document.getElementById('bt-exposicao').value      = '';
+  document.getElementById('bt-red-valor').value      = '';
+  document.getElementById('bt-data-ini').value       = '';
+  document.getElementById('bt-data-fim').value       = '';
+  document.getElementById('bt-usar-periodo').checked = false;
+  document.getElementById('bt-periodo-campos').style.display = 'none';
+  document.getElementById('bt-erro').style.display   = 'none';
   document.getElementById('bt-resultados').style.display = 'none';
   document.getElementById('bt-graficos').style.display   = 'none';
-  document.getElementById('bt-total').textContent   = '—';
-  document.getElementById('bt-wr').textContent      = '—';
-  document.getElementById('bt-wr').style.color      = '';
-  document.getElementById('bt-red-max').textContent = '—';
-  document.getElementById('bt-lista').innerHTML     = '';
+  document.getElementById('bt-total').textContent    = '—';
+  document.getElementById('bt-wr').textContent       = '—';
+  document.getElementById('bt-wr').style.color       = '';
+  document.getElementById('bt-red-max').textContent  = '—';
+  document.getElementById('bt-lista').innerHTML      = '';
   destroyC('bt-chart-acum');
   destroyC('bt-chart-mensal');
   window._btJogos = null;
