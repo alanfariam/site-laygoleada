@@ -157,6 +157,26 @@ nav{
 .page.active{display:block;}
 @keyframes fadeIn{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:none;}}
 
+/* ── BACKTEST TOOLTIP ── */
+.bt-tip{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:16px;height:16px;border-radius:50%;
+  font-size:11px;color:var(--text3);cursor:help;
+  border:1px solid var(--border2);flex-shrink:0;
+  position:relative;
+}
+.bt-tip:hover::after{
+  content:attr(title);
+  position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);
+  background:rgba(15,18,24,.97);border:1px solid var(--border2);border-radius:8px;
+  padding:8px 12px;font-size:11px;color:var(--text2);line-height:1.5;
+  white-space:normal;width:240px;z-index:999;pointer-events:none;
+  box-shadow:0 4px 20px rgba(0,0,0,.4);
+}
+@media(max-width:600px){
+  #page-backtest .section > div[style*="grid-template-columns:repeat(3"]{grid-template-columns:1fr!important;}
+}
+
 /* ── SECTION HEADER ── */
 .section{padding:0 32px 56px;max-width:960px;margin:0 auto;}
 .section-title{
@@ -390,6 +410,7 @@ footer a:hover{color:var(--green);}
   <button class="tab" onclick="showTab('analise')">Análise</button>
   <button class="tab" onclick="showTab('camp')">Campeonatos</button>
   <button class="tab" onclick="showTab('times')">Times</button>
+  <button class="tab" onclick="showTab('backtest')">Backtest</button>
 </div>
 
 <!-- PAGE: INÍCIO -->
@@ -792,6 +813,131 @@ footer a:hover{color:var(--green);}
   </div>
 
 </div><!-- /page-times -->
+
+
+<!-- PAGE: BACKTEST -->
+<div class="page" id="page-backtest">
+<div class="section" style="max-width:860px;margin:0 auto;padding:40px 24px;">
+
+  <div class="section-title" style="margin-bottom:6px;">Backtest de Filtros</div>
+  <p style="font-size:13px;color:var(--text2);margin-bottom:32px;">
+    Simule diferentes critérios de entrada e veja como o método teria performado historicamente.
+  </p>
+
+  <!-- FORMULÁRIO -->
+  <div class="card" style="padding:28px;margin-bottom:28px;">
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-bottom:24px;">
+
+      <!-- Campo 1 -->
+      <div>
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px;">
+          <label style="font-size:12px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;">Minuto Mínimo</label>
+          <span class="bt-tip" title="Minuto mínimo para considerar a entrada. Jogos onde o primeiro gol ocorreu ANTES deste minuto serão descartados — o gol já tinha saído antes da janela de entrada.">ⓘ</span>
+        </div>
+        <input id="bt-min-entrada" type="number" min="0" max="120" placeholder="ex: 40"
+          style="width:100%;padding:11px 14px;border-radius:8px;border:1px solid var(--border);background:var(--bg3);color:var(--text);font-size:16px;font-family:var(--mono);outline:none;">
+      </div>
+
+      <!-- Campo 2 -->
+      <div>
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px;">
+          <label style="font-size:12px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;">Minuto Máximo</label>
+          <span class="bt-tip" title="Minuto máximo para aceitar o alerta. Alertas emitidos APÓS este minuto serão descartados — entrada muito tarde na partida.">ⓘ</span>
+        </div>
+        <input id="bt-max-entrada" type="number" min="0" max="120" placeholder="ex: 60"
+          style="width:100%;padding:11px 14px;border-radius:8px;border:1px solid var(--border);background:var(--bg3);color:var(--text);font-size:16px;font-family:var(--mono);outline:none;">
+      </div>
+
+      <!-- Campo 3 -->
+      <div>
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px;">
+          <label style="font-size:12px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;">Tempo de Exposição</label>
+          <span class="bt-tip" title="Janela de minutos após o ponto de entrada em que o gol precisa sair para ser considerado GREEN. Exemplo: entrada no min 50 com exposição 30 → gol precisa sair até o min 80.">ⓘ</span>
+        </div>
+        <input id="bt-exposicao" type="number" min="1" max="90" placeholder="ex: 30"
+          style="width:100%;padding:11px 14px;border-radius:8px;border:1px solid var(--border);background:var(--bg3);color:var(--text);font-size:16px;font-family:var(--mono);outline:none;">
+      </div>
+
+    </div>
+    <div id="bt-erro" style="display:none;color:var(--red);font-size:13px;margin-bottom:14px;"></div>
+    <button id="bt-btn-calcular" onclick="btCalcular()"
+      style="width:100%;padding:13px;border-radius:8px;border:none;background:var(--green);color:#0A0C10;font-weight:700;font-size:15px;cursor:pointer;letter-spacing:.02em;">
+      Calcular
+    </button>
+  </div>
+
+  <!-- RESULTADOS (ocultos até calcular) -->
+  <div id="bt-resultados" style="display:none;">
+
+    <!-- CARDS PRINCIPAIS -->
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:28px;">
+      <div class="card" style="text-align:center;padding:24px 16px;">
+        <div style="display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:10px;">
+          <div style="font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;">Jogos Analisados</div>
+          <span class="bt-tip" title="Total de jogos que passaram pelos dois filtros: primeiro gol não anterior ao mínimo e alerta não posterior ao máximo.">ⓘ</span>
+        </div>
+        <div id="bt-total" style="font-family:var(--mono);font-size:36px;font-weight:700;color:var(--text);">—</div>
+      </div>
+      <div class="card" style="text-align:center;padding:24px 16px;">
+        <div style="display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:10px;">
+          <div style="font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;">Win Rate</div>
+          <span class="bt-tip" title="Percentual de jogos GREEN: gol saiu dentro da janela (ponto de entrada + tempo de exposição). O ponto de entrada é o maior valor entre o Minuto Mínimo e o Minuto do Alerta.">ⓘ</span>
+        </div>
+        <div id="bt-wr" style="font-family:var(--mono);font-size:36px;font-weight:700;">—</div>
+      </div>
+      <div class="card" style="text-align:center;padding:24px 16px;">
+        <div style="display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:10px;">
+          <div style="font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;">Red Máx. p/ Lucro</div>
+          <span class="bt-tip" title="Red médio máximo (por operação) para o método fechar no zero, considerando stake de R$100 e green líquido de R$93,50. Fórmula: (WR × 93,50) ÷ (1 − WR).">ⓘ</span>
+        </div>
+        <div id="bt-red-max" style="font-family:var(--mono);font-size:36px;font-weight:700;color:var(--gold);">—</div>
+      </div>
+    </div>
+
+    <!-- CAMPO RED MÉDIO -->
+    <div class="card" style="padding:24px;margin-bottom:28px;">
+      <div style="display:flex;align-items:center;gap:6px;margin-bottom:16px;">
+        <div style="font-size:13px;font-weight:600;color:var(--text);">Simular com Red Médio</div>
+        <span class="bt-tip" title="Informe o red médio real ou esperado por operação (em reais, considerando stake de R$100). O gráfico abaixo mostrará a curva de lucro acumulado com esse parâmetro.">ⓘ</span>
+      </div>
+      <div style="display:flex;gap:12px;align-items:center;">
+        <input id="bt-red-valor" type="number" min="0" placeholder="ex: 80"
+          style="flex:1;padding:11px 14px;border-radius:8px;border:1px solid var(--border);background:var(--bg3);color:var(--text);font-size:16px;font-family:var(--mono);outline:none;">
+        <button onclick="btSimular()"
+          style="padding:11px 28px;border-radius:8px;border:none;background:var(--green);color:#0A0C10;font-weight:700;font-size:14px;cursor:pointer;white-space:nowrap;">
+          Simular
+        </button>
+      </div>
+    </div>
+
+    <!-- GRÁFICOS (ocultos até simular) -->
+    <div id="bt-graficos" style="display:none;">
+      <div class="card" style="margin-bottom:20px;padding:20px;">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:16px;">
+          <div class="card-title" style="margin:0;">Lucro Acumulado</div>
+          <span class="bt-tip" title="Curva de lucro acumulado operação a operação. GREEN = +R$93,50 / RED = −Red Médio informado. Stake fixo de R$100.">ⓘ</span>
+        </div>
+        <div style="height:220px;"><canvas id="bt-chart-acum"></canvas></div>
+      </div>
+      <div class="card" style="margin-bottom:20px;padding:20px;">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:16px;">
+          <div class="card-title" style="margin:0;">Lucro Mensal</div>
+          <span class="bt-tip" title="Lucro ou prejuízo por mês calendário, considerando green de R$93,50 e o red médio informado.">ⓘ</span>
+        </div>
+        <div style="height:220px;"><canvas id="bt-chart-mensal"></canvas></div>
+      </div>
+      <div class="card" style="padding:20px;">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:16px;">
+          <div class="card-title" style="margin:0;">Últimos 100 jogos</div>
+          <span class="bt-tip" title="Lista dos 100 jogos mais recentes após o filtro, com resultado individual (GREEN ou RED) e lucro acumulado até ali.">ⓘ</span>
+        </div>
+        <div id="bt-lista" style="overflow-x:auto;"></div>
+      </div>
+    </div>
+
+  </div><!-- /bt-resultados -->
+</div>
+</div><!-- /page-backtest -->
 
 
 <!-- FOOTER -->
@@ -1419,11 +1565,185 @@ function showTab(id) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   document.getElementById('page-' + id).classList.add('active');
-  const idx = ['inicio','jogos','analise','camp','times'].indexOf(id);
+  const idx = ['inicio','jogos','analise','camp','times','backtest'].indexOf(id);
   document.querySelectorAll('.tab')[idx].classList.add('active');
   if (id === 'analise') lazyAnalise();
   if (id === 'camp')    lazyCamp();
   if (id === 'times')   lazyTimes();
+}
+
+// ── BACKTEST ─────────────────────────────────────────────────
+let btDados = null; // cache dos dados brutos
+
+async function btCalcular() {
+  const minE = parseInt(document.getElementById('bt-min-entrada').value);
+  const maxE = parseInt(document.getElementById('bt-max-entrada').value);
+  const exp  = parseInt(document.getElementById('bt-exposicao').value);
+  const erro = document.getElementById('bt-erro');
+
+  if (isNaN(minE) || isNaN(maxE) || isNaN(exp)) {
+    erro.textContent = 'Preencha todos os três campos antes de calcular.';
+    erro.style.display = 'block'; return;
+  }
+  if (minE >= maxE) {
+    erro.textContent = 'Minuto Mínimo deve ser menor que o Minuto Máximo.';
+    erro.style.display = 'block'; return;
+  }
+  if (exp <= 0) {
+    erro.textContent = 'Tempo de Exposição deve ser maior que zero.';
+    erro.style.display = 'block'; return;
+  }
+  erro.style.display = 'none';
+
+  const btn = document.getElementById('bt-btn-calcular');
+  btn.textContent = 'Carregando...';
+  btn.disabled = true;
+
+  try {
+    if (!btDados) {
+      const r = await fetch(API + '/api/backtest-data');
+      btDados = await r.json();
+    }
+
+    // Filtro
+    const filtrados = btDados.filter(j => {
+      if (j.min_alerta > maxE) return false;    // alerta depois do máximo
+      if (j.min_gol > 0 && j.min_gol < minE) return false; // gol antes do mínimo
+      return true;
+    });
+
+    // Resultado por jogo
+    const comResultado = filtrados.map(j => {
+      const entrada = Math.max(minE, j.min_alerta);
+      const limite  = entrada + exp;
+      const green   = j.min_gol > 0 && j.min_gol >= entrada && j.min_gol <= limite;
+      return { ...j, entrada, limite, green };
+    });
+
+    const total  = comResultado.length;
+    const greens = comResultado.filter(j => j.green).length;
+    const wr     = total > 0 ? greens / total : 0;
+    const redMax = wr < 1 ? (wr * 93.5) / (1 - wr) : Infinity;
+
+    // Exibe cards
+    document.getElementById('bt-total').textContent = total.toLocaleString('pt-BR');
+    const wrEl = document.getElementById('bt-wr');
+    wrEl.textContent = (wr * 100).toFixed(1) + '%';
+    wrEl.style.color = wr >= 0.5 ? 'var(--green)' : 'var(--red)';
+    document.getElementById('bt-red-max').textContent = redMax === Infinity ? '∞' : 'R$' + redMax.toFixed(2);
+
+    document.getElementById('bt-resultados').style.display = 'block';
+    document.getElementById('bt-graficos').style.display = 'none';
+
+    // Guarda para simular
+    window._btJogos = comResultado;
+
+  } catch(e) {
+    erro.textContent = 'Erro ao buscar dados da API. Tente novamente.';
+    erro.style.display = 'block';
+  } finally {
+    btn.textContent = 'Calcular';
+    btn.disabled = false;
+  }
+}
+
+function btSimular() {
+  const redVal = parseFloat(document.getElementById('bt-red-valor').value);
+  if (isNaN(redVal) || redVal < 0) {
+    alert('Informe um valor de Red Médio válido (≥ 0).');
+    return;
+  }
+  const jogos = window._btJogos || [];
+  if (!jogos.length) return;
+
+  const GREEN = 93.5;
+  const RED   = -redVal;
+
+  // Lucro acumulado
+  let acum = 0;
+  const acumVals = jogos.map(j => { acum += j.green ? GREEN : RED; return parseFloat(acum.toFixed(2)); });
+  const acumLabels = jogos.map((_, i) => i + 1);
+
+  destroyC('bt-chart-acum');
+  charts['bt-chart-acum'] = new Chart(document.getElementById('bt-chart-acum'), {
+    type: 'line',
+    data: { labels: acumLabels, datasets: [{ label: 'Lucro Acumulado', data: acumVals,
+      borderColor: '#4A9EF0', borderWidth: 2, pointRadius: 0, tension: .3,
+      fill: true, backgroundColor: 'rgba(74,158,240,.08)' }] },
+    options: { ...cd(), scales: {
+      x: { display: false },
+      y: { grid: { color: 'rgba(255,255,255,.04)' }, ticks: { callback: v => 'R$' + v.toFixed(0), color: '#606060', font: { size: 10 } } }
+    }}
+  });
+
+  // Lucro mensal
+  const mensal = {};
+  jogos.forEach(j => {
+    const [d, m, y] = j.data.split('/');
+    const key = `${y}-${m}`;
+    const lbl = `${m}/${y.slice(2)}`;
+    if (!mensal[key]) mensal[key] = { lbl, lucro: 0 };
+    mensal[key].lucro += j.green ? GREEN : RED;
+  });
+  const mensalOrd = Object.keys(mensal).sort();
+  const mensalVals = mensalOrd.map(k => parseFloat(mensal[k].lucro.toFixed(2)));
+  const mensalLbls = mensalOrd.map(k => mensal[k].lbl);
+
+  destroyC('bt-chart-mensal');
+  charts['bt-chart-mensal'] = new Chart(document.getElementById('bt-chart-mensal'), {
+    type: 'bar',
+    data: { labels: mensalLbls, datasets: [{ label: 'Lucro Mensal', data: mensalVals,
+      backgroundColor: mensalVals.map(v => v >= 0 ? 'rgba(46,204,138,.7)' : 'rgba(240,90,90,.65)'),
+      borderRadius: 4, barPercentage: .7 }] },
+    options: { ...cd(), scales: {
+      x: { grid: { display: false }, ticks: { color: '#606060', font: { size: 10 } } },
+      y: { grid: { color: 'rgba(255,255,255,.04)' }, ticks: { callback: v => 'R$' + v.toFixed(0), color: '#606060', font: { size: 10 } } }
+    }}
+  });
+
+  // Lista últimos 100
+  const ultimos = jogos.slice(-100).reverse();
+  let acumLista = acumVals[jogos.length - 1] ?? 0;
+  // Recalcula acumulado a partir do último para os 100
+  const acumUlt = [];
+  let a = acumVals[jogos.length - 1] ?? 0;
+  for (let i = jogos.length - 1; i >= Math.max(0, jogos.length - 100); i--) {
+    acumUlt.unshift(parseFloat(a.toFixed(2)));
+    a -= jogos[i].green ? GREEN : RED;
+  }
+
+  const linhas = ultimos.map((j, idx) => {
+    const cor = j.green ? 'var(--green)' : 'var(--red)';
+    const res = j.green ? '✓ GREEN' : '✗ RED';
+    const lucroJ = j.green ? GREEN : RED;
+    return `<tr>
+      <td class="mono" style="color:var(--text3)">${j.data}</td>
+      <td>${j.jogo}</td>
+      <td class="mono" style="text-align:center">${j.min_alerta}'</td>
+      <td class="mono" style="text-align:center">${j.entrada}'</td>
+      <td class="mono" style="text-align:center">${j.limite}'</td>
+      <td class="mono" style="text-align:center">${j.min_gol > 0 ? j.min_gol + "'" : '—'}</td>
+      <td class="mono" style="text-align:center;color:${cor};font-weight:700">${res}</td>
+      <td class="mono" style="text-align:right;color:${lucroJ >= 0 ? 'var(--green)' : 'var(--red)'}">${lucroJ >= 0 ? '+' : ''}R$${lucroJ.toFixed(2)}</td>
+    </tr>`;
+  }).join('');
+
+  document.getElementById('bt-lista').innerHTML = `
+    <table class="tbl">
+      <thead><tr>
+        <th title="Data do jogo">Data</th>
+        <th title="Times da partida">Jogo</th>
+        <th title="Minuto em que o alerta foi emitido">Alerta</th>
+        <th title="Ponto de entrada = max(Mínimo, Alerta)">Entrada</th>
+        <th title="Limite da janela = Entrada + Exposição">Limite</th>
+        <th title="Minuto em que saiu o primeiro gol">1º Gol</th>
+        <th title="GREEN = gol dentro da janela / RED = fora da janela ou sem gol">Resultado</th>
+        <th title="Lucro individual: GREEN +R$93,50 / RED −Red Médio">Lucro</th>
+      </tr></thead>
+      <tbody>${linhas}</tbody>
+    </table>`;
+
+  document.getElementById('bt-graficos').style.display = 'block';
 }
 
 // ── api ──────────────────────────────────────────────────────
