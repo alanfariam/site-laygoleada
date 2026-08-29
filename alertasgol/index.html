@@ -964,6 +964,21 @@ footer a:hover{color:var(--green);}
 
     <!-- GRÁFICOS (ocultos até simular) -->
     <div id="bt-graficos" style="display:none;">
+      <!-- Card Lucro Total -->
+      <div class="card" style="margin-bottom:20px;padding:24px 28px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;">
+        <div>
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;">
+            <div style="font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;">Lucro Total Simulado</div>
+            <span class="bt-tip" title="Soma de todos os resultados: GREEN +R$93,50 e RED −Red Médio informado, considerando todos os jogos analisados após o filtro.">ⓘ</span>
+          </div>
+          <div id="bt-lucro-total" style="font-family:var(--mono);font-size:42px;font-weight:700;line-height:1;">—</div>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;">Stake referência</div>
+          <div style="font-family:var(--mono);font-size:18px;font-weight:600;color:var(--text2);">R$100 por operação</div>
+          <div style="font-size:11px;color:var(--text3);margin-top:4px;">GREEN = +R$93,50 · RED = −Red Médio</div>
+        </div>
+      </div>
       <div class="card" style="margin-bottom:20px;padding:20px;">
         <div style="display:flex;align-items:center;gap:6px;margin-bottom:16px;">
           <div class="card-title" style="margin:0;">Lucro Acumulado</div>
@@ -1883,6 +1898,12 @@ function btSimular() {
       </tr></thead>
       <tbody>${linhas}</tbody>
     </table>`;
+
+  // Lucro total
+  const lucroTotal = acumVals[acumVals.length - 1] ?? 0;
+  const ltEl = document.getElementById('bt-lucro-total');
+  ltEl.textContent = (lucroTotal >= 0 ? '+' : '') + 'R$' + lucroTotal.toFixed(2);
+  ltEl.style.color = lucroTotal >= 0 ? 'var(--green)' : 'var(--red)';
 
   document.getElementById('bt-graficos').style.display = 'block';
 }
