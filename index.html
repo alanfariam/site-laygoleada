@@ -214,6 +214,11 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
   background:var(--bg2);border-top:1px solid var(--border);border-bottom:1px solid var(--border);
 }
 .partners-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;}
+.partner-card-destaque{grid-column:1/-1;}
+.partner-card-destaque .partner-body{flex-direction:row;align-items:flex-start;gap:28px;}
+.partner-card-destaque .partner-desc-col{flex:1;}
+.partner-card-destaque .partner-cta-col{display:flex;flex-direction:column;gap:10px;flex-shrink:0;}
+@media(max-width:700px){.partner-card-destaque .partner-body{flex-direction:column;}.partner-card-destaque .partner-cta-col{flex-direction:row;flex-wrap:wrap;}}
 .partner-card{
   background:var(--bg3);border:1px solid var(--border);border-radius:var(--r2);
   padding:0;display:flex;flex-direction:column;
@@ -376,43 +381,9 @@ footer a{color:var(--red);text-decoration:none;}
     <div class="partners-grid">
 
 
-      <a class="partner-card" href="http://traderline.com/?ref=alan" target="_blank">
-        <div class="partner-accent" style="background:linear-gradient(90deg,#00C853,#69F0AE);"></div>
-        <div class="partner-body">
-          <div class="partner-icon-row">
-            <div class="partner-icon" style="background:rgba(0,200,83,.15);">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#00C853" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/>
-              </svg>
-            </div>
-            <div>
-              <div class="partner-wordmark" style="color:#00C853;">Traderline</div>
-              <div class="partner-badge" style="color:#00C853;border-color:rgba(0,200,83,.3);background:rgba(0,200,83,.08);">Software de Trade</div>
-            </div>
-          </div>
-          <div class="partner-desc">O software que uso para operar os jogos com mais facilidade e rapidez. Interface profissional para traders esportivos.</div>
-          <div class="partner-cta">Adquirir totalmente grátis →</div>
-        </div>
-      </a>
-
-      <a class="partner-card" href="https://packball.com/matches?affiliate=201704257371" target="_blank">
-        <div class="partner-accent" style="background:linear-gradient(90deg,#2979FF,#82B1FF);"></div>
-        <div class="partner-body">
-          <div class="partner-icon-row">
-            <div class="partner-icon" style="background:rgba(41,121,255,.15);">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2979FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
-                <line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/>
-              </svg>
-            </div>
-            <div>
-              <div class="partner-wordmark" style="color:#2979FF;">Packball</div>
-              <div class="partner-badge" style="color:#2979FF;border-color:rgba(41,121,255,.3);background:rgba(41,121,255,.08);">Scanner Live & Pré-live</div>
-            </div>
-          </div>
-          <div class="partner-desc">Filtre jogos com dados avançados live e pré-live — a ferramenta que mudou o meu trade.</div>
-          <div class="partner-cta">Acessar com desconto →</div>
-        </div>
+      <!-- PACKBALL — Parceiro Principal -->
+      <a class="partner-card partner-card-destaque" href="/treinamentopackball" style="border-color:rgba(41,121,255,.3);">
+        <img src="/img/cardPackball.jpg" alt="Packball — Treinamento Exclusivo" style="width:100%;display:block;border-radius:var(--r2);">
       </a>
 
       <a class="partner-card" href="https://robotip.com.br/landing_redirect?a=GOLEADA" target="_blank">
