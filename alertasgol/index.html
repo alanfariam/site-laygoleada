@@ -173,6 +173,14 @@ nav{
   white-space:normal;width:240px;z-index:999;pointer-events:none;
   box-shadow:0 4px 20px rgba(0,0,0,.4);
 }
+/* botões preset de período */
+.bt-preset{
+  padding:6px 14px;border-radius:99px;border:1px solid var(--border2);
+  background:var(--bg3);color:var(--text2);font-size:12px;font-weight:600;
+  cursor:pointer;transition:all .15s;white-space:nowrap;
+}
+.bt-preset:hover{border-color:var(--green);color:var(--green);}
+.bt-preset.active{border-color:var(--green);background:rgba(46,204,138,.12);color:var(--green);}
 @media(max-width:600px){
   #page-backtest .section > div[style*="grid-template-columns:repeat(3"]{grid-template-columns:1fr!important;}
 }
@@ -870,8 +878,17 @@ footer a:hover{color:var(--green);}
         </label>
         <span class="bt-tip" title="Por padrão o backtest usa todo o histórico disponível. Ative esta opção para restringir a análise a um intervalo de datas específico.">ⓘ</span>
       </div>
-      <div id="bt-periodo-campos" style="display:none;margin-top:14px;display:none;">
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+      <div id="bt-periodo-campos" style="display:none;margin-top:14px;">
+        <!-- Atalhos rápidos -->
+        <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;">
+          <button class="bt-preset" onclick="btPreset('mes')"   title="Do primeiro ao último dia do mês atual">Este mês</button>
+          <button class="bt-preset" onclick="btPreset('3m')"    title="Últimos 3 meses a partir de hoje">Últimos 3 meses</button>
+          <button class="bt-preset" onclick="btPreset('6m')"    title="Últimos 6 meses a partir de hoje">Últimos 6 meses</button>
+          <button class="bt-preset" onclick="btPreset('ano')"   title="De 1º de janeiro do ano atual até hoje">Este ano</button>
+          <button class="bt-preset" onclick="btPreset('custom')" title="Informe datas de início e fim manualmente">Personalizado</button>
+        </div>
+        <!-- Campos de data (visíveis só no Personalizado) -->
+        <div id="bt-campos-custom" style="display:none;grid-template-columns:1fr 1fr;gap:16px;">
           <div>
             <label style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:6px;">Data Início</label>
             <input id="bt-data-ini" type="date"
@@ -883,6 +900,8 @@ footer a:hover{color:var(--green);}
               style="width:100%;padding:10px 14px;border-radius:8px;border:1px solid var(--border);background:var(--bg3);color:var(--text);font-size:14px;font-family:var(--mono);outline:none;color-scheme:dark;">
           </div>
         </div>
+        <!-- Label do período selecionado -->
+        <div id="bt-periodo-label" style="font-size:12px;color:var(--green);font-family:var(--mono);margin-top:4px;"></div>
       </div>
     </div>
 
@@ -1701,6 +1720,47 @@ async function btCalcular() {
 function btTogglePeriodo() {
   const ativo = document.getElementById('bt-usar-periodo').checked;
   document.getElementById('bt-periodo-campos').style.display = ativo ? 'block' : 'none';
+  if (!ativo) {
+    document.getElementById('bt-data-ini').value = '';
+    document.getElementById('bt-data-fim').value = '';
+    document.getElementById('bt-periodo-label').textContent = '';
+    document.querySelectorAll('.bt-preset').forEach(b => b.classList.remove('active'));
+    document.getElementById('bt-campos-custom').style.display = 'none';
+  }
+}
+
+function btPreset(tipo) {
+  document.querySelectorAll('.bt-preset').forEach(b => b.classList.remove('active'));
+  event.currentTarget.classList.add('active');
+
+  const hoje = new Date();
+  let ini, fim;
+
+  if (tipo === 'mes') {
+    ini = new Date(hoje.getFullYear(), hoje.getMonth(), 1);
+    fim = new Date(hoje.getFullYear(), hoje.getMonth() + 1, 0);
+  } else if (tipo === '3m') {
+    ini = new Date(hoje); ini.setMonth(ini.getMonth() - 3);
+    fim = hoje;
+  } else if (tipo === '6m') {
+    ini = new Date(hoje); ini.setMonth(ini.getMonth() - 6);
+    fim = hoje;
+  } else if (tipo === 'ano') {
+    ini = new Date(hoje.getFullYear(), 0, 1);
+    fim = hoje;
+  } else if (tipo === 'custom') {
+    document.getElementById('bt-campos-custom').style.display = 'grid';
+    document.getElementById('bt-periodo-label').textContent = '';
+    return;
+  }
+
+  document.getElementById('bt-campos-custom').style.display = 'none';
+  const fmt = d => d.toISOString().split('T')[0];
+  document.getElementById('bt-data-ini').value = fmt(ini);
+  document.getElementById('bt-data-fim').value = fmt(fim);
+
+  const fmtBR = d => d.toLocaleDateString('pt-BR', { day:'2-digit', month:'2-digit', year:'numeric' });
+  document.getElementById('bt-periodo-label').textContent = `${fmtBR(ini)} → ${fmtBR(fim)}`;
 }
 
 function btLimpar() {
@@ -1712,6 +1772,9 @@ function btLimpar() {
   document.getElementById('bt-data-fim').value       = '';
   document.getElementById('bt-usar-periodo').checked = false;
   document.getElementById('bt-periodo-campos').style.display = 'none';
+  document.getElementById('bt-campos-custom').style.display  = 'none';
+  document.getElementById('bt-periodo-label').textContent    = '';
+  document.querySelectorAll('.bt-preset').forEach(b => b.classList.remove('active'));
   document.getElementById('bt-erro').style.display   = 'none';
   document.getElementById('bt-resultados').style.display = 'none';
   document.getElementById('bt-graficos').style.display   = 'none';
