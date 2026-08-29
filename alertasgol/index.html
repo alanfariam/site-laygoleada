@@ -834,7 +834,7 @@ footer a:hover{color:var(--green);}
           <label style="font-size:12px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;">Minuto Mínimo</label>
           <span class="bt-tip" title="Minuto mínimo para considerar a entrada. Jogos onde o primeiro gol ocorreu ANTES deste minuto serão descartados — o gol já tinha saído antes da janela de entrada.">ⓘ</span>
         </div>
-        <input id="bt-min-entrada" type="number" min="0" max="120" placeholder="ex: 40"
+        <input id="bt-min-entrada" type="number" min="0" max="120" placeholder="ex: 40" value="37"
           style="width:100%;padding:11px 14px;border-radius:8px;border:1px solid var(--border);background:var(--bg3);color:var(--text);font-size:16px;font-family:var(--mono);outline:none;">
       </div>
 
@@ -844,7 +844,7 @@ footer a:hover{color:var(--green);}
           <label style="font-size:12px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;">Minuto Máximo</label>
           <span class="bt-tip" title="Minuto máximo para aceitar o alerta. Alertas emitidos APÓS este minuto serão descartados — entrada muito tarde na partida.">ⓘ</span>
         </div>
-        <input id="bt-max-entrada" type="number" min="0" max="120" placeholder="ex: 60"
+        <input id="bt-max-entrada" type="number" min="0" max="120" placeholder="ex: 60" value="60"
           style="width:100%;padding:11px 14px;border-radius:8px;border:1px solid var(--border);background:var(--bg3);color:var(--text);font-size:16px;font-family:var(--mono);outline:none;">
       </div>
 
@@ -854,7 +854,7 @@ footer a:hover{color:var(--green);}
           <label style="font-size:12px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;">Tempo de Exposição</label>
           <span class="bt-tip" title="Janela de minutos após o ponto de entrada em que o gol precisa sair para ser considerado GREEN. Exemplo: entrada no min 50 com exposição 30 → gol precisa sair até o min 80.">ⓘ</span>
         </div>
-        <input id="bt-exposicao" type="number" min="1" max="90" placeholder="ex: 30"
+        <input id="bt-exposicao" type="number" min="1" max="90" placeholder="ex: 30" value="38"
           style="width:100%;padding:11px 14px;border-radius:8px;border:1px solid var(--border);background:var(--bg3);color:var(--text);font-size:16px;font-family:var(--mono);outline:none;">
       </div>
 
