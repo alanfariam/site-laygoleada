@@ -881,6 +881,7 @@ footer a:hover{color:var(--green);}
       <div id="bt-periodo-campos" style="display:none;margin-top:14px;">
         <!-- Atalhos rápidos -->
         <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;">
+          <button class="bt-preset" onclick="btPreset('hoje')"  title="Apenas os dados de hoje">Hoje</button>
           <button class="bt-preset" onclick="btPreset('mes')"   title="Do primeiro ao último dia do mês atual">Este mês</button>
           <button class="bt-preset" onclick="btPreset('3m')"    title="Últimos 3 meses a partir de hoje">Últimos 3 meses</button>
           <button class="bt-preset" onclick="btPreset('6m')"    title="Últimos 6 meses a partir de hoje">Últimos 6 meses</button>
@@ -922,7 +923,7 @@ footer a:hover{color:var(--green);}
   <div id="bt-resultados" style="display:none;">
 
     <!-- CARDS PRINCIPAIS -->
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:28px;">
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:16px;margin-bottom:28px;">
       <div class="card" style="text-align:center;padding:24px 16px;">
         <div style="display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:10px;">
           <div style="font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;">Jogos Analisados</div>
@@ -944,13 +945,20 @@ footer a:hover{color:var(--green);}
         </div>
         <div id="bt-red-max" style="font-family:var(--mono);font-size:36px;font-weight:700;color:var(--red);">—</div>
       </div>
+      <div class="card" style="text-align:center;padding:24px 16px;">
+        <div style="display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:10px;">
+          <div style="font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;">Red Previsto</div>
+          <span class="bt-tip" title="Red médio previsto com base no tempo de exposição informado, conforme tabela de exposição do método. É apenas uma referência estimada — use como ponto de partida para a simulação abaixo.">ⓘ</span>
+        </div>
+        <div id="bt-red-previsto" style="font-family:var(--mono);font-size:36px;font-weight:700;color:var(--red);">—</div>
+      </div>
     </div>
 
     <!-- CAMPO RED MÉDIO -->
     <div class="card" style="padding:24px;margin-bottom:28px;">
       <div style="display:flex;align-items:center;gap:6px;margin-bottom:16px;">
         <div style="font-size:13px;font-weight:600;color:var(--text);">Simular com Red Médio</div>
-        <span class="bt-tip" title="Informe o red médio real ou esperado por operação (em reais, considerando stake de R$100). O gráfico abaixo mostrará a curva de lucro acumulado com esse parâmetro.">ⓘ</span>
+        <span class="bt-tip" title="Informe o red médio por operação (em reais, stake R$100). O campo é pré-preenchido com o Red Previsto calculado a partir da exposição informada — é apenas uma estimativa de referência, ajuste se quiser simular outros cenários.">ⓘ</span>
       </div>
       <div style="display:flex;gap:12px;align-items:center;">
         <input id="bt-red-valor" type="number" min="0" placeholder="ex: 80"
@@ -1642,6 +1650,8 @@ function showTab(id) {
 // ── BACKTEST ─────────────────────────────────────────────────
 let btDados = null; // cache dos dados brutos
 
+const TEMPO_EXPOSICAO = {1:-4,2:-8,3:-12,4:-16,5:-20,6:-24,7:-28,8:-32,9:-36,10:-40,11:-45,12:-50,13:-55,14:-60,15:-67,16:-74,17:-81,18:-89,19:-97,20:-105,21:-113,22:-121,23:-129,24:-139,25:-149,26:-159,27:-169,28:-179,29:-189,30:-200,31:-211,32:-222,33:-233,34:-244,35:-256,36:-268,37:-280,38:-292,39:-306,40:-320,41:-334,42:-350,43:-366,44:-382,45:-398,46:-418,47:-438,48:-458,49:-498,50:-548,51:-608,52:-678,53:-758,54:-848,55:-948,56:-1058,57:-1178,58:-1308};
+
 async function btCalcular() {
   const minE = parseInt(document.getElementById('bt-min-entrada').value);
   const maxE = parseInt(document.getElementById('bt-max-entrada').value);
@@ -1717,6 +1727,17 @@ async function btCalcular() {
     wrEl.style.color = wr >= 0.5 ? 'var(--green)' : 'var(--red)';
     document.getElementById('bt-red-max').textContent = redMax === Infinity ? '∞' : 'R$' + redMax.toFixed(2);
 
+    // Red Previsto via tabela tempo_exposicao
+    const stopLoss = TEMPO_EXPOSICAO[exp];
+    const redPrevisto = stopLoss !== undefined ? Math.abs(stopLoss) : null;
+    const rpEl = document.getElementById('bt-red-previsto');
+    if (redPrevisto !== null) {
+      rpEl.textContent = 'R$' + redPrevisto.toFixed(2);
+      document.getElementById('bt-red-valor').value = redPrevisto.toFixed(2);
+    } else {
+      rpEl.textContent = '—';
+    }
+
     document.getElementById('bt-resultados').style.display = 'block';
     document.getElementById('bt-graficos').style.display = 'none';
 
@@ -1751,7 +1772,10 @@ function btPreset(tipo) {
   const hoje = new Date();
   let ini, fim;
 
-  if (tipo === 'mes') {
+  if (tipo === 'hoje') {
+    ini = new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate());
+    fim = new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate());
+  } else if (tipo === 'mes') {
     ini = new Date(hoje.getFullYear(), hoje.getMonth(), 1);
     fim = new Date(hoje.getFullYear(), hoje.getMonth() + 1, 0);
   } else if (tipo === '3m') {
@@ -1796,8 +1820,9 @@ function btLimpar() {
   document.getElementById('bt-total').textContent    = '—';
   document.getElementById('bt-wr').textContent       = '—';
   document.getElementById('bt-wr').style.color       = '';
-  document.getElementById('bt-red-max').textContent  = '—';
-  document.getElementById('bt-lista').innerHTML      = '';
+  document.getElementById('bt-red-max').textContent      = '—';
+  document.getElementById('bt-red-previsto').textContent = '—';
+  document.getElementById('bt-lista').innerHTML           = '';
   destroyC('bt-chart-acum');
   destroyC('bt-chart-mensal');
   window._btJogos = null;
