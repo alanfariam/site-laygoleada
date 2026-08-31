@@ -453,9 +453,19 @@ footer a:hover{color:var(--green);}
   </div>
 </div>
 
-<!-- CARDS ANÁLISE -->
-<div class="kpi-grid" id="analiseCards">
-  <!-- preenchido via JS -->
+<!-- VÍDEO DE APRESENTAÇÃO -->
+<div class="section" style="padding-top:8px;">
+  <div class="section-title">Conheça o grupo de alertas</div>
+  <a href="https://youtu.be/NFBHzIeYJko" target="_blank" rel="noopener"
+     style="display:block;position:relative;border-radius:12px;overflow:hidden;border:1px solid var(--border);cursor:pointer;max-width:720px;margin:0 auto;text-decoration:none;">
+    <img src="https://img.youtube.com/vi/NFBHzIeYJko/maxresdefault.jpg" alt="Apresentação do Grupo de Alertas"
+         style="width:100%;display:block;aspect-ratio:16/9;object-fit:cover;">
+    <div style="position:absolute;inset:0;background:rgba(0,0,0,.35);display:flex;align-items:center;justify-content:center;transition:background .2s;">
+      <div style="width:64px;height:64px;background:var(--green);border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 0 24px rgba(46,204,138,.4);">
+        <svg width="22" height="22" viewBox="0 0 16 16" fill="#0A0C10"><polygon points="4,2 14,8 4,14"/></svg>
+      </div>
+    </div>
+  </a>
 </div>
 
 <!-- COMO FUNCIONA -->
@@ -598,6 +608,11 @@ footer a:hover{color:var(--green);}
       <div class="sum-qty" id="sDois">—</div>
       <div class="sum-pct" style="color:var(--green);" id="sDoisPct">—</div>
     </div>
+  </div>
+
+  <!-- CARDS ANÁLISE OVER -->
+  <div class="kpi-grid" id="analiseCards" style="margin-top:16px;">
+    <!-- preenchido via JS -->
   </div>
 
   <!-- GRÁFICOS -->
@@ -1284,13 +1299,13 @@ function renderJogosSummary(d) {
 // ── cards análise ────────────────────────────────────────────
 function renderAnaliseCards(grupos, total) {
   const cores = [
-    'rgba(240,90,90,.85)',
     'rgba(240,160,48,.85)',
     'rgba(46,204,138,.85)',
     'rgba(74,158,240,.85)',
     'rgba(180,100,240,.85)',
   ];
-  document.getElementById('analiseCards').innerHTML = grupos.map((g, i) => `
+  const filtrados = grupos.filter(g => g.label !== 'Zero Gols');
+  document.getElementById('analiseCards').innerHTML = filtrados.map((g, i) => `
     <div class="kpi" style="border-color:${cores[i].replace('.85','.3')}">
       <div style="position:absolute;top:0;left:0;right:0;height:2px;background:${cores[i]};border-radius:2px 2px 0 0;"></div>
       <div class="kpi-label">${g.label}</div>
