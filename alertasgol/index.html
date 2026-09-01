@@ -2097,8 +2097,9 @@ window.addEventListener('DOMContentLoaded', async () => {
 
 // ── lazy loaders por aba ─────────────────────────────────────
 async function lazyAnalise(mes = '') {
-  if (!mes && _loaded.analise) return;
-  if (!mes) _loaded.analise = true;
+  if (mes === window._analise_mes_atual) return;
+  window._analise_mes_atual = mes;
+  _loaded.analise = true;
   const q = mes ? `?mes=${encodeURIComponent(mes)}` : '';
   try {
     const [golsPosAlerta, distPrimGol, intervaloGols] = await Promise.all([
