@@ -686,6 +686,16 @@ footer a:hover{color:var(--green);}
 <!-- PAGE: ANÁLISE -->
 <div class="page" id="page-analise">
 
+  <!-- FILTRO MÊS/ANO -->
+  <div style="padding:24px 32px 0;max-width:960px;margin:0 auto;display:flex;align-items:center;gap:12px;">
+    <span style="font-family:var(--mono);font-size:10px;color:var(--text3);letter-spacing:.08em;text-transform:uppercase;">Período</span>
+    <select id="analise-mes-select" onchange="analise_filtrarMes(this.value)"
+      style="padding:7px 14px;border-radius:6px;border:1px solid var(--border);background:var(--bg3);color:var(--text);font-size:13px;font-family:var(--mono);cursor:pointer;outline:none;min-width:160px;">
+      <option value="">Todos os dados</option>
+    </select>
+    <span id="analise-filtro-label" style="font-family:var(--mono);font-size:11px;color:var(--green);display:none;">● filtrado</span>
+  </div>
+
   <!-- PLACAR NO ALERTA -->
   <div class="section" style="padding-top:48px;">
     <div class="section-title">% de jogos sem gol pós alerta — por placar no momento do alerta</div>
@@ -2086,19 +2096,41 @@ window.addEventListener('DOMContentLoaded', async () => {
 });
 
 // ── lazy loaders por aba ─────────────────────────────────────
-async function lazyAnalise() {
-  if (_loaded.analise) return;
-  _loaded.analise = true;
+async function lazyAnalise(mes = '') {
+  if (!mes && _loaded.analise) return;
+  if (!mes) _loaded.analise = true;
+  const q = mes ? `?mes=${encodeURIComponent(mes)}` : '';
   try {
     const [golsPosAlerta, distPrimGol, intervaloGols] = await Promise.all([
-      fetchJson('/api/gols-pos-alerta').catch(() => null),
-      fetchJson('/api/dist-primeiro-gol').catch(() => null),
-      fetchJson('/api/intervalo-gols').catch(() => null),
+      fetchJson('/api/gols-pos-alerta' + q).catch(() => null),
+      fetchJson('/api/dist-primeiro-gol' + q).catch(() => null),
+      fetchJson('/api/intervalo-gols' + q).catch(() => null),
     ]);
-    if (golsPosAlerta) { renderPlacarZero(golsPosAlerta); renderPlacarDif(golsPosAlerta); }
+    if (golsPosAlerta) {
+      renderPlacarZero(golsPosAlerta);
+      renderPlacarDif(golsPosAlerta);
+      const sel = document.getElementById('analise-mes-select');
+      if (sel && sel.options.length === 1 && golsPosAlerta.meses_disponiveis) {
+        const meses = golsPosAlerta.meses_disponiveis.slice().reverse();
+        meses.forEach(m => {
+          const [mm, aa] = m.split('/');
+          const nomes = ['','Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+          const opt = document.createElement('option');
+          opt.value = m;
+          opt.textContent = `${nomes[parseInt(mm)]} ${aa}`;
+          sel.appendChild(opt);
+        });
+      }
+    }
     if (distPrimGol)   renderDistPrimGol(distPrimGol);
     if (intervaloGols) renderMinutoGols(intervaloGols);
   } catch(e) {}
+}
+
+function analise_filtrarMes(mes) {
+  const lbl = document.getElementById('analise-filtro-label');
+  if (lbl) lbl.style.display = mes ? 'inline' : 'none';
+  lazyAnalise(mes);
 }
 
 async function lazyCamp() {
