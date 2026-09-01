@@ -705,8 +705,15 @@ footer a:hover{color:var(--green);}
   <!-- MINUTOS PARA O GOL -->
   <div class="section" style="padding-top:8px;">
     <div class="section-title">Em quantos minutos chegou o primeiro gol após o alerta?</div>
-    <div class="card card-full" style="height:300px;">
-      <canvas id="cDistPrimGol"></canvas>
+    <div class="charts">
+      <div class="card" style="height:300px;">
+        <div class="card-title">Distribuição por faixa de minutos</div>
+        <canvas id="cDistPrimGol"></canvas>
+      </div>
+      <div class="card" style="height:300px;">
+        <div class="card-title">% acumulado — gols saídos em até N minutos</div>
+        <canvas id="cDistPrimGolAcum"></canvas>
+      </div>
     </div>
   </div>
 
@@ -1609,6 +1616,39 @@ function renderDistPrimGol(raw) {
       }}},
       scales: {
         y: { ticks: { color: '#556070', font: {size:10} }, grid: { color: 'rgba(255,255,255,.04)' } },
+        x: { ticks: { color: '#8A96A3', font: {size:10} }, grid: { display: false } }
+      }
+    }
+  });
+
+  // Acumulado (exclui "Sem Gols")
+  const comGol = faixas.filter(f => f.faixa !== 'Sem Gols');
+  const totalComGol = comGol.reduce((s, f) => s + f.count, 0);
+  let acum = 0;
+  const acumLabels = comGol.map(f => f.faixa);
+  const acumVals = comGol.map(f => {
+    acum += f.count;
+    return totalComGol > 0 ? Math.round(acum / totalComGol * 1000) / 10 : 0;
+  });
+  destroyC('cDistPrimGolAcum');
+  charts['cDistPrimGolAcum'] = new Chart(document.getElementById('cDistPrimGolAcum'), {
+    type: 'line',
+    data: { labels: acumLabels, datasets: [{
+      data: acumVals,
+      borderColor: 'rgba(46,204,138,.9)',
+      backgroundColor: 'rgba(46,204,138,.12)',
+      borderWidth: 2,
+      pointRadius: 3,
+      pointBackgroundColor: 'rgba(46,204,138,.9)',
+      fill: true,
+      tension: .35
+    }]},
+    options: { ...cd(),
+      plugins: { ...cd().plugins, tooltip: { ...cd().plugins.tooltip, callbacks: {
+        label: ctx => ` ${ctx.raw}% dos alertas com gol`
+      }}},
+      scales: {
+        y: { min: 0, max: 100, ticks: { callback: v => v + '%', color: '#556070', font: {size:10} }, grid: { color: 'rgba(255,255,255,.04)' } },
         x: { ticks: { color: '#8A96A3', font: {size:10} }, grid: { display: false } }
       }
     }
