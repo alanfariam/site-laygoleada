@@ -379,20 +379,18 @@ async function clearCache(product) {
 const VISITAS_URL = 'https://api.laygoleada.com.br/adm/api/visitas';
 
 const PAGE_LABELS = {
-  alertasgol:   'Alertas Gol',
-  freefire:     'FreeFire (hist.)',
-  trinity:      'Trinity',
-  overtriplex:  'Over Triplex',
-  projetolb26:  'Projeto LB26',
+  alertasgol:            'Alertas Gol',
+  projetolb26:           'Projeto LB26',
+  treinamentopackball:   'Treinamento',
 };
 
 const PAGE_COLORS = {
-  alertasgol:   '#4A9EF0',
-  freefire:     '#556070',
-  trinity:      '#3B82F6',
-  overtriplex:  '#F59E0B',
-  projetolb26:  '#C8FF1A',
+  alertasgol:            '#4A9EF0',
+  projetolb26:           '#C8FF1A',
+  treinamentopackball:   '#A78BFA',
 };
+
+const PAGES_ATIVAS = new Set(Object.keys(PAGE_LABELS));
 
 let visitChart = null;
 
@@ -469,8 +467,9 @@ async function loadVisitas() {
   try {
     const resp = await fetch(VISITAS_URL);
     const d    = await resp.json();
-    renderVisitsSummary(d.resumo || {}, d.paginas || []);
-    renderVisitChart(d.diario  || [], d.paginas || []);
+    const paginas = (d.paginas || []).filter(p => PAGES_ATIVAS.has(p));
+    renderVisitsSummary(d.resumo || {}, paginas);
+    renderVisitChart(d.diario  || [], paginas);
   } catch(e) {
     document.getElementById('visitsSummary').innerHTML =
       `<div class="visit-card" style="opacity:.5;color:var(--red)">Erro ao carregar visitas: ${e.message}</div>`;
