@@ -1005,18 +1005,41 @@ footer a:hover{color:var(--green);}
     <!-- GRÁFICOS (ocultos até simular) -->
     <div id="bt-graficos" style="display:none;">
       <!-- Card Lucro Total -->
-      <div class="card" style="margin-bottom:20px;padding:24px 28px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;">
-        <div>
-          <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;">
-            <div style="font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;">Lucro Total Simulado</div>
-            <span class="bt-tip" title="Soma de todos os resultados: GREEN +R$93,50 e RED −Red Médio informado, considerando todos os jogos analisados após o filtro.">ⓘ</span>
+      <div class="card" style="margin-bottom:20px;padding:24px 28px;">
+        <div style="display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:20px;margin-bottom:20px;">
+          <div>
+            <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;">
+              <div style="font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;">Lucro Total Simulado</div>
+              <span class="bt-tip" title="Soma de todos os resultados: GREEN +R$93,50 e RED −Red Médio informado, considerando todos os jogos analisados após o filtro.">ⓘ</span>
+            </div>
+            <div id="bt-lucro-total" style="font-family:var(--mono);font-size:42px;font-weight:700;line-height:1;">—</div>
           </div>
-          <div id="bt-lucro-total" style="font-family:var(--mono);font-size:42px;font-weight:700;line-height:1;">—</div>
+          <div style="font-size:11px;color:var(--text3);text-align:right;line-height:1.6;">
+            Stake R$100 · GREEN = +R$93,50 · RED = −Red Médio
+          </div>
         </div>
-        <div style="text-align:right;">
-          <div style="font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;">Stake referência</div>
-          <div style="font-family:var(--mono);font-size:18px;font-weight:600;color:var(--text2);">R$100 por operação</div>
-          <div style="font-size:11px;color:var(--text3);margin-top:4px;">GREEN = +R$93,50 · RED = −Red Médio</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;border-top:1px solid var(--border);padding-top:16px;">
+          <div style="text-align:center;">
+            <div style="display:flex;align-items:center;justify-content:center;gap:5px;margin-bottom:6px;">
+              <div style="font-size:9px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;">Drawdown</div>
+              <span class="bt-tip" title="Maior queda do pico ao vale na curva de lucro acumulado. Representa o pior momento da sequência simulada.">ⓘ</span>
+            </div>
+            <div id="bt-drawdown" style="font-family:var(--mono);font-size:22px;font-weight:700;color:var(--red);">—</div>
+          </div>
+          <div style="text-align:center;">
+            <div style="display:flex;align-items:center;justify-content:center;gap:5px;margin-bottom:6px;">
+              <div style="font-size:9px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;">Good Run</div>
+              <span class="bt-tip" title="Maior sequência consecutiva de GREENs na simulação.">ⓘ</span>
+            </div>
+            <div id="bt-good-run" style="font-family:var(--mono);font-size:22px;font-weight:700;color:var(--green);">—</div>
+          </div>
+          <div style="text-align:center;">
+            <div style="display:flex;align-items:center;justify-content:center;gap:5px;margin-bottom:6px;">
+              <div style="font-size:9px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;">Bad Run</div>
+              <span class="bt-tip" title="Maior sequência consecutiva de REDs na simulação.">ⓘ</span>
+            </div>
+            <div id="bt-bad-run" style="font-family:var(--mono);font-size:22px;font-weight:700;color:var(--red);">—</div>
+          </div>
         </div>
       </div>
       <div class="card" style="margin-bottom:20px;padding:20px;">
@@ -1888,6 +1911,9 @@ function btLimpar() {
   document.getElementById('bt-red-max').textContent      = '—';
   document.getElementById('bt-red-previsto').textContent = '—';
   document.getElementById('bt-lista').innerHTML           = '';
+  document.getElementById('bt-drawdown').textContent  = '—';
+  document.getElementById('bt-good-run').textContent  = '—';
+  document.getElementById('bt-bad-run').textContent   = '—';
   destroyC('bt-chart-acum');
   destroyC('bt-chart-mensal');
   window._btJogos = null;
@@ -1994,6 +2020,20 @@ function btSimular() {
   const ltEl = document.getElementById('bt-lucro-total');
   ltEl.textContent = (lucroTotal >= 0 ? '+' : '') + 'R$' + lucroTotal.toFixed(2);
   ltEl.style.color = lucroTotal >= 0 ? 'var(--green)' : 'var(--red)';
+
+  // Drawdown
+  let peak = 0, dd = 0;
+  acumVals.forEach(v => { peak = Math.max(peak, v); dd = Math.max(dd, peak - v); });
+  document.getElementById('bt-drawdown').textContent = 'R$' + dd.toFixed(2);
+
+  // Good Run / Bad Run
+  let goodRun = 0, badRun = 0, curG = 0, curB = 0;
+  jogos.forEach(j => {
+    if (j.resultado === 'GREEN') { curG++; curB = 0; goodRun = Math.max(goodRun, curG); }
+    else                         { curB++; curG = 0; badRun  = Math.max(badRun,  curB); }
+  });
+  document.getElementById('bt-good-run').textContent = goodRun;
+  document.getElementById('bt-bad-run').textContent  = badRun;
 
   document.getElementById('bt-graficos').style.display = 'block';
 }
