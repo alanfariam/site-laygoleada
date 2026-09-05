@@ -1051,6 +1051,13 @@ footer a:hover{color:var(--green);}
       </div>
       <div class="card" style="margin-bottom:20px;padding:20px;">
         <div style="display:flex;align-items:center;gap:6px;margin-bottom:16px;">
+          <div class="card-title" style="margin:0;">Lucro Diário</div>
+          <span class="bt-tip" title="Lucro ou prejuízo por dia, considerando green de R$93,50 e o red médio informado.">ⓘ</span>
+        </div>
+        <div style="height:220px;"><canvas id="bt-chart-diario"></canvas></div>
+      </div>
+      <div class="card" style="margin-bottom:20px;padding:20px;">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:16px;">
           <div class="card-title" style="margin:0;">Lucro Mensal</div>
           <span class="bt-tip" title="Lucro ou prejuízo por mês calendário, considerando green de R$93,50 e o red médio informado.">ⓘ</span>
         </div>
@@ -1915,6 +1922,7 @@ function btLimpar() {
   document.getElementById('bt-good-run').textContent  = '—';
   document.getElementById('bt-bad-run').textContent   = '—';
   destroyC('bt-chart-acum');
+  destroyC('bt-chart-diario');
   destroyC('bt-chart-mensal');
   window._btJogos = null;
 }
@@ -1944,6 +1952,31 @@ function btSimular() {
       fill: true, backgroundColor: 'rgba(74,158,240,.08)' }] },
     options: { ...cd(), scales: {
       x: { display: false },
+      y: { grid: { color: 'rgba(255,255,255,.04)' }, ticks: { callback: v => 'R$' + v.toFixed(0), color: '#606060', font: { size: 10 } } }
+    }}
+  });
+
+  // Lucro diário
+  const diario = {};
+  jogos.forEach(j => {
+    const [d, m, y] = j.data.split('/');
+    const key = `${y}-${m}-${d}`;
+    const lbl = `${d}/${m}`;
+    if (!diario[key]) diario[key] = { lbl, lucro: 0 };
+    diario[key].lucro += j.green ? GREEN : RED;
+  });
+  const diarioOrd = Object.keys(diario).sort();
+  const diarioVals = diarioOrd.map(k => parseFloat(diario[k].lucro.toFixed(2)));
+  const diarioLbls = diarioOrd.map(k => diario[k].lbl);
+
+  destroyC('bt-chart-diario');
+  charts['bt-chart-diario'] = new Chart(document.getElementById('bt-chart-diario'), {
+    type: 'bar',
+    data: { labels: diarioLbls, datasets: [{ label: 'Lucro Diário', data: diarioVals,
+      backgroundColor: diarioVals.map(v => v >= 0 ? 'rgba(46,204,138,.7)' : 'rgba(240,90,90,.65)'),
+      borderRadius: 3, barPercentage: .8 }] },
+    options: { ...cd(), scales: {
+      x: { grid: { display: false }, ticks: { color: '#606060', font: { size: 10 }, maxRotation: 45 } },
       y: { grid: { color: 'rgba(255,255,255,.04)' }, ticks: { callback: v => 'R$' + v.toFixed(0), color: '#606060', font: { size: 10 } } }
     }}
   });
