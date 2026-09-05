@@ -1018,27 +1018,41 @@ footer a:hover{color:var(--green);}
             Stake R$100 · GREEN = +R$93,50 · RED = −Red Médio
           </div>
         </div>
-        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;border-top:1px solid var(--border);padding-top:16px;">
+        <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px;border-top:1px solid var(--border);padding-top:16px;">
           <div style="text-align:center;">
             <div style="display:flex;align-items:center;justify-content:center;gap:5px;margin-bottom:6px;">
               <div style="font-size:9px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;">Drawdown</div>
               <span class="bt-tip" title="Maior queda do pico ao vale na curva de lucro acumulado. Representa o pior momento da sequência simulada.">ⓘ</span>
             </div>
-            <div id="bt-drawdown" style="font-family:var(--mono);font-size:22px;font-weight:700;color:var(--red);">—</div>
+            <div id="bt-drawdown" style="font-family:var(--mono);font-size:20px;font-weight:700;color:var(--red);">—</div>
           </div>
           <div style="text-align:center;">
             <div style="display:flex;align-items:center;justify-content:center;gap:5px;margin-bottom:6px;">
               <div style="font-size:9px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;">Good Run</div>
               <span class="bt-tip" title="Maior sequência consecutiva de GREENs na simulação.">ⓘ</span>
             </div>
-            <div id="bt-good-run" style="font-family:var(--mono);font-size:22px;font-weight:700;color:var(--green);">—</div>
+            <div id="bt-good-run" style="font-family:var(--mono);font-size:20px;font-weight:700;color:var(--green);">—</div>
           </div>
           <div style="text-align:center;">
             <div style="display:flex;align-items:center;justify-content:center;gap:5px;margin-bottom:6px;">
               <div style="font-size:9px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;">Bad Run</div>
               <span class="bt-tip" title="Maior sequência consecutiva de REDs na simulação.">ⓘ</span>
             </div>
-            <div id="bt-bad-run" style="font-family:var(--mono);font-size:22px;font-weight:700;color:var(--red);">—</div>
+            <div id="bt-bad-run" style="font-family:var(--mono);font-size:20px;font-weight:700;color:var(--red);">—</div>
+          </div>
+          <div style="text-align:center;">
+            <div style="display:flex;align-items:center;justify-content:center;gap:5px;margin-bottom:6px;">
+              <div style="font-size:9px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;">Expectativa</div>
+              <span class="bt-tip" title="Lucro médio por operação. Positivo significa que o método é matematicamente lucrativo neste período.">ⓘ</span>
+            </div>
+            <div id="bt-expectativa" style="font-family:var(--mono);font-size:20px;font-weight:700;">—</div>
+          </div>
+          <div style="text-align:center;">
+            <div style="display:flex;align-items:center;justify-content:center;gap:5px;margin-bottom:6px;">
+              <div style="font-size:9px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;">Breakeven WR</div>
+              <span class="bt-tip" title="Winrate mínimo para o método ser lucrativo com o Red Médio informado. Quanto mais abaixo do seu WR atual, maior a margem de segurança.">ⓘ</span>
+            </div>
+            <div id="bt-breakeven" style="font-family:var(--mono);font-size:20px;font-weight:700;color:var(--text2);">—</div>
           </div>
         </div>
       </div>
@@ -1918,9 +1932,12 @@ function btLimpar() {
   document.getElementById('bt-red-max').textContent      = '—';
   document.getElementById('bt-red-previsto').textContent = '—';
   document.getElementById('bt-lista').innerHTML           = '';
-  document.getElementById('bt-drawdown').textContent  = '—';
-  document.getElementById('bt-good-run').textContent  = '—';
-  document.getElementById('bt-bad-run').textContent   = '—';
+  document.getElementById('bt-drawdown').textContent   = '—';
+  document.getElementById('bt-good-run').textContent   = '—';
+  document.getElementById('bt-bad-run').textContent    = '—';
+  document.getElementById('bt-expectativa').textContent = '—';
+  document.getElementById('bt-expectativa').style.color = '';
+  document.getElementById('bt-breakeven').textContent  = '—';
   destroyC('bt-chart-acum');
   destroyC('bt-chart-diario');
   destroyC('bt-chart-mensal');
@@ -2067,6 +2084,16 @@ function btSimular() {
   });
   document.getElementById('bt-good-run').textContent = goodRun;
   document.getElementById('bt-bad-run').textContent  = badRun;
+
+  // Expectativa por jogo
+  const expectativa = jogos.length > 0 ? lucroTotal / jogos.length : 0;
+  const expEl = document.getElementById('bt-expectativa');
+  expEl.textContent = (expectativa >= 0 ? '+' : '') + 'R$' + expectativa.toFixed(2);
+  expEl.style.color = expectativa >= 0 ? 'var(--green)' : 'var(--red)';
+
+  // Breakeven WR
+  const breakevenWR = redVal > 0 ? (redVal / (93.5 + redVal)) * 100 : 0;
+  document.getElementById('bt-breakeven').textContent = breakevenWR.toFixed(1) + '%';
 
   document.getElementById('bt-graficos').style.display = 'block';
 }
