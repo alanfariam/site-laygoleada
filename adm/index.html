@@ -467,7 +467,7 @@ async function loadVisitas() {
   try {
     const resp = await fetch(VISITAS_URL);
     const d    = await resp.json();
-    const paginas = (d.paginas || []).filter(p => PAGES_ATIVAS.has(p));
+    const paginas = [...PAGES_ATIVAS]; // sempre exibe todas as páginas ativas, mesmo sem visitas ainda
     renderVisitsSummary(d.resumo || {}, paginas);
     renderVisitChart(d.diario  || [], paginas);
   } catch(e) {
