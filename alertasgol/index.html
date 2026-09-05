@@ -2029,8 +2029,8 @@ function btSimular() {
   // Good Run / Bad Run
   let goodRun = 0, badRun = 0, curG = 0, curB = 0;
   jogos.forEach(j => {
-    if (j.resultado === 'GREEN') { curG++; curB = 0; goodRun = Math.max(goodRun, curG); }
-    else                         { curB++; curG = 0; badRun  = Math.max(badRun,  curB); }
+    if (j.green) { curG++; curB = 0; goodRun = Math.max(goodRun, curG); }
+    else         { curB++; curG = 0; badRun  = Math.max(badRun,  curB); }
   });
   document.getElementById('bt-good-run').textContent = goodRun;
   document.getElementById('bt-bad-run').textContent  = badRun;
