@@ -2133,84 +2133,96 @@ function btSimular() {
   const breakevenWR = redVal > 0 ? (redVal / (93.5 + redVal)) * 100 : 0;
   document.getElementById('bt-breakeven').textContent = breakevenWR.toFixed(1) + '%';
 
+  // helper: opções comuns para gráficos com linha de volume
+  function chartComVolume(indexAxis, lucroVals, volVals, labels, barColor) {
+    const isH = indexAxis === 'y';
+    return {
+      type: 'bar',
+      data: {
+        labels,
+        datasets: [
+          {
+            label: 'Lucro', data: lucroVals, yAxisID: isH ? 'x' : 'y',
+            xAxisID: isH ? 'x' : undefined,
+            backgroundColor: Array.isArray(barColor) ? barColor : lucroVals.map(v => v >= 0 ? 'rgba(46,204,138,.7)' : 'rgba(240,90,90,.65)'),
+            borderRadius: 3, barPercentage: .7, order: 2,
+          },
+          {
+            label: 'Volume', data: volVals,
+            type: 'line',
+            yAxisID: isH ? 'xVol' : 'yVol',
+            xAxisID: isH ? 'xVol' : undefined,
+            borderColor: 'rgba(250,204,21,.8)', borderWidth: 2,
+            pointRadius: 3, pointBackgroundColor: 'rgba(250,204,21,.9)',
+            tension: .3, fill: false, order: 1,
+          }
+        ]
+      },
+      options: {
+        ...cd(),
+        indexAxis,
+        scales: isH ? {
+          x:    { grid: { color: 'rgba(255,255,255,.04)' }, ticks: { callback: v => 'R$'+v.toFixed(0), color: '#606060', font: { size: 10 } } },
+          xVol: { position: 'top', grid: { display: false }, ticks: { color: 'rgba(250,204,21,.6)', font: { size: 9 } }, title: { display: false } },
+          y:    { grid: { display: false }, ticks: { color: '#c9d1d9', font: { size: 10 } } },
+        } : {
+          x:    { grid: { display: false }, ticks: { color: '#c9d1d9', font: { size: 11 } } },
+          y:    { grid: { color: 'rgba(255,255,255,.04)' }, ticks: { callback: v => 'R$'+v.toFixed(0), color: '#606060', font: { size: 10 } } },
+          yVol: { position: 'right', grid: { display: false }, ticks: { color: 'rgba(250,204,21,.6)', font: { size: 9 } } },
+        }
+      }
+    };
+  }
+
   // ── Lucro por Placar ──────────────────────────────────────
   const byPlacar = {};
   jogos.forEach(j => {
     const p = (j.placar || '?').trim();
-    if (!byPlacar[p]) byPlacar[p] = 0;
-    byPlacar[p] += j.green ? GREEN : RED;
+    if (!byPlacar[p]) byPlacar[p] = { lucro: 0, vol: 0 };
+    byPlacar[p].lucro += j.green ? GREEN : RED;
+    byPlacar[p].vol++;
   });
-  const placarEntries = Object.entries(byPlacar).sort((a,b) => b[1]-a[1]);
+  const placarEntries = Object.entries(byPlacar).sort((a,b) => b[1].lucro - a[1].lucro);
   const placarLbls = placarEntries.map(e => e[0]);
-  const placarVals = placarEntries.map(e => parseFloat(e[1].toFixed(2)));
+  const placarVals = placarEntries.map(e => parseFloat(e[1].lucro.toFixed(2)));
+  const placarVols = placarEntries.map(e => e[1].vol);
   destroyC('bt-chart-placar');
-  charts['bt-chart-placar'] = new Chart(document.getElementById('bt-chart-placar'), {
-    type: 'bar',
-    data: { labels: placarLbls, datasets: [{ label: 'Lucro', data: placarVals,
-      backgroundColor: placarVals.map(v => v >= 0 ? 'rgba(46,204,138,.7)' : 'rgba(240,90,90,.65)'),
-      borderRadius: 3, barPercentage: .7 }] },
-    options: { ...cd(), indexAxis: 'y', scales: {
-      x: { grid: { color: 'rgba(255,255,255,.04)' }, ticks: { callback: v => 'R$'+v.toFixed(0), color: '#606060', font: { size: 10 } } },
-      y: { grid: { display: false }, ticks: { color: '#c9d1d9', font: { size: 11 } } }
-    }}
-  });
+  charts['bt-chart-placar'] = new Chart(document.getElementById('bt-chart-placar'), chartComVolume('y', placarVals, placarVols, placarLbls, null));
 
-  // ── Lucro por Dia da Semana ───────────────────────────────
+  // ── Lucro por Dia da Semana (calculado da data) ───────────
   const DIAS = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
-  const bySemana = { Dom:0, Seg:0, Ter:0, Qua:0, Qui:0, Sex:0, Sáb:0 };
+  const bySemana = { Dom:{lucro:0,vol:0}, Seg:{lucro:0,vol:0}, Ter:{lucro:0,vol:0}, Qua:{lucro:0,vol:0}, Qui:{lucro:0,vol:0}, Sex:{lucro:0,vol:0}, Sáb:{lucro:0,vol:0} };
   jogos.forEach(j => {
-    let dia = (j.semana || '').trim();
-    // normalizar abreviações do banco para as chaves acima
-    const mapa = { 'Domingo':'Dom','Segunda':'Seg','Terça':'Ter','Quarta':'Qua','Quinta':'Qui','Sexta':'Sex','Sábado':'Sáb',
-                   'Dom':'Dom','Seg':'Seg','Ter':'Ter','Qua':'Qua','Qui':'Qui','Sex':'Sex','Sáb':'Sáb','Sab':'Sáb' };
-    dia = mapa[dia] || dia;
-    if (bySemana[dia] !== undefined) bySemana[dia] += j.green ? GREEN : RED;
+    const [dd, mm, yyyy] = j.data.split('/');
+    const dow = new Date(+yyyy, +mm - 1, +dd).getDay(); // 0=Dom … 6=Sáb
+    const dia = DIAS[dow];
+    bySemana[dia].lucro += j.green ? GREEN : RED;
+    bySemana[dia].vol++;
   });
-  const semanaVals = DIAS.map(d => parseFloat((bySemana[d]||0).toFixed(2)));
+  const semanaVals = DIAS.map(d => parseFloat(bySemana[d].lucro.toFixed(2)));
+  const semanaVols = DIAS.map(d => bySemana[d].vol);
   destroyC('bt-chart-semana');
-  charts['bt-chart-semana'] = new Chart(document.getElementById('bt-chart-semana'), {
-    type: 'bar',
-    data: { labels: DIAS, datasets: [{ label: 'Lucro', data: semanaVals,
-      backgroundColor: semanaVals.map(v => v >= 0 ? 'rgba(46,204,138,.7)' : 'rgba(240,90,90,.65)'),
-      borderRadius: 4, barPercentage: .7 }] },
-    options: { ...cd(), scales: {
-      x: { grid: { display: false }, ticks: { color: '#c9d1d9', font: { size: 11 } } },
-      y: { grid: { color: 'rgba(255,255,255,.04)' }, ticks: { callback: v => 'R$'+v.toFixed(0), color: '#606060', font: { size: 10 } } }
-    }}
-  });
+  charts['bt-chart-semana'] = new Chart(document.getElementById('bt-chart-semana'), chartComVolume('x', semanaVals, semanaVols, DIAS, null));
 
   // ── Top 10 Ligas ─────────────────────────────────────────
   const byLiga = {};
   jogos.forEach(j => {
     const l = (j.campeonato || '?').trim();
-    if (!byLiga[l]) byLiga[l] = 0;
-    byLiga[l] += j.green ? GREEN : RED;
+    if (!byLiga[l]) byLiga[l] = { lucro: 0, vol: 0 };
+    byLiga[l].lucro += j.green ? GREEN : RED;
+    byLiga[l].vol++;
   });
-  const ligasSorted = Object.entries(byLiga).sort((a,b) => b[1]-a[1]);
-  const top10 = ligasSorted.slice(0,10);
-  const bot10 = [...ligasSorted].sort((a,b) => a[1]-b[1]).slice(0,10).reverse();
+  const ligasSorted = Object.entries(byLiga).sort((a,b) => b[1].lucro - a[1].lucro);
+  const top10 = ligasSorted.slice(0, 10);
+  const bot10 = [...ligasSorted].sort((a,b) => a[1].lucro - b[1].lucro).slice(0, 10); // pior primeiro (topo)
 
   destroyC('bt-chart-ligas-top');
-  charts['bt-chart-ligas-top'] = new Chart(document.getElementById('bt-chart-ligas-top'), {
-    type: 'bar',
-    data: { labels: top10.map(e=>e[0]), datasets: [{ label: 'Lucro', data: top10.map(e=>parseFloat(e[1].toFixed(2))),
-      backgroundColor: 'rgba(46,204,138,.7)', borderRadius: 3, barPercentage: .7 }] },
-    options: { ...cd(), indexAxis: 'y', scales: {
-      x: { grid: { color: 'rgba(255,255,255,.04)' }, ticks: { callback: v => 'R$'+v.toFixed(0), color: '#606060', font: { size: 10 } } },
-      y: { grid: { display: false }, ticks: { color: '#c9d1d9', font: { size: 10 } } }
-    }}
-  });
+  charts['bt-chart-ligas-top'] = new Chart(document.getElementById('bt-chart-ligas-top'),
+    chartComVolume('y', top10.map(e => parseFloat(e[1].lucro.toFixed(2))), top10.map(e => e[1].vol), top10.map(e => e[0]), 'rgba(46,204,138,.7)'));
 
   destroyC('bt-chart-ligas-bot');
-  charts['bt-chart-ligas-bot'] = new Chart(document.getElementById('bt-chart-ligas-bot'), {
-    type: 'bar',
-    data: { labels: bot10.map(e=>e[0]), datasets: [{ label: 'Lucro', data: bot10.map(e=>parseFloat(e[1].toFixed(2))),
-      backgroundColor: 'rgba(240,90,90,.65)', borderRadius: 3, barPercentage: .7 }] },
-    options: { ...cd(), indexAxis: 'y', scales: {
-      x: { grid: { color: 'rgba(255,255,255,.04)' }, ticks: { callback: v => 'R$'+v.toFixed(0), color: '#606060', font: { size: 10 } } },
-      y: { grid: { display: false }, ticks: { color: '#c9d1d9', font: { size: 10 } } }
-    }}
-  });
+  charts['bt-chart-ligas-bot'] = new Chart(document.getElementById('bt-chart-ligas-bot'),
+    chartComVolume('y', bot10.map(e => parseFloat(e[1].lucro.toFixed(2))), bot10.map(e => e[1].vol), bot10.map(e => e[0]), 'rgba(240,90,90,.65)'));
 
   document.getElementById('bt-graficos').style.display = 'block';
 }
