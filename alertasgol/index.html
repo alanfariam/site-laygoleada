@@ -2141,7 +2141,10 @@ function btSimular() {
     byPlacar[p].lucro += j.green ? GREEN : RED;
     byPlacar[p].vol++;
   });
-  const placarEntries = Object.entries(byPlacar).sort((a,b) => b[1].lucro - a[1].lucro);
+  const volMinPlacar = Math.max(1, Math.round(jogos.length * 0.02));
+  const placarEntries = Object.entries(byPlacar)
+    .filter(e => e[1].vol >= volMinPlacar)
+    .sort((a,b) => b[1].lucro - a[1].lucro);
   const placarLbls = placarEntries.map(e => e[0]);
   const placarVals = placarEntries.map(e => parseFloat(e[1].lucro.toFixed(2)));
   const placarVols = placarEntries.map(e => e[1].vol);
