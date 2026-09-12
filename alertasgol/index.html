@@ -866,8 +866,8 @@ footer a:hover{color:var(--green);}
     <div id="bt-metodo-ff" onclick="btSetMetodo('freefire')"
       style="cursor:pointer;border:2px solid var(--green);border-radius:12px;padding:16px 20px;background:rgba(46,204,138,.07);transition:all .2s;">
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
-        <div style="width:8px;height:8px;border-radius:50%;background:var(--green);flex-shrink:0;"></div>
-        <div style="font-size:12px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.08em;">FreeFire Personalizado</div>
+        <div id="bt-metodo-ff-dot" style="width:8px;height:8px;border-radius:50%;background:var(--green);flex-shrink:0;"></div>
+        <div id="bt-metodo-ff-lbl" style="font-size:12px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.08em;">FreeFire Personalizado</div>
       </div>
       <div style="font-size:12px;color:var(--text3);line-height:1.5;">Lay ao Under no mercado limite de gols. Parametrize livremente o minuto de entrada, exposição e red médio.</div>
     </div>
@@ -1821,37 +1821,36 @@ function btSetMetodo(metodo) {
   btLimpar();
 
   const ffCard  = document.getElementById('bt-metodo-ff');
+  const ffDot   = document.getElementById('bt-metodo-ff-dot');
+  const ffLbl   = document.getElementById('bt-metodo-ff-lbl');
   const trCard  = document.getElementById('bt-metodo-triplex');
   const trDot   = document.getElementById('bt-metodo-triplex-dot');
   const trLbl   = document.getElementById('bt-metodo-triplex-lbl');
   const fields  = ['bt-min-entrada','bt-max-entrada','bt-exposicao','bt-red-valor'];
 
   if (metodo === 'triplex') {
-    // Estilo cards
-    ffCard.style.borderColor  = 'var(--border2)';
-    ffCard.style.background   = 'transparent';
-    ffCard.querySelector('div > div:first-child').style.background = 'var(--text3)';
-    ffCard.querySelector('div > div:last-child').style.color = 'var(--text3)';
-    trCard.style.borderColor  = 'var(--green)';
-    trCard.style.background   = 'rgba(46,204,138,.07)';
-    trDot.style.background    = 'var(--green)';
-    trLbl.style.color         = 'var(--green)';
-    // Valores fixos
+    ffCard.style.borderColor = 'var(--border2)';
+    ffCard.style.background  = 'transparent';
+    ffDot.style.background   = 'var(--text3)';
+    ffLbl.style.color        = 'var(--text3)';
+    trCard.style.borderColor = 'var(--green)';
+    trCard.style.background  = 'rgba(46,204,138,.07)';
+    trDot.style.background   = 'var(--green)';
+    trLbl.style.color        = 'var(--green)';
     document.getElementById('bt-min-entrada').value = 45;
     document.getElementById('bt-max-entrada').value = 55;
     document.getElementById('bt-exposicao').value   = 37;
     document.getElementById('bt-red-valor').value   = 300;
     fields.forEach(id => { document.getElementById(id).disabled = true; });
   } else {
-    // Estilo cards
-    ffCard.style.borderColor  = 'var(--green)';
-    ffCard.style.background   = 'rgba(46,204,138,.07)';
-    ffCard.querySelector('div > div:first-child').style.background = 'var(--green)';
-    ffCard.querySelector('div > div:last-child').style.color = 'var(--green)';
-    trCard.style.borderColor  = 'var(--border2)';
-    trCard.style.background   = 'transparent';
-    trDot.style.background    = 'var(--text3)';
-    trLbl.style.color         = 'var(--text3)';
+    ffCard.style.borderColor = 'var(--green)';
+    ffCard.style.background  = 'rgba(46,204,138,.07)';
+    ffDot.style.background   = 'var(--green)';
+    ffLbl.style.color        = 'var(--green)';
+    trCard.style.borderColor = 'var(--border2)';
+    trCard.style.background  = 'transparent';
+    trDot.style.background   = 'var(--text3)';
+    trLbl.style.color        = 'var(--text3)';
     fields.forEach(id => { document.getElementById(id).disabled = false; });
   }
 }
@@ -1918,12 +1917,14 @@ async function btCalcular() {
       });
 
       comResultado = filtrados.map(j => {
-        const entrada = Math.max(45, j.min_alerta);
-        const limite  = entrada + 37;
-        const golsC   = parsearGols(j.gols_c);
-        const golsF   = parsearGols(j.gols_f);
-        const green   = golsC.concat(golsF).some(m => m >= entrada && m <= limite);
-        return { ...j, entrada, limite, green };
+        const entrada    = Math.max(45, j.min_alerta);
+        const limite     = entrada + 37;
+        const golsC      = parsearGols(j.gols_c);
+        const golsF      = parsearGols(j.gols_f);
+        const todosGols  = golsC.concat(golsF).filter(m => m >= entrada).sort((a,b) => a - b);
+        const green      = todosGols.some(m => m <= limite);
+        const primeiroGol = todosGols.length > 0 ? todosGols[0] : 0;
+        return { ...j, entrada, limite, green, primeiroGol };
       });
     } else {
       // FreeFire: lógica original
@@ -1942,7 +1943,7 @@ async function btCalcular() {
         const entrada = Math.max(minE, j.min_alerta);
         const limite  = entrada + exp;
         const green   = j.min_gol > 0 && j.min_gol >= entrada && j.min_gol <= limite;
-        return { ...j, entrada, limite, green };
+        return { ...j, entrada, limite, green, primeiroGol: j.min_gol };
       });
     }
 
@@ -1958,9 +1959,14 @@ async function btCalcular() {
     wrEl.style.color = wr >= 0.5 ? 'var(--green)' : 'var(--red)';
     document.getElementById('bt-red-max').textContent = redMax === Infinity ? '∞' : 'R$' + redMax.toFixed(2);
 
-    // Red Previsto via tabela tempo_exposicao
-    const stopLoss = TEMPO_EXPOSICAO[exp];
-    const redPrevisto = stopLoss !== undefined ? Math.abs(stopLoss) : null;
+    // Red Previsto
+    let redPrevisto;
+    if (metodo === 'triplex') {
+      redPrevisto = 300;
+    } else {
+      const stopLoss = TEMPO_EXPOSICAO[exp];
+      redPrevisto = stopLoss !== undefined ? Math.abs(stopLoss) : null;
+    }
     const rpEl = document.getElementById('bt-red-previsto');
     if (redPrevisto !== null) {
       rpEl.textContent = 'R$' + redPrevisto.toFixed(2);
@@ -2171,7 +2177,7 @@ function btSimular() {
       <td class="mono" style="text-align:center">${j.min_alerta}'</td>
       <td class="mono" style="text-align:center">${j.entrada}'</td>
       <td class="mono" style="text-align:center">${j.limite}'</td>
-      <td class="mono" style="text-align:center">${j.min_gol > 0 ? j.min_gol + "'" : '—'}</td>
+      <td class="mono" style="text-align:center">${j.primeiroGol > 0 ? j.primeiroGol + "'" : '—'}</td>
       <td class="mono" style="text-align:center;color:${cor};font-weight:700">${res}</td>
       <td class="mono" style="text-align:right;color:${lucroJ >= 0 ? 'var(--green)' : 'var(--red)'}">${lucroJ >= 0 ? '+' : ''}R$${lucroJ.toFixed(2)}</td>
     </tr>`;
