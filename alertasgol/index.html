@@ -860,9 +860,26 @@ footer a:hover{color:var(--green);}
 <div class="section" style="max-width:860px;margin:0 auto;padding:40px 24px;">
 
   <div class="section-title" style="margin-bottom:6px;">Backtest de Filtros</div>
-  <p style="font-size:13px;color:var(--text2);margin-bottom:32px;">
-    Simule diferentes critérios de entrada para o método <strong style="color:var(--text);">Lay ao Under Limite</strong> e veja como teria performado historicamente com base nos alertas emitidos.
-  </p>
+
+  <!-- SELETOR DE MÉTODO -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:28px;">
+    <div id="bt-metodo-ff" onclick="btSetMetodo('freefire')"
+      style="cursor:pointer;border:2px solid var(--green);border-radius:12px;padding:16px 20px;background:rgba(46,204,138,.07);transition:all .2s;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+        <div style="width:8px;height:8px;border-radius:50%;background:var(--green);flex-shrink:0;"></div>
+        <div style="font-size:12px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.08em;">FreeFire Personalizado</div>
+      </div>
+      <div style="font-size:12px;color:var(--text3);line-height:1.5;">Lay ao Under no mercado limite de gols. Parametrize livremente o minuto de entrada, exposição e red médio.</div>
+    </div>
+    <div id="bt-metodo-triplex" onclick="btSetMetodo('triplex')"
+      style="cursor:pointer;border:2px solid var(--border2);border-radius:12px;padding:16px 20px;background:transparent;transition:all .2s;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+        <div style="width:8px;height:8px;border-radius:50%;background:var(--text3);flex-shrink:0;" id="bt-metodo-triplex-dot"></div>
+        <div style="font-size:12px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;" id="bt-metodo-triplex-lbl">Triplex</div>
+      </div>
+      <div style="font-size:12px;color:var(--text3);line-height:1.5;">Lay ao Under limite no mercado de gols. Entrada fixa do minuto 45 ao 82. Stop loss 300%. Dados a partir de 10/10/2025.</div>
+    </div>
+  </div>
 
   <!-- FORMULÁRIO -->
   <div class="card" style="padding:28px;margin-bottom:28px;">
@@ -1792,6 +1809,52 @@ function showTab(id) {
 
 // ── BACKTEST ─────────────────────────────────────────────────
 let btDados = null; // cache dos dados brutos
+window._btMetodo = 'freefire';
+
+function parsearGols(str) {
+  if (!str || str.trim() === '') return [];
+  return str.trim().split(/\s+/).filter(s => s !== '@').map(Number).filter(n => !isNaN(n));
+}
+
+function btSetMetodo(metodo) {
+  window._btMetodo = metodo;
+  btLimpar();
+
+  const ffCard  = document.getElementById('bt-metodo-ff');
+  const trCard  = document.getElementById('bt-metodo-triplex');
+  const trDot   = document.getElementById('bt-metodo-triplex-dot');
+  const trLbl   = document.getElementById('bt-metodo-triplex-lbl');
+  const fields  = ['bt-min-entrada','bt-max-entrada','bt-exposicao','bt-red-valor'];
+
+  if (metodo === 'triplex') {
+    // Estilo cards
+    ffCard.style.borderColor  = 'var(--border2)';
+    ffCard.style.background   = 'transparent';
+    ffCard.querySelector('div > div:first-child').style.background = 'var(--text3)';
+    ffCard.querySelector('div > div:last-child').style.color = 'var(--text3)';
+    trCard.style.borderColor  = 'var(--green)';
+    trCard.style.background   = 'rgba(46,204,138,.07)';
+    trDot.style.background    = 'var(--green)';
+    trLbl.style.color         = 'var(--green)';
+    // Valores fixos
+    document.getElementById('bt-min-entrada').value = 45;
+    document.getElementById('bt-max-entrada').value = 55;
+    document.getElementById('bt-exposicao').value   = 37;
+    document.getElementById('bt-red-valor').value   = 300;
+    fields.forEach(id => { document.getElementById(id).disabled = true; });
+  } else {
+    // Estilo cards
+    ffCard.style.borderColor  = 'var(--green)';
+    ffCard.style.background   = 'rgba(46,204,138,.07)';
+    ffCard.querySelector('div > div:first-child').style.background = 'var(--green)';
+    ffCard.querySelector('div > div:last-child').style.color = 'var(--green)';
+    trCard.style.borderColor  = 'var(--border2)';
+    trCard.style.background   = 'transparent';
+    trDot.style.background    = 'var(--text3)';
+    trLbl.style.color         = 'var(--text3)';
+    fields.forEach(id => { document.getElementById(id).disabled = false; });
+  }
+}
 
 const TEMPO_EXPOSICAO = {1:-4,2:-8,3:-12,4:-16,5:-20,6:-24,7:-28,8:-32,9:-36,10:-40,11:-45,12:-50,13:-55,14:-60,15:-67,16:-74,17:-81,18:-89,19:-97,20:-105,21:-113,22:-121,23:-129,24:-139,25:-149,26:-159,27:-169,28:-179,29:-189,30:-200,31:-211,32:-222,33:-233,34:-244,35:-256,36:-268,37:-280,38:-292,39:-306,40:-320,41:-334,42:-350,43:-366,44:-382,45:-398,46:-418,47:-438,48:-458,49:-498,50:-548,51:-608,52:-678,53:-758,54:-848,55:-948,56:-1058,57:-1178,58:-1308};
 
@@ -1838,25 +1901,50 @@ async function btCalcular() {
     const dataFim = usarPeriodo ? new Date(dataFimStr + 'T23:59:59') : null;
     erro.style.display = 'none';
 
-    // Filtro
-    const filtrados = btDados.filter(j => {
-      if (usarPeriodo) {
-        const [d, m, y] = j.data.split('/');
-        const dt = new Date(`${y}-${m}-${d}T00:00:00`);
-        if (dt < dataIni || dt > dataFim) return false;
-      }
-      if (j.min_alerta > maxE) return false;
-      if (j.min_gol > 0 && j.min_gol < minE) return false;
-      return true;
-    });
+    const metodo = window._btMetodo || 'freefire';
+    const TRIPLEX_INICIO = new Date(2025, 9, 10); // 10/10/2025
 
-    // Resultado por jogo
-    const comResultado = filtrados.map(j => {
-      const entrada = Math.max(minE, j.min_alerta);
-      const limite  = entrada + exp;
-      const green   = j.min_gol > 0 && j.min_gol >= entrada && j.min_gol <= limite;
-      return { ...j, entrada, limite, green };
-    });
+    let comResultado;
+
+    if (metodo === 'triplex') {
+      // Triplex: apenas jogos a partir de 10/10/2025, ignorar se min_alerta > 55
+      const filtrados = btDados.filter(j => {
+        const [d, m, y] = j.data.split('/');
+        const dt = new Date(+y, +m - 1, +d);
+        if (dt < TRIPLEX_INICIO) return false;
+        if (usarPeriodo && (dt < dataIni || dt > dataFim)) return false;
+        if (j.min_alerta > 55) return false;
+        return true;
+      });
+
+      comResultado = filtrados.map(j => {
+        const entrada = Math.max(45, j.min_alerta);
+        const limite  = entrada + 37;
+        const golsC   = parsearGols(j.gols_c);
+        const golsF   = parsearGols(j.gols_f);
+        const green   = golsC.concat(golsF).some(m => m >= entrada && m <= limite);
+        return { ...j, entrada, limite, green };
+      });
+    } else {
+      // FreeFire: lógica original
+      const filtrados = btDados.filter(j => {
+        if (usarPeriodo) {
+          const [d, m, y] = j.data.split('/');
+          const dt = new Date(`${y}-${m}-${d}T00:00:00`);
+          if (dt < dataIni || dt > dataFim) return false;
+        }
+        if (j.min_alerta > maxE) return false;
+        if (j.min_gol > 0 && j.min_gol < minE) return false;
+        return true;
+      });
+
+      comResultado = filtrados.map(j => {
+        const entrada = Math.max(minE, j.min_alerta);
+        const limite  = entrada + exp;
+        const green   = j.min_gol > 0 && j.min_gol >= entrada && j.min_gol <= limite;
+        return { ...j, entrada, limite, green };
+      });
+    }
 
     const total  = comResultado.length;
     const greens = comResultado.filter(j => j.green).length;
@@ -1946,10 +2034,11 @@ function btPreset(tipo) {
 }
 
 function btLimpar() {
-  document.getElementById('bt-min-entrada').value    = '';
-  document.getElementById('bt-max-entrada').value    = '';
-  document.getElementById('bt-exposicao').value      = '';
-  document.getElementById('bt-red-valor').value      = '';
+  const isTriplex = window._btMetodo === 'triplex';
+  document.getElementById('bt-min-entrada').value    = isTriplex ? 45 : '';
+  document.getElementById('bt-max-entrada').value    = isTriplex ? 55 : '';
+  document.getElementById('bt-exposicao').value      = isTriplex ? 37 : '';
+  document.getElementById('bt-red-valor').value      = isTriplex ? 300 : '';
   document.getElementById('bt-data-ini').value       = '';
   document.getElementById('bt-data-fim').value       = '';
   document.getElementById('bt-usar-periodo').checked = false;
