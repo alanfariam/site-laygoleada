@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
@@ -2230,7 +2230,8 @@ function btSimular() {
     });
   }
   chartLiga('bt-chart-ligas-top', top10, 'rgba(46,204,138,.7)');
-  chartLiga('bt-chart-ligas-bot', bot10, 'rgba(240,90,90,.65)');
+  const bot10Abs = bot10.map(e => [e[0], { lucro: Math.abs(e[1].lucro), vol: e[1].vol }]);
+  chartLiga('bt-chart-ligas-bot', bot10Abs, 'rgba(240,90,90,.65)');
 
   document.getElementById('bt-graficos').style.display = 'block';
 }
