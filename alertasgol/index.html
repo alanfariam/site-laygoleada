@@ -1813,11 +1813,14 @@ window._btMetodo = 'freefire';
 
 function parsearGols(str) {
   if (!str || str.trim() === '') return [];
-  return str.trim().split(/\s+/).filter(s => s !== '@').map(Number).filter(n => !isNaN(n));
+  return str.trim().split(/\s+/)
+    .map(s => parseInt(s.replace(/@/g, '')))
+    .filter(n => !isNaN(n) && n > 0);
 }
 
 function btSetMetodo(metodo) {
   window._btMetodo = metodo;
+  btDados = null; // força re-fetch ao trocar método
   btLimpar();
 
   const ffCard  = document.getElementById('bt-metodo-ff');
@@ -1852,6 +1855,9 @@ function btSetMetodo(metodo) {
     trDot.style.background   = 'var(--text3)';
     trLbl.style.color        = 'var(--text3)';
     fields.forEach(id => { document.getElementById(id).disabled = false; });
+    document.getElementById('bt-min-entrada').value = 37;
+    document.getElementById('bt-max-entrada').value = 60;
+    document.getElementById('bt-exposicao').value   = 38;
   }
 }
 
