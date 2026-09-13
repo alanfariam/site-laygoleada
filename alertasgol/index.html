@@ -1163,7 +1163,7 @@ document.addEventListener('DOMContentLoaded', () => {
     .then(r => r.json())
     .then(d => {
       const el = document.getElementById('footer-ultima-atualizacao');
-      if (el && d.data) el.textContent = d.data;
+      if (el && d.ultima_atualizacao) el.textContent = d.ultima_atualizacao;
     })
     .catch(() => {});
 });
