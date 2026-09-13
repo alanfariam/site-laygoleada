@@ -1146,6 +1146,7 @@ footer a:hover{color:var(--green);}
 <footer>
   <p>© 2026 Lay Goleada · <a href="../index.html">laygoleada.com.br</a></p>
   <p style="margin-top:6px">Dados extraídos da base histórica de alertas. Over Limite (1+) = pelo menos 1 gol registrado após o alerta no decorrer da partida.</p>
+  <p style="margin-top:8px;font-size:11px;color:var(--text3);">Última atualização de dados: <span id="footer-ultima-atualizacao">—</span></p>
 </footer>
 
 <script>
@@ -1156,6 +1157,15 @@ document.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('.preco-assinatura').forEach(el => el.textContent = PRECO_ASSINATURA);
   document.querySelectorAll('.preco-assinatura-inteiro').forEach(el => el.textContent = inteiro);
   document.querySelectorAll('.preco-assinatura-decimal').forEach(el => el.textContent = ',' + decimal);
+
+  // Última atualização de dados
+  fetch(API + '/api/ultima-atualizacao')
+    .then(r => r.json())
+    .then(d => {
+      const el = document.getElementById('footer-ultima-atualizacao');
+      if (el && d.data) el.textContent = d.data;
+    })
+    .catch(() => {});
 });
 
 // ── helpers ──────────────────────────────────────────────────
