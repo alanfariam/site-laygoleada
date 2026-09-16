@@ -2233,22 +2233,33 @@ function btSimular() {
     const [d, m, y] = j.data.split('/');
     const key = `${y}-${m}`;
     const lbl = `${m}/${y.slice(2)}`;
-    if (!mensal[key]) mensal[key] = { lbl, lucro: 0 };
+    if (!mensal[key]) mensal[key] = { lbl, lucro: 0, vol: 0 };
     mensal[key].lucro += j.green ? GREEN : RED;
+    mensal[key].vol++;
   });
   const mensalOrd = Object.keys(mensal).sort();
   const mensalVals = mensalOrd.map(k => parseFloat(mensal[k].lucro.toFixed(2)));
   const mensalLbls = mensalOrd.map(k => mensal[k].lbl);
+  const mensalVol  = mensalOrd.map(k => mensal[k].vol);
 
   destroyC('bt-chart-mensal');
   charts['bt-chart-mensal'] = new Chart(document.getElementById('bt-chart-mensal'), {
     type: 'bar',
-    data: { labels: mensalLbls, datasets: [{ label: 'Lucro Mensal', data: mensalVals,
-      backgroundColor: mensalVals.map(v => v >= 0 ? 'rgba(46,204,138,.7)' : 'rgba(240,90,90,.65)'),
-      borderRadius: 4, barPercentage: .7 }] },
+    data: { labels: mensalLbls, datasets: [
+      { label: 'Lucro Mensal', data: mensalVals, yAxisID: 'y',
+        backgroundColor: mensalVals.map(v => v >= 0 ? 'rgba(46,204,138,.7)' : 'rgba(240,90,90,.65)'),
+        borderRadius: 4, barPercentage: .7 },
+      { label: 'Volume', data: mensalVol, type: 'line', yAxisID: 'yVol',
+        borderColor: 'rgba(255,255,255,.35)', backgroundColor: 'transparent',
+        borderWidth: 2, pointRadius: 3, pointBackgroundColor: 'rgba(255,255,255,.6)',
+        tension: .3, order: 0 }
+    ]},
     options: { ...cd(), scales: {
       x: { grid: { display: false }, ticks: { color: '#606060', font: { size: 10 } } },
-      y: { grid: { color: 'rgba(255,255,255,.04)' }, ticks: { callback: v => 'R$' + v.toFixed(0), color: '#606060', font: { size: 10 } } }
+      y: { grid: { color: 'rgba(255,255,255,.04)' }, ticks: { callback: v => 'R$' + v.toFixed(0), color: '#606060', font: { size: 10 } } },
+      yVol: { position: 'right', grid: { display: false },
+        ticks: { color: '#505050', font: { size: 10 }, callback: v => v + ' j' },
+        title: { display: false } }
     }}
   });
 
