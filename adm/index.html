@@ -185,8 +185,9 @@ let currentLog = null, logsData = {};
 const LABELS = {
   api_freefire: 'API Alertas Gol',
   bot_freefire: 'Bot Alertas Gol',
+  monitor:      'Monitor',
 };
-const LOGS_ATIVOS = ['api_freefire', 'bot_freefire'];
+const LOGS_ATIVOS = ['api_freefire', 'bot_freefire', 'monitor'];
 
 function colorLog(text) {
   if (!text) return '<span class="log-empty">Log vazio.</span>';
