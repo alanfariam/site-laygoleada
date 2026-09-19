@@ -129,29 +129,6 @@
 
 </div>
 
-<!-- Cache -->
-<div class="section-label">Cache da Planilha</div>
-<div class="data-grid">
-  <div class="data-card">
-    <div class="data-card-title">LG FREE FIRE</div>
-    <div class="data-card-sub" id="cacheInfoFreefire">Cache: 30 min</div>
-    <button class="btn-action" id="btnCacheFreefire" onclick="clearCache('freefire')">⟳ Forçar atualização</button>
-    <div class="action-msg" id="cacheMsgFreefire"></div>
-  </div>
-  <div class="data-card">
-    <div class="data-card-title">LG TRINITY</div>
-    <div class="data-card-sub" id="cacheInfoTrinity">Cache: 30 min</div>
-    <button class="btn-action" id="btnCacheTrinity" onclick="clearCache('trinity')">⟳ Forçar atualização</button>
-    <div class="action-msg" id="cacheMsgTrinity"></div>
-  </div>
-  <div class="data-card">
-    <div class="data-card-title">OVER TRIPLEX</div>
-    <div class="data-card-sub" id="cacheInfoOvertriplex">Cache: 30 min</div>
-    <button class="btn-action" id="btnCacheOvertriplex" onclick="clearCache('overtriplex')">⟳ Forçar atualização</button>
-    <div class="action-msg" id="cacheMsgOvertriplex"></div>
-  </div>
-</div>
-
 <!-- Sincronização -->
 <div class="section-label">Sincronização FreeFire (Sheets → SQLite)</div>
 <div class="data-card" style="max-width:100%;margin-bottom:16px;">
@@ -345,34 +322,6 @@ async function forceSync() {
   }
   btn.disabled = false;
   btn.textContent = '↻ Sincronizar Agora';
-}
-
-const CACHE_ENDPOINTS = {
-  freefire:    'https://api.laygoleada.com.br/api/cache/clear',
-  trinity:     'https://api.laygoleada.com.br/trinity/api/cache/clear',
-  overtriplex: 'https://api.laygoleada.com.br/overtriplex/api/cache/clear',
-};
-
-async function clearCache(product) {
-  const cap = product.charAt(0).toUpperCase()+product.slice(1);
-  const btn = document.getElementById('btnCache'+cap);
-  const msg = document.getElementById('cacheMsg'+cap);
-  const info = document.getElementById('cacheInfo'+cap);
-  btn.disabled = true;
-  btn.textContent = '⟳ Limpando...';
-  msg.className = 'action-msg';
-  msg.textContent = '';
-  try {
-    await fetch(CACHE_ENDPOINTS[product], { method: 'POST' });
-    msg.className = 'action-msg ok';
-    msg.textContent = '✓ Cache limpo — próxima visita já busca a planilha.';
-    info.textContent = `Limpo às ${new Date().toLocaleTimeString('pt-BR')}`;
-  } catch(e) {
-    msg.className = 'action-msg err';
-    msg.textContent = '✗ Erro: ' + e.message;
-  }
-  btn.disabled = false;
-  btn.textContent = '⟳ Forçar atualização';
 }
 
 // ── VISITAS ──────────────────────────────────────────────────────────────
