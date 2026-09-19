@@ -129,6 +129,18 @@
 
 </div>
 
+<!-- Canal Alertas -->
+<div class="section-label">Canal Alertas — Over Gols</div>
+<div id="canalSection" style="margin-bottom:28px;">
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px;" id="canalCards">
+    <div class="res-card" style="opacity:.4;grid-column:span 4">Carregando...</div>
+  </div>
+  <div class="vm-panel" style="padding:16px;">
+    <div class="data-card-title" style="margin-bottom:12px;">Crescimento de inscritos (últimos 90 dias)</div>
+    <div style="position:relative;height:140px;"><canvas id="canalGrowthChart"></canvas></div>
+  </div>
+</div>
+
 <!-- Sincronização -->
 <div class="section-label">Sincronização Alertas Gol (Sheets → SQLite)</div>
 <div class="data-card" style="max-width:100%;margin-bottom:16px;">
@@ -428,6 +440,99 @@ async function loadVisitas() {
 
 load();
 loadVisitas();
+
+// ── Canal Alertas ──────────────────────────────────────────────
+const CANAL_URL = 'https://api.laygoleada.com.br/adm/api/canal-stats';
+let canalGrowthChart = null;
+
+function deltaTag(cur, prev) {
+  const diff = cur - prev;
+  if (diff === 0) return '<span style="color:var(--text3)">—</span>';
+  const color = diff > 0 ? 'var(--green)' : 'var(--red)';
+  const sign  = diff > 0 ? '+' : '';
+  return `<span style="color:${color};font-size:0.75rem;font-weight:700;">${sign}${diff}</span>`;
+}
+
+function pct(part, total) {
+  return total > 0 ? Math.round((part / total) * 100) : 0;
+}
+
+async function loadCanal() {
+  try {
+    const resp = await fetch(CANAL_URL);
+    const json = await resp.json();
+    if (!json.ok) { console.warn('canal-stats erro:', json.error); return; }
+    const d = json.data;
+
+    const followersDelta = deltaTag(d.followers.current, d.followers.previous);
+    const viewsDelta     = deltaTag(d.views_per_post.current, d.views_per_post.previous);
+    const reacDelta      = deltaTag(d.reactions_per_post.current, d.reactions_per_post.previous);
+    const notifPct       = pct(d.enabled_notifications.part, d.enabled_notifications.total);
+
+    document.getElementById('canalCards').innerHTML = `
+      <div class="res-card" style="border-color:rgba(46,204,138,.3);">
+        <div class="res-label">Inscritos</div>
+        <div class="res-val" style="color:var(--green)">${Math.round(d.followers.current)}</div>
+        <div class="res-sub">${followersDelta} vs período anterior</div>
+      </div>
+      <div class="res-card">
+        <div class="res-label">Views / Post</div>
+        <div class="res-val">${Math.round(d.views_per_post.current)}</div>
+        <div class="res-sub">${viewsDelta} vs período anterior</div>
+      </div>
+      <div class="res-card">
+        <div class="res-label">Reações / Post</div>
+        <div class="res-val">${Math.round(d.reactions_per_post.current)}</div>
+        <div class="res-sub">${reacDelta} vs período anterior</div>
+      </div>
+      <div class="res-card" style="border-color:rgba(245,158,11,.25);">
+        <div class="res-label">Notif. Ativas</div>
+        <div class="res-val" style="color:var(--amber)">${notifPct}%</div>
+        <div class="res-sub">${Math.round(d.enabled_notifications.part)} de ${Math.round(d.enabled_notifications.total)} inscritos</div>
+      </div>
+    `;
+
+    // Growth chart
+    const xs = d.growth.x.map(ts => {
+      const dt = new Date(ts);
+      return `${String(dt.getDate()).padStart(2,'0')}/${String(dt.getMonth()+1).padStart(2,'0')}`;
+    });
+    const ys = d.growth.y;
+
+    if (canalGrowthChart) canalGrowthChart.destroy();
+    const ctx = document.getElementById('canalGrowthChart').getContext('2d');
+    canalGrowthChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: xs,
+        datasets: [{
+          data: ys,
+          borderColor: 'rgba(46,204,138,.8)',
+          backgroundColor: 'rgba(46,204,138,.08)',
+          borderWidth: 2,
+          fill: true,
+          pointRadius: 0,
+          pointHoverRadius: 4,
+          tension: .3,
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false }, tooltip: {
+          callbacks: { label: ctx => `${ctx.parsed.y} inscritos` }
+        }},
+        scales: {
+          x: { grid: { color: 'rgba(255,255,255,.04)' }, ticks: { color: '#8b949e', font: { size: 9 }, maxTicksLimit: 10 } },
+          y: { grid: { color: 'rgba(255,255,255,.04)' }, ticks: { color: '#8b949e', font: { size: 9 } } }
+        }
+      }
+    });
+  } catch(e) {
+    console.error('loadCanal:', e);
+  }
+}
+
+loadCanal();
 </script>
 </body>
 </html>
