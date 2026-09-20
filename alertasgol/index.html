@@ -778,6 +778,29 @@ footer a:hover{color:var(--green);}
         <canvas id="cAcumMinGol"></canvas>
       </div>
     </div>
+
+  <!-- Todos os gols da partida -->
+  <div class="section" style="padding-top:32px;">
+    <div class="section-title">
+      Distribuição de todos os gols da partida por minuto
+      <span class="bt-tip" title="Considera TODOS os gols marcados na partida (casa + fora), não apenas o primeiro. Mostra em quais faixas de minuto ao menos 1 gol ocorreu. Dados disponíveis a partir de 10/10/2025.">ⓘ</span>
+    </div>
+    <div id="todosGolsAviso" style="font-size:0.72rem;color:#778899;margin-bottom:10px;">
+      ⚠ Contexto diferente: considera todos os gols da partida inteira, independente do alerta · dados a partir de 10/10/2025
+    </div>
+    <div class="charts">
+      <div class="card" style="height:300px;">
+        <div class="card-title">% partidas com ≥1 gol na faixa</div>
+        <canvas id="cTodosGolsDist"></canvas>
+      </div>
+      <div class="card" style="height:300px;">
+        <div class="card-title">% acumulado — partidas com gol até o minuto</div>
+        <canvas id="cTodosGolsAcum"></canvas>
+      </div>
+    </div>
+    <div id="todosGolsTotal" style="font-size:0.68rem;color:#556070;text-align:right;margin-top:6px;"></div>
+  </div>
+
   </div>
 
 </div><!-- /page-analise -->
@@ -1862,6 +1885,45 @@ function renderMinutoGols(raw) {
   });
 }
 
+// ── todos os gols da partida por minuto ──────────────────────
+function renderTodosGols(raw) {
+  if (!raw || !raw.distribuicao) return;
+  const dist = raw.distribuicao;
+  const acum = raw.acumulado;
+  const labels = dist.map(x => x.faixa);
+  const distPcts = dist.map(x => x.pct);
+  const acumPcts = acum.map(x => x.pct);
+
+  const el = document.getElementById('todosGolsTotal');
+  if (el) el.textContent = `${(raw.total||0).toLocaleString('pt-BR')} partidas · dados desde ${raw.data_inicio||'10/10/2025'}`;
+
+  destroyC('cTodosGolsDist');
+  charts['cTodosGolsDist'] = new Chart(document.getElementById('cTodosGolsDist'), {
+    type: 'bar',
+    data: { labels, datasets: [{ data: distPcts, backgroundColor: distPcts.map(v => v >= 20 ? 'rgba(46,204,138,.75)' : 'rgba(240,160,48,.75)'), borderRadius: 3, barPercentage: .85 }] },
+    options: { ...cd(),
+      plugins: { ...cd().plugins, tooltip: { ...cd().plugins.tooltip, callbacks: { label: ctx => ` ${ctx.raw}% das partidas` }}},
+      scales: {
+        y: { ticks: { callback: v => v+'%', color: '#556070', font: {size:10} }, grid: { color: 'rgba(255,255,255,.04)' } },
+        x: { ticks: { color: '#8A96A3', font: {size:9}, maxRotation: 45 }, grid: { display: false } }
+      }
+    }
+  });
+
+  destroyC('cTodosGolsAcum');
+  charts['cTodosGolsAcum'] = new Chart(document.getElementById('cTodosGolsAcum'), {
+    type: 'bar',
+    data: { labels: acumPcts.map((_, i) => acum[i].faixa), datasets: [{ data: acumPcts, backgroundColor: acumPcts.map(v => v <= 60 ? 'rgba(46,204,138,.75)' : 'rgba(240,160,48,.75)'), borderRadius: 3, barPercentage: .85 }] },
+    options: { ...cd(),
+      plugins: { ...cd().plugins, tooltip: { ...cd().plugins.tooltip, callbacks: { label: ctx => ` ${ctx.raw}% das partidas` }}},
+      scales: {
+        y: { min:0, max:100, ticks: { callback: v => v+'%', color: '#556070', font: {size:10} }, grid: { color: 'rgba(255,255,255,.04)' } },
+        x: { ticks: { color: '#8A96A3', font: {size:9}, maxRotation: 45 }, grid: { display: false } }
+      }
+    }
+  });
+}
+
 // ── tabs ─────────────────────────────────────────────────────
 function showTab(id) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -2549,10 +2611,11 @@ async function lazyAnalise(mes = '') {
   _loaded.analise = true;
   const q = mes ? `?mes=${encodeURIComponent(mes)}` : '';
   try {
-    const [golsPosAlerta, distPrimGol, intervaloGols] = await Promise.all([
+    const [golsPosAlerta, distPrimGol, intervaloGols, todosGols] = await Promise.all([
       fetchJson('/api/gols-pos-alerta' + q).catch(() => null),
       fetchJson('/api/dist-primeiro-gol' + q).catch(() => null),
       fetchJson('/api/intervalo-gols' + q).catch(() => null),
+      fetchJson('/api/dist-todos-gols' + q).catch(() => null),
     ]);
     if (golsPosAlerta) {
       renderPlacarZero(golsPosAlerta);
@@ -2572,6 +2635,7 @@ async function lazyAnalise(mes = '') {
     }
     if (distPrimGol)   renderDistPrimGol(distPrimGol);
     if (intervaloGols) renderMinutoGols(intervaloGols);
+    if (todosGols)     renderTodosGols(todosGols);
   } catch(e) {}
 }
 
