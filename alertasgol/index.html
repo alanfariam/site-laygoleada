@@ -764,14 +764,17 @@ footer a:hover{color:var(--green);}
 
   <!-- DISTRIBUIÇÃO POR MINUTO DO JOGO -->
   <div class="section" style="padding-top:8px;padding-bottom:48px;">
-    <div class="section-title">Distribuição de gols por minuto do jogo</div>
+    <div class="section-title">
+      Distribuição do 1º gol pós-alerta por minuto do jogo
+      <span class="bt-tip" title="Considera apenas o primeiro gol marcado após o alerta, e mostra em qual minuto real da partida ele ocorreu (ex: 75', 82'). Diferente dos gráficos acima, que mostram quantos minutos decorreram entre o alerta e o gol.">ⓘ</span>
+    </div>
     <div class="charts">
       <div class="card" style="height:300px;">
-        <div class="card-title">% de gols saídos em cada faixa de minuto (sem acumular)</div>
+        <div class="card-title">% por faixa de minuto (sem acumular)</div>
         <canvas id="cDistMinGol"></canvas>
       </div>
       <div class="card" style="height:300px;">
-        <div class="card-title">% acumulado de gols saídos por faixa de minuto</div>
+        <div class="card-title">% acumulado por faixa de minuto</div>
         <canvas id="cAcumMinGol"></canvas>
       </div>
     </div>
