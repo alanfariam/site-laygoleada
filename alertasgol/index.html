@@ -731,20 +731,20 @@ footer a:hover{color:var(--green);}
     <span id="analise-filtro-label" style="font-family:var(--mono);font-size:11px;color:var(--green);display:none;">● filtrado</span>
   </div>
 
-  <!-- PLACAR NO ALERTA -->
+  <!-- PLACARES LADO A LADO -->
   <div class="section" style="padding-top:48px;">
-    <div class="section-title">% de jogos sem gol pós alerta — por placar no momento do alerta</div>
-    <div class="card card-full" style="height:280px;">
-      <canvas id="cPlacarZero"></canvas>
+    <div class="section-title">Análise por placar no momento do alerta</div>
+    <div class="charts">
+      <div class="card" style="height:280px;">
+        <div class="card-title">% jogos sem gol pós alerta</div>
+        <canvas id="cPlacarZero"></canvas>
+      </div>
+      <div class="card" style="height:280px;">
+        <div class="card-title">Média de #DIF</div>
+        <canvas id="cPlacarDif"></canvas>
+      </div>
     </div>
-  </div>
-
-  <!-- MÉDIA DIF POR PLACAR -->
-  <div class="section" style="padding-top:8px;">
-    <div class="section-title">Média de #DIF por placar no momento do alerta</div>
-    <div class="card card-full" style="height:280px;">
-      <canvas id="cPlacarDif"></canvas>
-    </div>
+    <div id="placarMinLabel" style="font-size:0.68rem;color:#556070;text-align:right;margin-top:6px;"></div>
   </div>
 
   <!-- MINUTOS PARA O GOL -->
@@ -1709,7 +1709,12 @@ function renderRankingCamp(rawGolsPosAlerta) {
 
 // ── análise: placar no alerta ─────────────────────────────────
 function renderPlacarZero(rawGolsPosAlerta) {
-  const p = rawGolsPosAlerta.por_placar_zero || [];
+  const all = rawGolsPosAlerta.por_placar_zero || [];
+  const sumTotal = all.reduce((s, x) => s + x.total, 0);
+  const minVol   = Math.max(10, Math.round(sumTotal * 0.03));
+  const p        = all.filter(x => x.total >= minVol);
+  const lbl = document.getElementById('placarMinLabel');
+  if (lbl) lbl.textContent = `Exibindo placares com ≥ ${minVol} entradas (3% de ${sumTotal} no filtro atual)`;
   destroyC('cPlacarZero');
   charts['cPlacarZero'] = new Chart(document.getElementById('cPlacarZero'), {
     type: 'bar',
@@ -1735,7 +1740,10 @@ function renderPlacarZero(rawGolsPosAlerta) {
 
 // ── análise: média DIF por placar ─────────────────────────────
 function renderPlacarDif(rawGolsPosAlerta) {
-  const p = (rawGolsPosAlerta.por_placar_dif || []).slice(0, 20);
+  const all    = rawGolsPosAlerta.por_placar_dif || [];
+  const sumTotal = all.reduce((s, x) => s + x.total, 0);
+  const minVol   = Math.max(10, Math.round(sumTotal * 0.03));
+  const p        = all.filter(x => x.total >= minVol).slice(0, 20);
   if (!p.length) return;
   const refDif = mediaDifHist ?? (p.reduce((s, x) => s + x.media_dif, 0) / p.length);
   destroyC('cPlacarDif');
