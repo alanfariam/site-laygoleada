@@ -386,7 +386,7 @@ footer a:hover{color:var(--green);}
   </a>
   <div class="nav-links">
     <a class="btn" href="../index.html">← Início</a>
-    <a class="btn-cta" href="https://t.me/AlertasFreeFireAstrofy_bot" target="_blank">ASSINAR R$14,90</a>
+    <a class="btn-cta" href="https://t.me/AlertasFreeFireAstrofy_bot" target="_blank">ASSINAR <span class="preco-assinatura"></span></a>
   </div>
 </nav>
 
@@ -424,7 +424,56 @@ footer a:hover{color:var(--green);}
 <!-- PAGE: INÍCIO -->
 <div class="page active" id="page-inicio">
 
-<!-- HERO -->
+<!-- VÍDEO DE APRESENTAÇÃO EM DESTAQUE -->
+<div class="section" style="padding-top:40px;padding-bottom:8px;">
+  <div class="section-title" style="margin-bottom:20px;">Entenda o método antes de entrar</div>
+  <a href="https://youtu.be/NFBHzIeYJko" target="_blank" rel="noopener"
+     style="display:block;position:relative;border-radius:14px;overflow:hidden;border:2px solid var(--green);cursor:pointer;max-width:760px;margin:0 auto;text-decoration:none;box-shadow:0 0 32px rgba(46,204,138,.18);">
+    <img src="https://img.youtube.com/vi/NFBHzIeYJko/maxresdefault.jpg" alt="Apresentação do Grupo de Alertas"
+         style="width:100%;display:block;aspect-ratio:16/9;object-fit:cover;">
+    <div style="position:absolute;inset:0;background:rgba(0,0,0,.4);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;transition:background .2s;">
+      <div style="width:72px;height:72px;background:var(--green);border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 0 32px rgba(46,204,138,.5);">
+        <svg width="26" height="26" viewBox="0 0 16 16" fill="#0A0C10"><polygon points="4,2 14,8 4,14"/></svg>
+      </div>
+      <span style="font-size:14px;font-weight:700;color:#fff;letter-spacing:.08em;text-transform:uppercase;opacity:.9;">Assistir apresentação</span>
+    </div>
+  </a>
+</div>
+
+<!-- 3 PILARES DO TRADER -->
+<div class="section" style="padding-top:40px;padding-bottom:8px;">
+  <div class="eyebrow" style="margin-bottom:6px;">O que diferencia um trader de um apostador</div>
+  <div class="section-title" style="margin-bottom:28px;">Os 3 pilares do trader</div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:20px;max-width:820px;margin:0 auto;">
+
+    <!-- GESTÃO -->
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:28px 24px;display:flex;flex-direction:column;gap:14px;">
+      <div style="width:46px;height:46px;background:rgba(46,204,138,.1);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px;">💰</div>
+      <div style="font-size:13px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.08em;">Gestão</div>
+      <div style="font-size:15px;font-weight:700;color:var(--text);line-height:1.4;">Proteja sua banca</div>
+      <p style="font-size:14px;color:var(--text2);line-height:1.6;margin:0;">Recomendamos usar <strong style="color:var(--text);">no máximo 3% da banca</strong> por operação. Com gestão consistente, a variância de curto prazo não compromete o resultado de longo prazo.</p>
+    </div>
+
+    <!-- MÉTODO -->
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:28px 24px;display:flex;flex-direction:column;gap:14px;">
+      <div style="width:46px;height:46px;background:rgba(46,204,138,.1);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px;">📋</div>
+      <div style="font-size:13px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.08em;">Método</div>
+      <div style="font-size:15px;font-weight:700;color:var(--text);line-height:1.4;">Opere com critério</div>
+      <p style="font-size:14px;color:var(--text2);line-height:1.6;margin:0;">Sugerimos o <strong style="color:var(--text);">Lay Under Limite</strong>, explicado em detalhes no vídeo acima. A melhor abordagem para o seu perfil é uma decisão sua — o método dá o critério, você dá o julgamento.</p>
+    </div>
+
+    <!-- LONGO PRAZO -->
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:28px 24px;display:flex;flex-direction:column;gap:14px;">
+      <div style="width:46px;height:46px;background:rgba(46,204,138,.1);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px;">📈</div>
+      <div style="font-size:13px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.08em;">Longo Prazo</div>
+      <div style="font-size:15px;font-weight:700;color:var(--text);line-height:1.4;">Resultados são cumulativos</div>
+      <p style="font-size:14px;color:var(--text2);line-height:1.6;margin:0;">Disponibilizamos <strong style="color:var(--text);">todo o histórico de jogos</strong> que caíram no alerta. Analise como a taxa de acerto se comporta ao longo do tempo — os dados estão na aba Backtest.</p>
+    </div>
+
+  </div>
+</div>
+
+<!-- HERO — EFICIÊNCIA -->
 <section class="hero">
   <div class="hero-glow"></div>
   <div class="eyebrow">Eficiência de alertas</div>
@@ -433,7 +482,7 @@ footer a:hover{color:var(--green);}
   <p class="hero-tagline">dos alertas emitidos resultaram em <strong>pelo menos 1 gol</strong> após a chegada do alerta</p>
   <div class="hero-cta">
     <a class="btn-buy" href="https://t.me/AlertasFreeFireAstrofy_bot" target="_blank">
-      ASSINAR AGORA · <span class="btn-buy-price">R$14,90/mês</span>
+      ASSINAR AGORA · <span class="btn-buy-price">R$<span class="preco-assinatura"></span>/mês</span>
     </a>
     <a class="btn-ghost" href="#como-funciona">COMO FUNCIONA</a>
   </div>
@@ -451,21 +500,6 @@ footer a:hover{color:var(--green);}
     <div class="tile-val"><span id="tileAlerts">0</span></div>
     <div class="tile-lbl">Alertas analisados</div>
   </div>
-</div>
-
-<!-- VÍDEO DE APRESENTAÇÃO -->
-<div class="section" style="padding-top:8px;">
-  <div class="section-title">Conheça o grupo de alertas</div>
-  <a href="https://youtu.be/NFBHzIeYJko" target="_blank" rel="noopener"
-     style="display:block;position:relative;border-radius:12px;overflow:hidden;border:1px solid var(--border);cursor:pointer;max-width:720px;margin:0 auto;text-decoration:none;">
-    <img src="https://img.youtube.com/vi/NFBHzIeYJko/maxresdefault.jpg" alt="Apresentação do Grupo de Alertas"
-         style="width:100%;display:block;aspect-ratio:16/9;object-fit:cover;">
-    <div style="position:absolute;inset:0;background:rgba(0,0,0,.35);display:flex;align-items:center;justify-content:center;transition:background .2s;">
-      <div style="width:64px;height:64px;background:var(--green);border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 0 24px rgba(46,204,138,.4);">
-        <svg width="22" height="22" viewBox="0 0 16 16" fill="#0A0C10"><polygon points="4,2 14,8 4,14"/></svg>
-      </div>
-    </div>
-  </a>
 </div>
 
 <!-- COMO FUNCIONA -->
@@ -531,7 +565,7 @@ footer a:hover{color:var(--green);}
   <div class="section-title">Plano de acesso</div>
   <div class="cta-block">
     <div class="cta-label">Acesso mensal</div>
-    <div class="cta-price"><sup>R$</sup>14<span style="font-size:28px">,90</span></div>
+    <div class="cta-price"><sup>R$</sup><span class="preco-assinatura-inteiro"></span><span class="preco-assinatura-decimal" style="font-size:28px"></span></div>
     <div class="cta-period">por mês · cancele quando quiser</div>
     <div class="cta-perks">
       <span class="perk">Alertas em tempo real via Telegram</span>
@@ -552,6 +586,7 @@ footer a:hover{color:var(--green);}
     <p><strong>⚠ Aviso importante</strong></p>
     <p>Este serviço fornece <strong>informação sobre comportamento de jogos</strong> e não constitui aconselhamento financeiro, indicação de apostas ou garantia de lucro. Resultados passados não garantem resultados futuros.</p>
     <p>Apostas esportivas envolvem risco de perda financeira. <strong>Jogue com responsabilidade.</strong> O uso deste serviço é permitido apenas para <strong>maiores de 18 anos</strong>. Se você acredita ter um problema com jogos de azar, procure ajuda profissional.</p>
+    <p><strong>Apostas esportivas não são investimentos.</strong> Conforme orientação do Ministério da Fazenda, apostas de quota fixa são uma forma de entretenimento e não devem ser tratadas como fonte de renda ou estratégia de investimento financeiro.</p>
   </div>
 </div>
 
@@ -696,20 +731,20 @@ footer a:hover{color:var(--green);}
     <span id="analise-filtro-label" style="font-family:var(--mono);font-size:11px;color:var(--green);display:none;">● filtrado</span>
   </div>
 
-  <!-- PLACAR NO ALERTA -->
+  <!-- PLACARES LADO A LADO -->
   <div class="section" style="padding-top:48px;">
-    <div class="section-title">% de jogos sem gol pós alerta — por placar no momento do alerta</div>
-    <div class="card card-full" style="height:280px;">
-      <canvas id="cPlacarZero"></canvas>
+    <div class="section-title">Análise por placar no momento do alerta</div>
+    <div class="charts">
+      <div class="card" style="height:280px;">
+        <div class="card-title">% jogos sem gol pós alerta</div>
+        <canvas id="cPlacarZero"></canvas>
+      </div>
+      <div class="card" style="height:280px;">
+        <div class="card-title">Média de #DIF</div>
+        <canvas id="cPlacarDif"></canvas>
+      </div>
     </div>
-  </div>
-
-  <!-- MÉDIA DIF POR PLACAR -->
-  <div class="section" style="padding-top:8px;">
-    <div class="section-title">Média de #DIF por placar no momento do alerta</div>
-    <div class="card card-full" style="height:280px;">
-      <canvas id="cPlacarDif"></canvas>
-    </div>
+    <div id="placarMinLabel" style="font-size:0.68rem;color:#556070;text-align:right;margin-top:6px;"></div>
   </div>
 
   <!-- MINUTOS PARA O GOL -->
@@ -860,9 +895,26 @@ footer a:hover{color:var(--green);}
 <div class="section" style="max-width:860px;margin:0 auto;padding:40px 24px;">
 
   <div class="section-title" style="margin-bottom:6px;">Backtest de Filtros</div>
-  <p style="font-size:13px;color:var(--text2);margin-bottom:32px;">
-    Simule diferentes critérios de entrada para o método <strong style="color:var(--text);">Lay ao Under Limite</strong> e veja como teria performado historicamente com base nos alertas emitidos.
-  </p>
+
+  <!-- SELETOR DE MÉTODO -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:28px;">
+    <div id="bt-metodo-ff" onclick="btSetMetodo('freefire')"
+      style="cursor:pointer;border:2px solid var(--green);border-radius:12px;padding:16px 20px;background:rgba(46,204,138,.07);transition:all .2s;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+        <div id="bt-metodo-ff-dot" style="width:8px;height:8px;border-radius:50%;background:var(--green);flex-shrink:0;"></div>
+        <div id="bt-metodo-ff-lbl" style="font-size:12px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.08em;">FreeFire Personalizado</div>
+      </div>
+      <div style="font-size:12px;color:var(--text3);line-height:1.5;">Lay ao Under no mercado limite de gols. Parametrize livremente o minuto de entrada, exposição e red médio.</div>
+    </div>
+    <div id="bt-metodo-triplex" onclick="btSetMetodo('triplex')"
+      style="cursor:pointer;border:2px solid var(--border2);border-radius:12px;padding:16px 20px;background:transparent;transition:all .2s;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+        <div style="width:8px;height:8px;border-radius:50%;background:var(--text3);flex-shrink:0;" id="bt-metodo-triplex-dot"></div>
+        <div style="font-size:12px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;" id="bt-metodo-triplex-lbl">Triplex</div>
+      </div>
+      <div style="font-size:12px;color:var(--text3);line-height:1.5;">Lay ao Under limite no mercado de gols. Entrada fixa do minuto 45 ao 82. Stop loss 300%. Dados a partir de 10/10/2025.</div>
+    </div>
+  </div>
 
   <!-- FORMULÁRIO -->
   <div class="card" style="padding:28px;margin-bottom:28px;">
@@ -902,13 +954,19 @@ footer a:hover{color:var(--green);}
 
     <!-- PERÍODO -->
     <div style="margin-top:20px;border-top:1px solid var(--border);padding-top:20px;">
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:0;">
+      <div style="display:flex;flex-wrap:wrap;align-items:center;gap:16px;margin-bottom:0;">
         <label style="display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none;">
           <input type="checkbox" id="bt-usar-periodo" onchange="btTogglePeriodo()"
             style="width:16px;height:16px;accent-color:var(--green);cursor:pointer;">
           <span style="font-size:12px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;">Definir um Período</span>
         </label>
         <span class="bt-tip" title="Por padrão o backtest usa todo o histórico disponível. Ative esta opção para restringir a análise a um intervalo de datas específico.">ⓘ</span>
+        <label id="bt-ignorar-gols-wrap" style="display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none;">
+          <input type="checkbox" id="bt-ignorar-gols" checked
+            style="width:16px;height:16px;accent-color:var(--green);cursor:pointer;">
+          <span style="font-size:12px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;">Ignorar jogos que já saíram gols</span>
+        </label>
+        <span id="bt-ignorar-gols-tip" class="bt-tip" title="Marcado: comportamento padrão — descarta jogos onde o primeiro gol saiu antes do minuto mínimo de entrada. Desmarcado: usa gols_c/gols_f para simular todos os jogos a partir de 10/10/2025, independente de quando o primeiro gol saiu.">ⓘ</span>
       </div>
       <div id="bt-periodo-campos" style="display:none;margin-top:14px;">
         <!-- Atalhos rápidos -->
@@ -1129,9 +1187,28 @@ footer a:hover{color:var(--green);}
 <footer>
   <p>© 2026 Lay Goleada · <a href="../index.html">laygoleada.com.br</a></p>
   <p style="margin-top:6px">Dados extraídos da base histórica de alertas. Over Limite (1+) = pelo menos 1 gol registrado após o alerta no decorrer da partida.</p>
+  <p style="margin-top:8px;font-size:11px;color:var(--text3);">Última atualização de dados: <span id="footer-ultima-atualizacao">—</span></p>
 </footer>
 
 <script>
+// ── PREÇO DE ASSINATURA — altere aqui para atualizar em todo o site ──────────
+const PRECO_ASSINATURA = '19,90';
+document.addEventListener('DOMContentLoaded', () => {
+  const [inteiro, decimal] = PRECO_ASSINATURA.split(',');
+  document.querySelectorAll('.preco-assinatura').forEach(el => el.textContent = PRECO_ASSINATURA);
+  document.querySelectorAll('.preco-assinatura-inteiro').forEach(el => el.textContent = inteiro);
+  document.querySelectorAll('.preco-assinatura-decimal').forEach(el => el.textContent = ',' + decimal);
+
+  // Última atualização de dados
+  fetch(API + '/api/ultima-atualizacao')
+    .then(r => r.json())
+    .then(d => {
+      const el = document.getElementById('footer-ultima-atualizacao');
+      if (el && d.ultima_atualizacao) el.textContent = d.ultima_atualizacao;
+    })
+    .catch(() => {});
+});
+
 // ── helpers ──────────────────────────────────────────────────
 const ease = t => 1 - Math.pow(1 - t, 4);
 const round1 = v => Math.round(v * 10) / 10;
@@ -1632,7 +1709,12 @@ function renderRankingCamp(rawGolsPosAlerta) {
 
 // ── análise: placar no alerta ─────────────────────────────────
 function renderPlacarZero(rawGolsPosAlerta) {
-  const p = rawGolsPosAlerta.por_placar_zero || [];
+  const all = rawGolsPosAlerta.por_placar_zero || [];
+  const sumTotal = all.reduce((s, x) => s + x.total, 0);
+  const minVol   = Math.max(10, Math.round(sumTotal * 0.03));
+  const p        = all.filter(x => x.total >= minVol);
+  const lbl = document.getElementById('placarMinLabel');
+  if (lbl) lbl.textContent = `Exibindo placares com ≥ ${minVol} entradas (3% de ${sumTotal} no filtro atual)`;
   destroyC('cPlacarZero');
   charts['cPlacarZero'] = new Chart(document.getElementById('cPlacarZero'), {
     type: 'bar',
@@ -1658,7 +1740,10 @@ function renderPlacarZero(rawGolsPosAlerta) {
 
 // ── análise: média DIF por placar ─────────────────────────────
 function renderPlacarDif(rawGolsPosAlerta) {
-  const p = (rawGolsPosAlerta.por_placar_dif || []).slice(0, 20);
+  const all    = rawGolsPosAlerta.por_placar_dif || [];
+  const sumTotal = all.reduce((s, x) => s + x.total, 0);
+  const minVol   = Math.max(10, Math.round(sumTotal * 0.03));
+  const p        = all.filter(x => x.total >= minVol).slice(0, 20);
   if (!p.length) return;
   const refDif = mediaDifHist ?? (p.reduce((s, x) => s + x.media_dif, 0) / p.length);
   destroyC('cPlacarDif');
@@ -1792,6 +1877,61 @@ function showTab(id) {
 
 // ── BACKTEST ─────────────────────────────────────────────────
 let btDados = null; // cache dos dados brutos
+window._btMetodo = 'freefire';
+
+function parsearGols(str) {
+  if (!str || str.trim() === '') return [];
+  return str.trim().split(/\s+/)
+    .map(s => parseInt(s.replace(/@/g, '')))
+    .filter(n => !isNaN(n) && n > 0);
+}
+
+function btSetMetodo(metodo) {
+  window._btMetodo = metodo;
+  btDados = null; // força re-fetch ao trocar método
+  btLimpar();
+
+  const ffCard  = document.getElementById('bt-metodo-ff');
+  const ffDot   = document.getElementById('bt-metodo-ff-dot');
+  const ffLbl   = document.getElementById('bt-metodo-ff-lbl');
+  const trCard  = document.getElementById('bt-metodo-triplex');
+  const trDot   = document.getElementById('bt-metodo-triplex-dot');
+  const trLbl   = document.getElementById('bt-metodo-triplex-lbl');
+  const fields  = ['bt-min-entrada','bt-max-entrada','bt-exposicao','bt-red-valor'];
+
+  if (metodo === 'triplex') {
+    ffCard.style.borderColor = 'var(--border2)';
+    ffCard.style.background  = 'transparent';
+    ffDot.style.background   = 'var(--text3)';
+    ffLbl.style.color        = 'var(--text3)';
+    trCard.style.borderColor = 'var(--green)';
+    trCard.style.background  = 'rgba(46,204,138,.07)';
+    trDot.style.background   = 'var(--green)';
+    trLbl.style.color        = 'var(--green)';
+    document.getElementById('bt-min-entrada').value = 45;
+    document.getElementById('bt-max-entrada').value = 55;
+    document.getElementById('bt-exposicao').value   = 37;
+    document.getElementById('bt-red-valor').value   = 300;
+    fields.forEach(id => { document.getElementById(id).disabled = true; });
+    document.getElementById('bt-ignorar-gols-wrap').style.display = 'none';
+    document.getElementById('bt-ignorar-gols-tip').style.display  = 'none';
+  } else {
+    ffCard.style.borderColor = 'var(--green)';
+    ffCard.style.background  = 'rgba(46,204,138,.07)';
+    ffDot.style.background   = 'var(--green)';
+    ffLbl.style.color        = 'var(--green)';
+    trCard.style.borderColor = 'var(--border2)';
+    trCard.style.background  = 'transparent';
+    trDot.style.background   = 'var(--text3)';
+    trLbl.style.color        = 'var(--text3)';
+    fields.forEach(id => { document.getElementById(id).disabled = false; });
+    document.getElementById('bt-ignorar-gols-wrap').style.display = 'flex';
+    document.getElementById('bt-ignorar-gols-tip').style.display  = '';
+    document.getElementById('bt-min-entrada').value = 37;
+    document.getElementById('bt-max-entrada').value = 60;
+    document.getElementById('bt-exposicao').value   = 38;
+  }
+}
 
 const TEMPO_EXPOSICAO = {1:-4,2:-8,3:-12,4:-16,5:-20,6:-24,7:-28,8:-32,9:-36,10:-40,11:-45,12:-50,13:-55,14:-60,15:-67,16:-74,17:-81,18:-89,19:-97,20:-105,21:-113,22:-121,23:-129,24:-139,25:-149,26:-159,27:-169,28:-179,29:-189,30:-200,31:-211,32:-222,33:-233,34:-244,35:-256,36:-268,37:-280,38:-292,39:-306,40:-320,41:-334,42:-350,43:-366,44:-382,45:-398,46:-418,47:-438,48:-458,49:-498,50:-548,51:-608,52:-678,53:-758,54:-848,55:-948,56:-1058,57:-1178,58:-1308};
 
@@ -1838,25 +1978,77 @@ async function btCalcular() {
     const dataFim = usarPeriodo ? new Date(dataFimStr + 'T23:59:59') : null;
     erro.style.display = 'none';
 
-    // Filtro
-    const filtrados = btDados.filter(j => {
-      if (usarPeriodo) {
-        const [d, m, y] = j.data.split('/');
-        const dt = new Date(`${y}-${m}-${d}T00:00:00`);
-        if (dt < dataIni || dt > dataFim) return false;
-      }
-      if (j.min_alerta > maxE) return false;
-      if (j.min_gol > 0 && j.min_gol < minE) return false;
-      return true;
-    });
+    const metodo = window._btMetodo || 'freefire';
+    const TRIPLEX_INICIO = new Date(2025, 9, 10); // 10/10/2025
 
-    // Resultado por jogo
-    const comResultado = filtrados.map(j => {
-      const entrada = Math.max(minE, j.min_alerta);
-      const limite  = entrada + exp;
-      const green   = j.min_gol > 0 && j.min_gol >= entrada && j.min_gol <= limite;
-      return { ...j, entrada, limite, green };
-    });
+    let comResultado;
+
+    if (metodo === 'triplex') {
+      // Triplex: apenas jogos a partir de 10/10/2025, ignorar se min_alerta > 55
+      const filtrados = btDados.filter(j => {
+        const [d, m, y] = j.data.split('/');
+        const dt = new Date(+y, +m - 1, +d);
+        if (dt < TRIPLEX_INICIO) return false;
+        if (usarPeriodo && (dt < dataIni || dt > dataFim)) return false;
+        if (j.min_alerta > 55) return false;
+        return true;
+      });
+
+      comResultado = filtrados.map(j => {
+        const entrada    = Math.max(45, j.min_alerta);
+        const limite     = entrada + 37;
+        const golsC      = parsearGols(j.gols_c);
+        const golsF      = parsearGols(j.gols_f);
+        const todosGols  = golsC.concat(golsF).filter(m => m >= entrada).sort((a,b) => a - b);
+        const green      = todosGols.some(m => m <= limite);
+        const primeiroGol = todosGols.length > 0 ? todosGols[0] : 0;
+        return { ...j, entrada, limite, green, primeiroGol };
+      });
+    } else {
+      const ignorarGols = document.getElementById('bt-ignorar-gols').checked;
+
+      if (ignorarGols) {
+        // FreeFire padrão: descarta jogos com gol antes da entrada, usa min_gol
+        const filtrados = btDados.filter(j => {
+          if (usarPeriodo) {
+            const [d, m, y] = j.data.split('/');
+            const dt = new Date(`${y}-${m}-${d}T00:00:00`);
+            if (dt < dataIni || dt > dataFim) return false;
+          }
+          if (j.min_alerta > maxE) return false;
+          if (j.min_gol > 0 && j.min_gol < minE) return false;
+          return true;
+        });
+
+        comResultado = filtrados.map(j => {
+          const entrada = Math.max(minE, j.min_alerta);
+          const limite  = entrada + exp;
+          const green   = j.min_gol > 0 && j.min_gol >= entrada && j.min_gol <= limite;
+          return { ...j, entrada, limite, green, primeiroGol: j.min_gol };
+        });
+      } else {
+        // FreeFire sem filtro de gol antecipado: usa gols_c/gols_f, apenas jogos ≥ 10/10/2025
+        const filtrados = btDados.filter(j => {
+          const [d, m, y] = j.data.split('/');
+          const dt = new Date(+y, +m - 1, +d);
+          if (dt < TRIPLEX_INICIO) return false;
+          if (usarPeriodo && (dt < dataIni || dt > dataFim)) return false;
+          if (j.min_alerta > maxE) return false;
+          return true;
+        });
+
+        comResultado = filtrados.map(j => {
+          const entrada    = Math.max(minE, j.min_alerta);
+          const limite     = entrada + exp;
+          const golsC      = parsearGols(j.gols_c);
+          const golsF      = parsearGols(j.gols_f);
+          const todosGols  = golsC.concat(golsF).filter(m => m >= entrada).sort((a, b) => a - b);
+          const green      = todosGols.some(m => m <= limite);
+          const primeiroGol = todosGols.length > 0 ? todosGols[0] : 0;
+          return { ...j, entrada, limite, green, primeiroGol };
+        });
+      }
+    }
 
     const total  = comResultado.length;
     const greens = comResultado.filter(j => j.green).length;
@@ -1870,9 +2062,14 @@ async function btCalcular() {
     wrEl.style.color = wr >= 0.5 ? 'var(--green)' : 'var(--red)';
     document.getElementById('bt-red-max').textContent = redMax === Infinity ? '∞' : 'R$' + redMax.toFixed(2);
 
-    // Red Previsto via tabela tempo_exposicao
-    const stopLoss = TEMPO_EXPOSICAO[exp];
-    const redPrevisto = stopLoss !== undefined ? Math.abs(stopLoss) : null;
+    // Red Previsto
+    let redPrevisto;
+    if (metodo === 'triplex') {
+      redPrevisto = 300;
+    } else {
+      const stopLoss = TEMPO_EXPOSICAO[exp];
+      redPrevisto = stopLoss !== undefined ? Math.abs(stopLoss) : null;
+    }
     const rpEl = document.getElementById('bt-red-previsto');
     if (redPrevisto !== null) {
       rpEl.textContent = 'R$' + redPrevisto.toFixed(2);
@@ -1946,13 +2143,15 @@ function btPreset(tipo) {
 }
 
 function btLimpar() {
-  document.getElementById('bt-min-entrada').value    = '';
-  document.getElementById('bt-max-entrada').value    = '';
-  document.getElementById('bt-exposicao').value      = '';
-  document.getElementById('bt-red-valor').value      = '';
+  const isTriplex = window._btMetodo === 'triplex';
+  document.getElementById('bt-min-entrada').value    = isTriplex ? 45 : '';
+  document.getElementById('bt-max-entrada').value    = isTriplex ? 55 : '';
+  document.getElementById('bt-exposicao').value      = isTriplex ? 37 : '';
+  document.getElementById('bt-red-valor').value      = isTriplex ? 300 : '';
   document.getElementById('bt-data-ini').value       = '';
   document.getElementById('bt-data-fim').value       = '';
-  document.getElementById('bt-usar-periodo').checked = false;
+  document.getElementById('bt-usar-periodo').checked  = false;
+  document.getElementById('bt-ignorar-gols').checked  = true;
   document.getElementById('bt-periodo-campos').style.display = 'none';
   document.getElementById('bt-campos-custom').style.display  = 'none';
   document.getElementById('bt-periodo-label').textContent    = '';
@@ -2042,22 +2241,33 @@ function btSimular() {
     const [d, m, y] = j.data.split('/');
     const key = `${y}-${m}`;
     const lbl = `${m}/${y.slice(2)}`;
-    if (!mensal[key]) mensal[key] = { lbl, lucro: 0 };
+    if (!mensal[key]) mensal[key] = { lbl, lucro: 0, vol: 0 };
     mensal[key].lucro += j.green ? GREEN : RED;
+    mensal[key].vol++;
   });
   const mensalOrd = Object.keys(mensal).sort();
   const mensalVals = mensalOrd.map(k => parseFloat(mensal[k].lucro.toFixed(2)));
   const mensalLbls = mensalOrd.map(k => mensal[k].lbl);
+  const mensalVol  = mensalOrd.map(k => mensal[k].vol);
 
   destroyC('bt-chart-mensal');
   charts['bt-chart-mensal'] = new Chart(document.getElementById('bt-chart-mensal'), {
     type: 'bar',
-    data: { labels: mensalLbls, datasets: [{ label: 'Lucro Mensal', data: mensalVals,
-      backgroundColor: mensalVals.map(v => v >= 0 ? 'rgba(46,204,138,.7)' : 'rgba(240,90,90,.65)'),
-      borderRadius: 4, barPercentage: .7 }] },
+    data: { labels: mensalLbls, datasets: [
+      { label: 'Lucro Mensal', data: mensalVals, yAxisID: 'y',
+        backgroundColor: mensalVals.map(v => v >= 0 ? 'rgba(46,204,138,.7)' : 'rgba(240,90,90,.65)'),
+        borderRadius: 4, barPercentage: .7 },
+      { label: 'Volume', data: mensalVol, type: 'line', yAxisID: 'yVol',
+        borderColor: 'rgba(255,255,255,.35)', backgroundColor: 'transparent',
+        borderWidth: 2, pointRadius: 3, pointBackgroundColor: 'rgba(255,255,255,.6)',
+        tension: .3, order: 0 }
+    ]},
     options: { ...cd(), scales: {
       x: { grid: { display: false }, ticks: { color: '#606060', font: { size: 10 } } },
-      y: { grid: { color: 'rgba(255,255,255,.04)' }, ticks: { callback: v => 'R$' + v.toFixed(0), color: '#606060', font: { size: 10 } } }
+      y: { grid: { color: 'rgba(255,255,255,.04)' }, ticks: { callback: v => 'R$' + v.toFixed(0), color: '#606060', font: { size: 10 } } },
+      yVol: { position: 'right', grid: { display: false },
+        ticks: { color: '#505050', font: { size: 10 }, callback: v => v + ' j' },
+        title: { display: false } }
     }}
   });
 
@@ -2082,7 +2292,7 @@ function btSimular() {
       <td class="mono" style="text-align:center">${j.min_alerta}'</td>
       <td class="mono" style="text-align:center">${j.entrada}'</td>
       <td class="mono" style="text-align:center">${j.limite}'</td>
-      <td class="mono" style="text-align:center">${j.min_gol > 0 ? j.min_gol + "'" : '—'}</td>
+      <td class="mono" style="text-align:center">${j.primeiroGol > 0 ? j.primeiroGol + "'" : '—'}</td>
       <td class="mono" style="text-align:center;color:${cor};font-weight:700">${res}</td>
       <td class="mono" style="text-align:right;color:${lucroJ >= 0 ? 'var(--green)' : 'var(--red)'}">${lucroJ >= 0 ? '+' : ''}R$${lucroJ.toFixed(2)}</td>
     </tr>`;
