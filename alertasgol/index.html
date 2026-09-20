@@ -1735,11 +1735,13 @@ function renderRankingCamp(rawGolsPosAlerta) {
 // ── análise: placar no alerta ─────────────────────────────────
 function renderPlacarZero(rawGolsPosAlerta) {
   const all = rawGolsPosAlerta.por_placar_zero || [];
-  const sumTotal = all.reduce((s, x) => s + x.total, 0);
-  const minVol   = Math.max(10, Math.round(sumTotal * 0.03));
-  const p        = all.filter(x => x.total >= minVol);
+  // API antiga mandava `total` = qtd de zeros; a nova separa `zeros` do volume
+  const zerosDe = x => x.zeros != null ? x.zeros : x.total;
+  const MIN_SHARE = 0.05;                                   // corte relativo: escala com o filtro
+  const totalZeros = all.reduce((s, x) => s + zerosDe(x), 0);
+  const p = totalZeros ? all.filter(x => zerosDe(x) / totalZeros >= MIN_SHARE) : [];
   const lbl = document.getElementById('placarMinLabel');
-  if (lbl) lbl.textContent = `Exibindo placares com ≥ ${minVol} entradas (3% de ${sumTotal} no filtro atual)`;
+  if (lbl) lbl.textContent = `Exibindo placares que concentram ≥ ${MIN_SHARE * 100}% dos jogos sem gol (${totalZeros} no filtro atual)`;
   destroyC('cPlacarZero');
   charts['cPlacarZero'] = new Chart(document.getElementById('cPlacarZero'), {
     type: 'bar',
@@ -1751,7 +1753,7 @@ function renderPlacarZero(rawGolsPosAlerta) {
       interaction: { mode: 'index', intersect: false },
       plugins: { ...cd().plugins, tooltip: { ...cd().plugins.tooltip, callbacks: {
         label: ctx => ctx.datasetIndex === 0
-          ? ` ${ctx.raw}% sem gol`
+          ? ` ${ctx.raw}% sem gol${p[ctx.dataIndex].zeros != null ? ` (${p[ctx.dataIndex].zeros} de ${p[ctx.dataIndex].total})` : ''}`
           : ` Volume: ${ctx.raw} entradas`
       }}},
       scales: {
