@@ -1805,16 +1805,12 @@ function renderDistPrimGol(raw) {
   });
   destroyC('cDistPrimGolAcum');
   charts['cDistPrimGolAcum'] = new Chart(document.getElementById('cDistPrimGolAcum'), {
-    type: 'line',
+    type: 'bar',
     data: { labels: acumLabels, datasets: [{
       data: acumVals,
-      borderColor: 'rgba(46,204,138,.9)',
-      backgroundColor: 'rgba(46,204,138,.12)',
-      borderWidth: 2,
-      pointRadius: 3,
-      pointBackgroundColor: 'rgba(46,204,138,.9)',
-      fill: true,
-      tension: .35
+      backgroundColor: acumVals.map(v => v <= 60 ? 'rgba(46,204,138,.75)' : 'rgba(240,160,48,.75)'),
+      borderRadius: 3,
+      barPercentage: .8
     }]},
     options: { ...cd(),
       plugins: { ...cd().plugins, tooltip: { ...cd().plugins.tooltip, callbacks: {
