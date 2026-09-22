@@ -937,7 +937,7 @@ footer a:hover{color:var(--green);}
         <div style="width:8px;height:8px;border-radius:50%;background:var(--text3);flex-shrink:0;" id="bt-metodo-triplex-dot"></div>
         <div style="font-size:12px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;" id="bt-metodo-triplex-lbl">Triplex</div>
       </div>
-      <div style="font-size:12px;color:var(--text3);line-height:1.5;">Lay ao Under limite no mercado de gols. Janela de análise: 46'–80' (exposição de 34 min). Alertas com min_alerta acima de 80' são descartados. Stop loss 300%. Dados a partir de 10/10/2025.</div>
+      <div style="font-size:12px;color:var(--text3);line-height:1.5;">Lay ao Under limite no mercado de gols. Janela de análise: 46'–80' (exposição de 34 min). Alertas com min_alerta acima de 82' são descartados. Stop loss 300%. Dados a partir de 10/10/2025.</div>
     </div>
   </div>
 
@@ -2050,7 +2050,7 @@ async function btCalcular() {
         const dt = new Date(+y, +m - 1, +d);
         if (dt < TRIPLEX_INICIO) return false;
         if (usarPeriodo && (dt < dataIni || dt > dataFim)) return false;
-        if (j.min_alerta > 80) return false;
+        if (j.min_alerta > 82) return false;
         return true;
       });
 
@@ -2205,7 +2205,7 @@ function btPreset(tipo) {
 function btLimpar() {
   const isTriplex = window._btMetodo === 'triplex';
   document.getElementById('bt-min-entrada').value    = isTriplex ? 46 : '';
-  document.getElementById('bt-max-entrada').value    = isTriplex ? 80 : '';
+  document.getElementById('bt-max-entrada').value    = isTriplex ? 82 : '';
   document.getElementById('bt-exposicao').value      = isTriplex ? 34 : '';
   document.getElementById('bt-red-valor').value      = isTriplex ? 300 : '';
   document.getElementById('bt-data-ini').value       = '';
