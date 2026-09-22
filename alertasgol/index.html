@@ -937,7 +937,7 @@ footer a:hover{color:var(--green);}
         <div style="width:8px;height:8px;border-radius:50%;background:var(--text3);flex-shrink:0;" id="bt-metodo-triplex-dot"></div>
         <div style="font-size:12px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;" id="bt-metodo-triplex-lbl">Triplex</div>
       </div>
-      <div style="font-size:12px;color:var(--text3);line-height:1.5;">Lay ao Under limite no mercado de gols. Entrada fixa do minuto 45 ao 82. Stop loss 300%. Dados a partir de 10/10/2025.</div>
+      <div style="font-size:12px;color:var(--text3);line-height:1.5;">Lay ao Under limite no mercado de gols. Janela de análise: 46'–80' (exposição de 34 min). Alertas com min_alerta acima de 80' são descartados. Stop loss 300%. Dados a partir de 10/10/2025.</div>
     </div>
   </div>
 
@@ -1735,13 +1735,11 @@ function renderRankingCamp(rawGolsPosAlerta) {
 // ── análise: placar no alerta ─────────────────────────────────
 function renderPlacarZero(rawGolsPosAlerta) {
   const all = rawGolsPosAlerta.por_placar_zero || [];
-  // API antiga mandava `total` = qtd de zeros; a nova separa `zeros` do volume
-  const zerosDe = x => x.zeros != null ? x.zeros : x.total;
-  const MIN_SHARE = 0.05;                                   // corte relativo: escala com o filtro
-  const totalZeros = all.reduce((s, x) => s + zerosDe(x), 0);
-  const p = totalZeros ? all.filter(x => zerosDe(x) / totalZeros >= MIN_SHARE) : [];
+  const sumTotal = all.reduce((s, x) => s + x.total, 0);
+  const minVol   = Math.max(10, Math.round(sumTotal * 0.03));
+  const p        = all.filter(x => x.total >= minVol);
   const lbl = document.getElementById('placarMinLabel');
-  if (lbl) lbl.textContent = `Exibindo placares que concentram ≥ ${MIN_SHARE * 100}% dos jogos sem gol (${totalZeros} no filtro atual)`;
+  if (lbl) lbl.textContent = `Exibindo placares com ≥ ${minVol} entradas (3% de ${sumTotal} no filtro atual)`;
   destroyC('cPlacarZero');
   charts['cPlacarZero'] = new Chart(document.getElementById('cPlacarZero'), {
     type: 'bar',
@@ -1753,7 +1751,7 @@ function renderPlacarZero(rawGolsPosAlerta) {
       interaction: { mode: 'index', intersect: false },
       plugins: { ...cd().plugins, tooltip: { ...cd().plugins.tooltip, callbacks: {
         label: ctx => ctx.datasetIndex === 0
-          ? ` ${ctx.raw}% sem gol${p[ctx.dataIndex].zeros != null ? ` (${p[ctx.dataIndex].zeros} de ${p[ctx.dataIndex].total})` : ''}`
+          ? ` ${ctx.raw}% sem gol`
           : ` Volume: ${ctx.raw} entradas`
       }}},
       scales: {
@@ -2046,19 +2044,19 @@ async function btCalcular() {
     let comResultado;
 
     if (metodo === 'triplex') {
-      // Triplex: apenas jogos a partir de 10/10/2025, ignorar se min_alerta > 55
+      // Triplex: apenas jogos a partir de 10/10/2025, janela 46'–80' (exposição 34 min)
       const filtrados = btDados.filter(j => {
         const [d, m, y] = j.data.split('/');
         const dt = new Date(+y, +m - 1, +d);
         if (dt < TRIPLEX_INICIO) return false;
         if (usarPeriodo && (dt < dataIni || dt > dataFim)) return false;
-        if (j.min_alerta > 55) return false;
+        if (j.min_alerta > 80) return false;
         return true;
       });
 
       comResultado = filtrados.map(j => {
-        const entrada    = Math.max(45, j.min_alerta);
-        const limite     = entrada + 37;
+        const entrada    = Math.max(46, j.min_alerta);
+        const limite     = entrada + 34;
         const golsC      = parsearGols(j.gols_c);
         const golsF      = parsearGols(j.gols_f);
         const todosGols  = golsC.concat(golsF).filter(m => m >= entrada).sort((a,b) => a - b);
@@ -2206,9 +2204,9 @@ function btPreset(tipo) {
 
 function btLimpar() {
   const isTriplex = window._btMetodo === 'triplex';
-  document.getElementById('bt-min-entrada').value    = isTriplex ? 45 : '';
-  document.getElementById('bt-max-entrada').value    = isTriplex ? 55 : '';
-  document.getElementById('bt-exposicao').value      = isTriplex ? 37 : '';
+  document.getElementById('bt-min-entrada').value    = isTriplex ? 46 : '';
+  document.getElementById('bt-max-entrada').value    = isTriplex ? 80 : '';
+  document.getElementById('bt-exposicao').value      = isTriplex ? 34 : '';
   document.getElementById('bt-red-valor').value      = isTriplex ? 300 : '';
   document.getElementById('bt-data-ini').value       = '';
   document.getElementById('bt-data-fim').value       = '';
