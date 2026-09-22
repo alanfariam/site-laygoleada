@@ -1975,6 +1975,7 @@ function btSetMetodo(metodo) {
     fields.forEach(id => { document.getElementById(id).disabled = true; });
     document.getElementById('bt-ignorar-gols-wrap').style.display = 'none';
     document.getElementById('bt-ignorar-gols-tip').style.display  = 'none';
+    document.getElementById('bt-max-entrada').parentElement.style.display = 'none';
   } else {
     ffCard.style.borderColor = 'var(--green)';
     ffCard.style.background  = 'rgba(46,204,138,.07)';
@@ -1987,6 +1988,7 @@ function btSetMetodo(metodo) {
     fields.forEach(id => { document.getElementById(id).disabled = false; });
     document.getElementById('bt-ignorar-gols-wrap').style.display = 'flex';
     document.getElementById('bt-ignorar-gols-tip').style.display  = '';
+    document.getElementById('bt-max-entrada').parentElement.style.display = '';
     document.getElementById('bt-min-entrada').value = 37;
     document.getElementById('bt-max-entrada').value = 60;
     document.getElementById('bt-exposicao').value   = 38;
@@ -2001,17 +2003,20 @@ async function btCalcular() {
   const exp  = parseInt(document.getElementById('bt-exposicao').value);
   const erro = document.getElementById('bt-erro');
 
-  if (isNaN(minE) || isNaN(maxE) || isNaN(exp)) {
-    erro.textContent = 'Preencha todos os três campos antes de calcular.';
-    erro.style.display = 'block'; return;
-  }
-  if (minE >= maxE) {
-    erro.textContent = 'Minuto Mínimo deve ser menor que o Minuto Máximo.';
-    erro.style.display = 'block'; return;
-  }
-  if (exp <= 0) {
-    erro.textContent = 'Tempo de Exposição deve ser maior que zero.';
-    erro.style.display = 'block'; return;
+  const isTriplex = window._btMetodo === 'triplex';
+  if (!isTriplex) {
+    if (isNaN(minE) || isNaN(maxE) || isNaN(exp)) {
+      erro.textContent = 'Preencha todos os três campos antes de calcular.';
+      erro.style.display = 'block'; return;
+    }
+    if (minE >= maxE) {
+      erro.textContent = 'Minuto Mínimo deve ser menor que o Minuto Máximo.';
+      erro.style.display = 'block'; return;
+    }
+    if (exp <= 0) {
+      erro.textContent = 'Tempo de Exposição deve ser maior que zero.';
+      erro.style.display = 'block'; return;
+    }
   }
   erro.style.display = 'none';
 
