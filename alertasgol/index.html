@@ -767,28 +767,6 @@ footer a:hover{color:var(--green);}
     </div>
   </div>
 
-  <!-- DISTRIBUIÇÃO POR MINUTO DO JOGO POS 46 -->
-  <div class="section" style="padding-top:8px;padding-bottom:48px;">
-    <div class="section-title">
-      Primeiro gol após o minuto 46 — em qual faixa ocorre?
-      <span class="bt-tip" title="Considera todas as colunas de gols (casa + fora) e busca o primeiro gol em qualquer equipe a partir do minuto 46. Partidas sem gol após o minuto 46 são contabilizadas como 'Sem gol'. Faixas de 10 em 10 minutos.">ⓘ</span>
-    </div>
-    <div style="font-size:0.72rem;color:#778899;margin-bottom:12px;">
-      Lê todas as colunas de gols da partida — não apenas o primeiro gol registrado
-    </div>
-    <div class="charts">
-      <div class="card" style="height:300px;">
-        <div class="card-title">% de partidas por faixa de minuto</div>
-        <canvas id="cDistMinGol"></canvas>
-      </div>
-      <div class="card" style="height:300px;">
-        <div class="card-title">% acumulado — partidas com gol até o minuto</div>
-        <canvas id="cAcumMinGol"></canvas>
-      </div>
-    </div>
-    <div id="golPos46Total" style="font-size:0.68rem;color:#556070;text-align:right;margin-top:6px;"></div>
-  </div>
-
   <!-- Todos os gols pós-alerta por minuto -->
   <div class="section" style="padding-top:8px;padding-bottom:48px;">
     <div class="section-title">
@@ -809,6 +787,28 @@ footer a:hover{color:var(--green);}
       </div>
     </div>
     <div id="todosGolsTotal" style="font-size:0.68rem;color:#556070;text-align:right;margin-top:6px;"></div>
+  </div>
+
+  <!-- DISTRIBUIÇÃO POR MINUTO DO JOGO POS 46 -->
+  <div class="section" style="padding-top:8px;padding-bottom:48px;">
+    <div class="section-title">
+      Primeiro gol após o minuto 46 — em qual faixa ocorre?
+      <span class="bt-tip" title="Considera todas as colunas de gols (casa + fora) e busca o primeiro gol em qualquer equipe a partir do minuto 46. Partidas sem gol após o minuto 46 são contabilizadas como 'Sem gol'. Faixas de 10 em 10 minutos.">ⓘ</span>
+    </div>
+    <div style="font-size:0.72rem;color:#778899;margin-bottom:12px;">
+      Lê todas as colunas de gols da partida — não apenas o primeiro gol registrado
+    </div>
+    <div class="charts">
+      <div class="card" style="height:300px;">
+        <div class="card-title">% de partidas por faixa de minuto</div>
+        <canvas id="cDistMinGol"></canvas>
+      </div>
+      <div class="card" style="height:300px;">
+        <div class="card-title">% acumulado — partidas com gol até o minuto</div>
+        <canvas id="cAcumMinGol"></canvas>
+      </div>
+    </div>
+    <div id="golPos46Total" style="font-size:0.68rem;color:#556070;text-align:right;margin-top:6px;"></div>
   </div>
 
 </div><!-- /page-analise -->
