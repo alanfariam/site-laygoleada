@@ -767,22 +767,26 @@ footer a:hover{color:var(--green);}
     </div>
   </div>
 
-  <!-- DISTRIBUIÇÃO POR MINUTO DO JOGO -->
+  <!-- DISTRIBUIÇÃO POR MINUTO DO JOGO POS 46 -->
   <div class="section" style="padding-top:8px;padding-bottom:48px;">
     <div class="section-title">
-      Distribuição do 1º gol pós-alerta por minuto do jogo
-      <span class="bt-tip" title="Considera apenas o primeiro gol marcado após o alerta, e mostra em qual minuto real da partida ele ocorreu (ex: 75', 82'). Diferente dos gráficos acima, que mostram quantos minutos decorreram entre o alerta e o gol.">ⓘ</span>
+      Primeiro gol após o minuto 46 — em qual faixa ocorre?
+      <span class="bt-tip" title="Considera todas as colunas de gols (casa + fora) e busca o primeiro gol em qualquer equipe a partir do minuto 46. Partidas sem gol após o minuto 46 são contabilizadas como 'Sem gol'. Faixas de 10 em 10 minutos.">ⓘ</span>
+    </div>
+    <div style="font-size:0.72rem;color:#778899;margin-bottom:12px;">
+      Lê todas as colunas de gols da partida — não apenas o primeiro gol registrado
     </div>
     <div class="charts">
       <div class="card" style="height:300px;">
-        <div class="card-title">% por faixa de minuto (sem acumular)</div>
+        <div class="card-title">% de partidas por faixa de minuto</div>
         <canvas id="cDistMinGol"></canvas>
       </div>
       <div class="card" style="height:300px;">
-        <div class="card-title">% acumulado por faixa de minuto</div>
+        <div class="card-title">% acumulado — partidas com gol até o minuto</div>
         <canvas id="cAcumMinGol"></canvas>
       </div>
     </div>
+    <div id="golPos46Total" style="font-size:0.68rem;color:#556070;text-align:right;margin-top:6px;"></div>
   </div>
 
   <!-- Todos os gols pós-alerta por minuto -->
@@ -1854,36 +1858,44 @@ function renderDistPrimGol(raw) {
   });
 }
 
-// ── análise: dist + acumulado por minuto ─────────────────────
+// ── análise: primeiro gol pós 46 por faixa ───────────────────
 function renderMinutoGols(raw) {
-  const acum = raw.acumulado_min_gol || [];
-  if (!acum.length) return;
-  const labels   = acum.map(x => x.faixa);
-  const acumPcts = acum.map(x => x.pct);
-  const distPcts = acumPcts.map((v, i) => round1(v - (i === 0 ? 0 : acumPcts[i-1])));
+  const faixas  = raw.faixas || [];
+  const acumArr = raw.acumulado || [];
+  if (!faixas.length) return;
+
+  const el = document.getElementById('golPos46Total');
+  if (el) el.textContent = `${(raw.total||0).toLocaleString('pt-BR')} partidas · ${raw.sem_gol||0} sem gol após min 46`;
+
+  const distLabels = faixas.map(f => f.faixa);
+  const distPcts   = faixas.map(f => f.pct);
+  const distColors = faixas.map(f => f.faixa === 'Sem gol' ? 'rgba(240,90,90,.65)' : 'rgba(46,204,138,.75)');
 
   destroyC('cDistMinGol');
   charts['cDistMinGol'] = new Chart(document.getElementById('cDistMinGol'), {
     type: 'bar',
-    data: { labels, datasets: [{ data: distPcts, backgroundColor: distPcts.map(v => v >= 10 ? 'rgba(46,204,138,.75)' : 'rgba(240,160,48,.75)'), borderRadius: 3, barPercentage: .85 }] },
+    data: { labels: distLabels, datasets: [{ data: distPcts, backgroundColor: distColors, borderRadius: 3, barPercentage: .85 }] },
     options: { ...cd(),
-      plugins: { ...cd().plugins, tooltip: { ...cd().plugins.tooltip, callbacks: { label: ctx => ` ${ctx.raw}% dos jogos` }}},
+      plugins: { ...cd().plugins, tooltip: { ...cd().plugins.tooltip, callbacks: { label: ctx => ` ${ctx.raw}% das partidas` }}},
       scales: {
         y: { ticks: { callback: v => v+'%', color: '#556070', font: {size:10} }, grid: { color: 'rgba(255,255,255,.04)' } },
-        x: { ticks: { color: '#8A96A3', font: {size:9}, maxRotation: 45 }, grid: { display: false } }
+        x: { ticks: { color: '#8A96A3', font: {size:9}, maxRotation: 0 }, grid: { display: false } }
       }
     }
   });
 
+  const acumLabels = acumArr.map(a => a.faixa);
+  const acumPcts   = acumArr.map(a => a.pct);
+
   destroyC('cAcumMinGol');
   charts['cAcumMinGol'] = new Chart(document.getElementById('cAcumMinGol'), {
     type: 'bar',
-    data: { labels, datasets: [{ data: acumPcts, backgroundColor: acumPcts.map(v => v <= 60 ? 'rgba(46,204,138,.75)' : 'rgba(240,160,48,.75)'), borderRadius: 3, barPercentage: .85 }] },
+    data: { labels: acumLabels, datasets: [{ data: acumPcts, backgroundColor: acumPcts.map(v => v <= 60 ? 'rgba(46,204,138,.75)' : 'rgba(240,160,48,.75)'), borderRadius: 3, barPercentage: .85 }] },
     options: { ...cd(),
-      plugins: { ...cd().plugins, tooltip: { ...cd().plugins.tooltip, callbacks: { label: ctx => ` ${ctx.raw}% acumulado` }}},
+      plugins: { ...cd().plugins, tooltip: { ...cd().plugins.tooltip, callbacks: { label: ctx => ` ${ctx.raw}% das partidas com gol` }}},
       scales: {
         y: { min:0, max:100, ticks: { callback: v => v+'%', color: '#556070', font: {size:10} }, grid: { color: 'rgba(255,255,255,.04)' } },
-        x: { ticks: { color: '#8A96A3', font: {size:9}, maxRotation: 45 }, grid: { display: false } }
+        x: { ticks: { color: '#8A96A3', font: {size:9}, maxRotation: 0 }, grid: { display: false } }
       }
     }
   });
@@ -2622,7 +2634,7 @@ async function lazyAnalise(mes = '') {
     const [golsPosAlerta, distPrimGol, intervaloGols, todosGols] = await Promise.all([
       fetchJson('/api/gols-pos-alerta' + q).catch(() => null),
       fetchJson('/api/dist-primeiro-gol' + q).catch(() => null),
-      fetchJson('/api/intervalo-gols' + q).catch(() => null),
+      fetchJson('/api/gol-pos46' + q).catch(() => null),
       fetchJson('/api/dist-todos-gols' + q).catch(() => null),
     ]);
     if (golsPosAlerta) {
