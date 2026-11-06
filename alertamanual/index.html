@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Alerta Manual — Free Fire</title>
+<style>
+  :root {
+    --bg: #0d0d0d;
+    --surface: #161616;
+    --surface2: #1e1e1e;
+    --border: #2a2a2a;
+    --green: #2ECC8A;
+    --green-dim: rgba(46,204,138,.12);
+    --text: #e8e8e8;
+    --muted: #777;
+    --red: #e55;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', system-ui, sans-serif; min-height: 100vh; }
+
+  header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  header h1 { font-size: 16px; font-weight: 600; color: var(--green); }
+  header span { font-size: 12px; color: var(--muted); background: var(--surface2); padding: 3px 8px; border-radius: 4px; }
+
+  .layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    min-height: calc(100vh - 57px);
+  }
+
+  .panel {
+    padding: 24px;
+    border-right: 1px solid var(--border);
+    overflow-y: auto;
+  }
+  .panel:last-child { border-right: none; }
+
+  h2 { font-size: 13px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 16px; }
+
+  .field { margin-bottom: 14px; }
+  label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 5px; font-weight: 500; }
+  input {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text);
+    padding: 8px 10px;
+    font-size: 14px;
+    transition: border-color .15s;
+    outline: none;
+  }
+  input:focus { border-color: var(--green); }
+  input::placeholder { color: #444; }
+
+  .row { display: grid; gap: 10px; }
+  .row-2 { grid-template-columns: 1fr 1fr; }
+  .row-4 { grid-template-columns: 1fr 1fr 1fr 1fr; }
+
+  .url-field { font-size: 12px; }
+
+  .preview-box {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+    font-family: 'Courier New', monospace;
+    font-size: 14px;
+    line-height: 1.8;
+    white-space: pre-wrap;
+    min-height: 220px;
+    color: var(--text);
+    margin-bottom: 20px;
+  }
+
+  .btn-send {
+    width: 100%;
+    background: var(--green);
+    color: #000;
+    border: none;
+    border-radius: 8px;
+    padding: 14px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: opacity .15s, transform .1s;
+  }
+  .btn-send:hover { opacity: .9; }
+  .btn-send:active { transform: scale(.98); }
+  .btn-send:disabled { opacity: .4; cursor: not-allowed; }
+
+  .status {
+    margin-top: 12px;
+    padding: 10px 14px;
+    border-radius: 6px;
+    font-size: 13px;
+    display: none;
+  }
+  .status.ok { background: var(--green-dim); border: 1px solid rgba(46,204,138,.3); color: var(--green); display: block; }
+  .status.err { background: rgba(238,85,85,.1); border: 1px solid rgba(238,85,85,.3); color: var(--red); display: block; }
+
+  .divider { border: none; border-top: 1px solid var(--border); margin: 20px 0; }
+
+  .link-hint { font-size: 11px; color: var(--muted); margin-top: 4px; word-break: break-all; }
+  .link-hint span { color: var(--green); }
+  .link-hint .err { color: var(--red); }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🚨 Alerta Manual</h1>
+  <span>FREE FIRE 9</span>
+</header>
+
+<div class="layout">
+
+  <div class="panel">
+    <h2>Dados do Jogo</h2>
+
+    <div class="field">
+      <label>URL do Jogo (Robotip)</label>
+      <input id="url" class="url-field" type="text" placeholder="https://robotip.com.br/jogo/879678892/..." oninput="update()">
+      <div class="link-hint" id="link-hint"></div>
+    </div>
+
+    <div class="field">
+      <label>Campeonato</label>
+      <input id="campeonato" type="text" placeholder="AFC Champions League Two" oninput="update()">
+    </div>
+
+    <div class="field">
+      <label>Time Casa · Placar · Time Fora</label>
+      <div style="display:grid;grid-template-columns:2fr 60px 32px 60px 2fr;align-items:center;gap:8px;">
+        <input id="time_casa" type="text" placeholder="Time Casa" oninput="update()">
+        <input id="placar_casa" type="number" placeholder="0" min="0" oninput="update()" style="text-align:center;">
+        <div style="text-align:center;color:var(--muted);font-weight:700;">x</div>
+        <input id="placar_fora" type="number" placeholder="0" min="0" oninput="update()" style="text-align:center;">
+        <input id="time_fora" type="text" placeholder="Time Fora" oninput="update()">
+      </div>
+    </div>
+
+    <div class="row row-2">
+      <div class="field">
+        <label>Minuto</label>
+        <input id="minuto" type="number" placeholder="66" min="1" max="120" oninput="update()">
+      </div>
+      <div class="field">
+        <label>Posição na Tabela (Casa - Fora)</label>
+        <div style="display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:6px;">
+          <input id="pos_casa" type="number" placeholder="1" min="1" oninput="update()" style="text-align:center;">
+          <span style="color:var(--muted);">-</span>
+          <input id="pos_fora" type="number" placeholder="3" min="1" oninput="update()" style="text-align:center;">
+        </div>
+      </div>
+    </div>
+
+    <hr class="divider">
+    <h2>Odds Pré-Jogo</h2>
+
+    <div class="row row-4">
+      <div class="field">
+        <label>C (Casa)</label>
+        <input id="odd_c" type="number" step="0.001" placeholder="1.285" oninput="update()">
+      </div>
+      <div class="field">
+        <label>E (Empate)</label>
+        <input id="odd_e" type="number" step="0.001" placeholder="5.25" oninput="update()">
+      </div>
+      <div class="field">
+        <label>F (Fora)</label>
+        <input id="odd_f" type="number" step="0.001" placeholder="7.0" oninput="update()">
+      </div>
+      <div class="field">
+        <label>U25</label>
+        <input id="odd_u25" type="number" step="0.001" placeholder="2.339" oninput="update()">
+      </div>
+    </div>
+
+    <hr class="divider">
+    <h2>P1/P2</h2>
+
+    <div class="row row-4">
+      <div class="field">
+        <label>P1 (Casa)</label>
+        <input id="p1" type="number" step="0.1" placeholder="30.2" oninput="update()">
+      </div>
+      <div class="field">
+        <label>P2 (Fora)</label>
+        <input id="p2" type="number" step="0.1" placeholder="29.8" oninput="update()">
+      </div>
+      <div class="field">
+        <label>G1 (Casa)</label>
+        <input id="g1" type="number" placeholder="6" oninput="update()">
+      </div>
+      <div class="field">
+        <label>G2 (Fora)</label>
+        <input id="g2" type="number" placeholder="6" oninput="update()">
+      </div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2>Preview da Mensagem</h2>
+
+    <div class="preview-box" id="preview">Preencha os campos ao lado para ver o preview...</div>
+
+    <button class="btn-send" id="btn-send" onclick="enviar()">
+      Enviar para o Grupo Free Fire
+    </button>
+
+    <div class="status" id="status"></div>
+  </div>
+
+</div>
+
+<script>
+const API = 'https://api.laygoleada.com.br/adm/api/enviar-alerta';
+
+function v(id) { return document.getElementById(id).value.trim(); }
+
+function extractId(url) {
+  const m = url.match(/robotip\.com\.br\/jogo\/(\d+)/);
+  return m ? m[1] : null;
+}
+
+function fmtOdd(val) {
+  if (!val) return '?';
+  const n = parseFloat(val);
+  if (isNaN(n)) return val;
+  let s = n.toFixed(3);
+  s = s.replace(/0+$/, '').replace(/\.$/, '');
+  return s;
+}
+
+function build() {
+  const url     = v('url');
+  const camp    = v('campeonato');
+  const tCasa   = v('time_casa');
+  const tFora   = v('time_fora');
+  const pCasa   = v('placar_casa');
+  const pFora   = v('placar_fora');
+  const min     = v('minuto');
+  const posCasa = v('pos_casa');
+  const posFora = v('pos_fora');
+  const oddC    = v('odd_c');
+  const oddE    = v('odd_e');
+  const oddF    = v('odd_f');
+  const oddU25  = v('odd_u25');
+  const p1      = v('p1');
+  const p2      = v('p2');
+  const g1      = v('g1');
+  const g2      = v('g2');
+
+  const gameId  = extractId(url);
+  const link    = gameId ? `https://robotip.com.br/jogo/${gameId}` : (url || '?');
+
+  const placar  = (pCasa !== '' && pFora !== '') ? `${pCasa} x ${pFora}` : '? x ?';
+  const jogo    = (tCasa || tFora) ? `${tCasa || '?'} ${placar} ${tFora || '?'}` : `? ${placar} ?`;
+  const tabela  = (posCasa && posFora) ? `${posCasa}º - ${posFora}º` : '?º - ?º';
+  const pre     = `C: ${fmtOdd(oddC)} - E: ${fmtOdd(oddE)} - F: ${fmtOdd(oddF)} - U25: ${fmtOdd(oddU25)}`;
+  const p1p2    = `${p1 || '?'} - ${p2 || '?'} / ${g1 || '?'} - ${g2 || '?'}`;
+
+  return [
+    '🚨OPORTUNIDADE FREE FIRE 9',
+    `🏟 ${camp || '?'}`,
+    `⚽️ ${jogo} `,
+    `⏰ Tempo: ${min || '?'}''`,
+    `📈 Posição na Tabela: ${tabela}`,
+    `📉 Pré: ${pre}`,
+    `🧠 P1/P2: ${p1p2}`,
+    '',
+    `📍 Link do Jogo: ${link}`,
+  ].join('\n');
+}
+
+function update() {
+  const url = v('url');
+  const gameId = extractId(url);
+  const hint = document.getElementById('link-hint');
+
+  if (url && gameId) {
+    hint.innerHTML = `Link: <span>https://robotip.com.br/jogo/${gameId}</span>`;
+  } else if (url) {
+    hint.innerHTML = '<span class="err">URL inválida — precisa conter /jogo/{id}</span>';
+  } else {
+    hint.innerHTML = '';
+  }
+
+  document.getElementById('preview').textContent = build();
+  document.getElementById('status').className = 'status';
+}
+
+async function enviar() {
+  const url = v('url');
+  const status = document.getElementById('status');
+
+  if (!extractId(url)) {
+    status.textContent = 'Informe uma URL válida do Robotip.';
+    status.className = 'status err';
+    return;
+  }
+
+  const btn = document.getElementById('btn-send');
+  btn.disabled = true;
+  btn.textContent = 'Enviando...';
+  status.className = 'status';
+
+  try {
+    const r = await fetch(API, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ mensagem: build() })
+    });
+    const data = await r.json();
+
+    if (data.ok) {
+      status.textContent = '✓ Alerta enviado para o grupo!';
+      status.className = 'status ok';
+    } else {
+      status.textContent = `Erro: ${data.error || 'resposta inesperada'}`;
+      status.className = 'status err';
+    }
+  } catch (e) {
+    status.textContent = `Erro de conexão: ${e.message}`;
+    status.className = 'status err';
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Enviar para o Grupo Free Fire';
+  }
+}
+</script>
+</body>
+</html>
